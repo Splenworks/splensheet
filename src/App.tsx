@@ -1,13 +1,16 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import DragDropArea from "./DragDropArea"
 import Footer from "./Footer"
 import Header from "./Header"
 import { useFullScreen } from "./hooks/useFullScreen"
-// import { FullScreenProvider } from "./providers/FullScreenProvider"
+import { FullScreenProvider } from "./providers/FullScreenProvider"
 import { isMac } from "./utils/isMac"
+import ExcelEditor from "./ExcelEditor"
+import ExcelJS from "exceljs"
 
 function App() {
   const { toggleFullScreen } = useFullScreen()
+  const [workbook, setWorkbook] = useState<ExcelJS.Workbook | null>(null)
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -28,10 +31,21 @@ function App() {
     }
   }, [toggleFullScreen])
 
+  if (workbook) {
+    return (
+      <FullScreenProvider>
+        <ExcelEditor
+          workbook={workbook}
+          onClose={() => setWorkbook(null)}
+        />
+      </FullScreenProvider>
+    )
+  }
+
   return (
     <>
       <Header />
-      <DragDropArea />
+      <DragDropArea setWorkbook={setWorkbook} />
       <Footer />
     </>
   )

@@ -4,8 +4,13 @@ import { twJoin, twMerge } from "tailwind-merge"
 import { useMediaQuery } from "usehooks-ts"
 import SheetIcon from "./assets/icons/sheet.svg?react"
 import Spinner from "./Spinner"
+import ExcelJS from "exceljs"
 
-const DragDropArea: React.FC = () => {
+interface DragDropAreaProps {
+  setWorkbook: (workbook: ExcelJS.Workbook) => void
+}
+
+const DragDropArea: React.FC<DragDropAreaProps> = ({ setWorkbook }) => {
   const [dragging, setDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [loading, setLoading] = useState(false)
@@ -31,9 +36,30 @@ const DragDropArea: React.FC = () => {
     if (loading) return
     setLoading(true)
     const items = e.dataTransfer.items
-    console.log("🚀 ~ handleDrop ~ items:", items)
     try {
-      // TODO: Handle files dropped from the desktop
+      if (items.length === 0) {
+        throw new Error("No files dropped.")
+      }
+      const file = items[0].getAsFile()
+      if (!file) {
+        throw new Error("No valid file found in the drop.")
+      }
+      if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".csv")) {
+        throw new Error("Please upload a valid Excel (.xlsx) or CSV file.")
+      }
+      const workbook = new ExcelJS.Workbook()
+      if (file.name.endsWith(".xlsx")) {
+        const arrayBuffer = await file.arrayBuffer();
+        await workbook.xlsx.load(arrayBuffer);
+      } else if (file.name.endsWith(".csv")) {
+        const csvData = await file.text()
+        const worksheet = workbook.addWorksheet("Sheet1")
+        csvData.split("\n").forEach((row) => {
+          const values = row.split(",")
+          worksheet.addRow(values)
+        })
+      }
+      setWorkbook(workbook)
     } catch (error) {
       alert(error instanceof Error ? error.message : error)
       console.error(error)
@@ -50,11 +76,27 @@ const DragDropArea: React.FC = () => {
   const handleFileInputChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const files = Array.from(e.target.files || [])
-    console.log("🚀 ~ files:", files)
     setLoading(true)
     try {
-      // TODO: Handle files selected from the file input
+      const files = Array.from(e.target.files || [])
+      const file = files[0]
+      if (!file) return
+      if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".csv")) {
+        throw new Error("Please upload a valid Excel (.xlsx) or CSV file.")
+      }
+      const workbook = new ExcelJS.Workbook()
+      if (file.name.endsWith(".xlsx")) {
+        const arrayBuffer = await file.arrayBuffer();
+        await workbook.xlsx.load(arrayBuffer);
+      } else if (file.name.endsWith(".csv")) {
+        const csvData = await file.text()
+        const worksheet = workbook.addWorksheet("Sheet1")
+        csvData.split("\n").forEach((row) => {
+          const values = row.split(",")
+          worksheet.addRow(values)
+        })
+      }
+      setWorkbook(workbook)
     } catch (error) {
       alert(error instanceof Error ? error.message : error)
       console.error(error)
@@ -79,8 +121,8 @@ const DragDropArea: React.FC = () => {
       >
         <input
           type="file"
-          multiple
-          accept="image/*, .zip"
+          multiple={false}
+          accept="xlsx, .csv"
           hidden
           ref={fileInputRef}
           onChange={handleFileInputChange}
