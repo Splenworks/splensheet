@@ -122,7 +122,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({ setWorkbook }) => {
         <input
           type="file"
           multiple={false}
-          accept="xlsx, .csv"
+          accept=".xlsx, .csv"
           hidden
           ref={fileInputRef}
           onChange={handleFileInputChange}
