@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react"
 import { Trans } from "react-i18next"
 import { twJoin, twMerge } from "tailwind-merge"
 import { useMediaQuery } from "usehooks-ts"
-import PictureIcon from "./assets/icons/picture.svg?react"
+import SheetIcon from "./assets/icons/sheet.svg?react"
 import Spinner from "./Spinner"
 
 const DragDropArea: React.FC = () => {
@@ -100,7 +100,7 @@ const DragDropArea: React.FC = () => {
               </p>
             ) : (
               <div className="flex flex-col items-center justify-center">
-                <PictureIcon className="mb-8 h-24 w-24" />
+                <SheetIcon className="mb-8 h-32 w-32" />
                 <p className="mb-4 text-center text-xl font-bold">
                   <Trans
                     i18nKey="dragDropArea.mainMessage"
