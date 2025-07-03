@@ -1,0 +1,29 @@
+{
+  "header": {
+    "goBack": "Go Back"
+  },
+  "dragDropArea": {
+    "dropHere": "Drop here",
+    "mainMessage": "Drag and drop any <u>image</u> files here!",
+    "subMessage": "You can drop <u>zip files</u> or <u>folders</u> too.",
+    "noImageFilesFound": "No image files found.",
+    "neverStoreYourData": "We never store your files in the server."
+  },
+  "footer": {
+    "checkOutProduct": "Check out our other product <link />"
+  },
+  "messages": {
+    "reachedEnd": "You have reached the end of the list.",
+    "reachedBeginning": "You have reached the beginning of the list.",
+    "pressTab": "Press [tab] to reveal more information.",
+    "longTouch": "Press anywhere and hold for 1 sec to reveal more information."
+  },
+  "others": {
+    "ad": "Ad",
+    "close": "Close",
+    "exit": "Exit",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit Fullscreen",
+    "toggleDarkMode": "Toggle Dark Mode"
+  }
+}

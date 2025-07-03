@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" class="dark:bg-neutral-900">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/src/assets/icons/favicon.svg"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="keywords"
+      content="image, viewer, splenview, simple, comic book, honeyview, browser"
+    />
+    <meta
+      name="description"
+      content="SplenView is a simple image viewer like HoneyView but in the browser. We never store your data in our server. This app only runs in your browser."
+    />
+    <meta
+      name="google-site-verification"
+      content="PMVsN4OCj-jq8ye7ql72Fxsamy-nTy6SwoGTbFlFPIQ"
+    />
+    <script>
+      if (
+        localStorage.theme === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        document.documentElement.classList.add("dark")
+      } else {
+        document.documentElement.classList.remove("dark")
+      }
+    </script>
+    <script
+      defer
+      data-domain="splenview.com"
+      src="https://plausible.io/js/script.js"
+    ></script>
+    <title>SplenView - Free Online Image Viewer</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

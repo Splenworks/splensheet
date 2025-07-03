@@ -1,0 +1,29 @@
+{
+  "header": {
+    "goBack": "戻る"
+  },
+  "dragDropArea": {
+    "dropHere": "ここにドロップしてください",
+    "mainMessage": "ここに<u>イメージ</u>ファイルをドロップしてください！",
+    "subMessage": "複数の<u>zipファイル</u>や、<u>フォルダ</u>も可能です。",
+    "noImageFilesFound": "イメージファイルが見つかりません。",
+    "neverStoreYourData": "お客様のデータをサーバに保存することは決してありません。"
+  },
+  "footer": {
+    "checkOutProduct": "弊社の他のプロダクト<link />もご確認ください"
+  },
+  "messages": {
+    "reachedEnd": "リストの最後です。",
+    "reachedBeginning": "リストの最初です。",
+    "pressTab": "[tab]を押すと詳細情報が表示されます。",
+    "longTouch": "1秒以上長く押すと、詳細情報が表示されます。"
+  },
+  "others": {
+    "ad": "広告",
+    "close": "閉じる",
+    "exit": "終了",
+    "fullscreen": "フルスクリーン",
+    "exitFullscreen": "フルスクリーンを終了",
+    "toggleDarkMode": "ダークモード切替"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "header": {
+    "goBack": "돌아가기"
+  },
+  "dragDropArea": {
+    "dropHere": "여기에 드롭하세요",
+    "mainMessage": "여기에 당신의 <u>이미지</u> 파일을 드래그 드롭하세요!",
+    "subMessage": "여러 <u>zip 파일</u>이나 심지어 <u>폴더</u>도 가능합니다.",
+    "noImageFilesFound": "이미지 파일을 찾을 수 없습니다.",
+    "neverStoreYourData": "저희는 절대로 파일 정보를 서버에 저장하지 않습니다."
+  },
+  "footer": {
+    "checkOutProduct": "우리의 다른 제품 <link />도 확인해보세요"
+  },
+  "messages": {
+    "reachedEnd": "마지막 이미지입니다.",
+    "reachedBeginning": "첫번째 이미지입니다.",
+    "pressTab": "자세한 정보를 보려면 [tab]을 누르세요.",
+    "longTouch": "자세한 정보를 보려면 1초 이상 길게 누르세요."
+  },
+  "others": {
+    "ad": "광고",
+    "close": "닫기",
+    "exit": "나가기",
+    "fullscreen": "전체화면",
+    "exitFullscreen": "전체화면 나가기",
+    "toggleDarkMode": "다크 모드 전환"
+  }
+}
