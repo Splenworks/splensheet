@@ -1,24 +1,14 @@
 import React, { useRef, useState } from "react"
-import { Trans, useTranslation } from "react-i18next"
+import { Trans } from "react-i18next"
 import { twJoin, twMerge } from "tailwind-merge"
 import { useMediaQuery } from "usehooks-ts"
 import PictureIcon from "./assets/icons/picture.svg?react"
 import Spinner from "./Spinner"
-import { FileList } from "./types/FileList"
-import {
-  getImageFiles,
-  getImageFilesFromDataTransfer,
-} from "./utils/getImageFiles"
 
-interface DragDropAreaProps {
-  setFileList: React.Dispatch<React.SetStateAction<FileList>>
-}
-
-const DragDropArea: React.FC<DragDropAreaProps> = ({ setFileList }) => {
+const DragDropArea: React.FC = () => {
   const [dragging, setDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [loading, setLoading] = useState(false)
-  const { t } = useTranslation()
   const smallScreen = useMediaQuery("(max-width: 640px) or (max-height: 640px)")
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
@@ -41,11 +31,9 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({ setFileList }) => {
     if (loading) return
     setLoading(true)
     const items = e.dataTransfer.items
+    console.log("🚀 ~ handleDrop ~ items:", items)
     try {
-      const imageFileList = await getImageFilesFromDataTransfer(items)
-      if (imageFileList.length === 0)
-        throw new Error(t("dragDropArea.noImageFilesFound"))
-      setFileList(imageFileList)
+      // TODO: Handle files dropped from the desktop
     } catch (error) {
       alert(error instanceof Error ? error.message : error)
       console.error(error)
@@ -63,12 +51,10 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({ setFileList }) => {
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const files = Array.from(e.target.files || [])
+    console.log("🚀 ~ files:", files)
     setLoading(true)
     try {
-      const imageFileList = await getImageFiles(files)
-      if (imageFileList.length === 0)
-        throw new Error(t("dragDropArea.noImageFilesFound"))
-      setFileList(imageFileList)
+      // TODO: Handle files selected from the file input
     } catch (error) {
       alert(error instanceof Error ? error.message : error)
       console.error(error)
@@ -83,7 +69,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({ setFileList }) => {
         className={twJoin(
           "absolute inset-x-8 inset-y-0 flex cursor-pointer items-center justify-center rounded-xl border-4 border-dashed border-gray-300 transition-colors duration-300 ease-in-out md:inset-x-16",
           (dragging || loading) &&
-            "border-pink-900 bg-neutral-200 dark:border-pink-700 dark:bg-neutral-600",
+          "border-pink-900 bg-neutral-200 dark:border-pink-700 dark:bg-neutral-600",
         )}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
@@ -123,14 +109,14 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({ setFileList }) => {
                     }}
                   />
                 </p>
-                <p className="mb-4 text-center text-lg font-semibold">
+                {/* <p className="mb-4 text-center text-lg font-semibold">
                   <Trans
                     i18nKey="dragDropArea.subMessage"
                     components={{
                       u: <span className="text-pink-900 dark:text-pink-700" />,
                     }}
                   />
-                </p>
+                </p> */}
                 {!smallScreen && (
                   <p className="text-center text-gray-800 dark:text-gray-300">
                     <Trans i18nKey="dragDropArea.neverStoreYourData" />

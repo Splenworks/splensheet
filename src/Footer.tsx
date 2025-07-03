@@ -11,6 +11,10 @@ const otherProducts = [
     name: "txtpad.io",
     url: "https://txtpad.io",
   },
+  {
+    name: "SplenView",
+    url: "https://splenview.com",
+  }
 ]
 
 const Footer: React.FC = () => {

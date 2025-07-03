@@ -4,9 +4,9 @@
   },
   "dragDropArea": {
     "dropHere": "Drop here",
-    "mainMessage": "Drag and drop any <u>image</u> files here!",
+    "mainMessage": "Drag and drop any <u>spreadsheet</u> files here!",
     "subMessage": "You can drop <u>zip files</u> or <u>folders</u> too.",
-    "noImageFilesFound": "No image files found.",
+    "noImageFilesFound": "No spreadsheet files found.",
     "neverStoreYourData": "We never store your files in the server."
   },
   "footer": {

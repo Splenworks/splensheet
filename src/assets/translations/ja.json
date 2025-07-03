@@ -4,9 +4,9 @@
   },
   "dragDropArea": {
     "dropHere": "ここにドロップしてください",
-    "mainMessage": "ここに<u>イメージ</u>ファイルをドロップしてください！",
+    "mainMessage": "ここに<u>スプレッドシート</u>ファイルをドロップしてください！",
     "subMessage": "複数の<u>zipファイル</u>や、<u>フォルダ</u>も可能です。",
-    "noImageFilesFound": "イメージファイルが見つかりません。",
+    "noImageFilesFound": "スプレッドシートファイルが見つかりません。",
     "neverStoreYourData": "お客様のデータをサーバに保存することは決してありません。"
   },
   "footer": {
