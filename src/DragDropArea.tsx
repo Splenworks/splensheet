@@ -8,9 +8,10 @@ import ExcelJS from "exceljs"
 
 interface DragDropAreaProps {
   setWorkbook: (workbook: ExcelJS.Workbook) => void
+  setFileName: (name: string) => void
 }
 
-const DragDropArea: React.FC<DragDropAreaProps> = ({ setWorkbook }) => {
+const DragDropArea: React.FC<DragDropAreaProps> = ({ setWorkbook, setFileName }) => {
   const [dragging, setDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [loading, setLoading] = useState(false)
@@ -60,6 +61,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({ setWorkbook }) => {
         })
       }
       setWorkbook(workbook)
+      setFileName(file.name)
     } catch (error) {
       alert(error instanceof Error ? error.message : error)
       console.error(error)
@@ -97,6 +99,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({ setWorkbook }) => {
         })
       }
       setWorkbook(workbook)
+      setFileName(file.name)
     } catch (error) {
       alert(error instanceof Error ? error.message : error)
       console.error(error)

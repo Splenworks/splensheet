@@ -7,10 +7,11 @@ import { twJoin } from "tailwind-merge"
 
 interface ExcelEditorProps {
   workbook: ExcelJS.Workbook
+  fileName: string
   onClose: () => void
 }
 
-const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, onClose }) => {
+const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, fileName, onClose }) => {
   const { isFullScreen, toggleFullScreen } = useFullScreen()
   const [darkMode, setDarkMode] = useState(getDarkmode())
   const [activeSheetIndex, setActiveSheetIndex] = useState(0)
@@ -64,6 +65,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, onClose }) => {
         setDarkMode={setDarkMode}
         isFullScreen={isFullScreen}
         toggleFullScreen={toggleFullScreen}
+        fileName={fileName}
         onClose={onClose}
       />
       <div className="flex flex-col flex-1 overflow-hidden">
