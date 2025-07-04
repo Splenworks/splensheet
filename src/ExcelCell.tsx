@@ -9,15 +9,8 @@ interface ExcelCellProps {
   colWidth?: number
 }
 
-const colorFrom = (color?: ExcelJS.Color): string | undefined => {
-  if (!color) return undefined
-  if ("argb" in color && color.argb) {
-    return `#${color.argb.slice(2)}`
-  }
-  if ("rgb" in color && color.rgb) {
-    return `#${color.rgb.slice(2)}`
-  }
-  return undefined
+const colorFrom = (argb: string): string => {
+  return `#${argb.slice(2)}`
 }
 
 const ExcelCell: React.FC<ExcelCellProps> = ({
@@ -36,19 +29,23 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     style.width = `${colWidth * 8}px`
   }
 
-  if (
-    cell.fill &&
-    cell.fill.type === "pattern" &&
-    (cell.fill as ExcelJS.PatternFill).fgColor
-  ) {
-    const c = colorFrom((cell.fill as ExcelJS.PatternFill).fgColor)
-    if (c) style.backgroundColor = c
-  }
+  // if (
+  //   cell.fill &&
+  //   cell.fill.type === "pattern" &&
+  //   cell.fill?.fgColor
+  // ) {
+  //   const argb = cell.fill.fgColor?.argb
+  //   if (argb) {
+  //     style.backgroundColor = colorFrom(argb) || style.backgroundColor
+  //   }
+  // }
 
-  if (cell.font?.color) {
-    const c = colorFrom(cell.font.color)
-    if (c) style.color = c
-  }
+  // if (cell.font?.color) {
+  //   const argb = cell.font.color.argb
+  //   if (argb) {
+  //     style.color = colorFrom(argb) || style.color
+  //   }
+  // }
 
   return (
     <td
