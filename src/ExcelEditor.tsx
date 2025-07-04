@@ -18,18 +18,41 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, onClose }) => {
   const worksheets = workbook.worksheets
   const activeSheet = worksheets[activeSheetIndex]
 
+  const getDisplayValue = (v: ExcelJS.CellValue): string => {
+    if (v === null || v === undefined) {
+      return ""
+    }
+    if (typeof v === "number" || typeof v === "boolean") {
+      return String(v)
+    }
+    if (typeof v === "string") {
+      return v
+    }
+    if (v instanceof Date) {
+      return v.toISOString()
+    }
+    if (typeof v === "object") {
+      if ("text" in v && typeof v.text === "string") {
+        return v.text
+      }
+      if ("richText" in v && Array.isArray(v.richText)) {
+        return v.richText.map((t) => t.text).join("")
+      }
+      if ("formula" in v || "sharedFormula" in v) {
+        const result = (v as ExcelJS.CellFormulaValue | ExcelJS.CellSharedFormulaValue).result
+        return result === undefined || result === null ? "" : String(result)
+      }
+      if ("error" in v && typeof v.error === "string") {
+        return v.error
+      }
+    }
+    return String(v)
+  }
+
   const rows: (string | number | boolean | null)[][] = []
   activeSheet.eachRow((row) => {
-    const values = row.values as unknown[]
-    rows.push(
-      values.slice(1).map((v) =>
-        v === null || v === undefined
-          ? ""
-          : typeof v === "object"
-            ? (v as { text?: string }).text ?? String(v)
-            : String(v),
-      ),
-    )
+    const values = row.values as ExcelJS.CellValue[]
+    rows.push(values.slice(1).map(getDisplayValue))
   })
 
   const maxCols = rows.reduce((m, r) => Math.max(m, r.length), 0)
