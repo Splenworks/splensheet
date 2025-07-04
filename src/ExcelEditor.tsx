@@ -5,6 +5,7 @@ import { useFullScreen } from "./hooks/useFullScreen"
 import { getDarkmode } from "./utils/darkmode"
 import { twJoin } from "tailwind-merge"
 import ExcelCell from "./ExcelCell"
+import ExcelSheets from "./ExcelSheets"
 
 interface ExcelEditorProps {
   workbook: ExcelJS.Workbook
@@ -79,23 +80,11 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, fileName, onClose }
         onClose={onClose}
       />
       <div className="flex flex-col flex-1 overflow-hidden">
-        <div className="flex border-b border-gray-300 dark:border-neutral-600 bg-gray-500 dark:bg-neutral-800">
-          {worksheets.map((ws, idx) => (
-            <button
-              key={ws.id}
-              className={twJoin(
-                `px-4 py-2 text-sm font-medium transition-colors duration-300 ease-in-out`,
-                "text-black dark:text-white",
-                idx === activeSheetIndex
-                  ? "text-black bg-white dark:bg-neutral-900"
-                  : "text-gray-900 hover:bg-gray-400 dark:hover:bg-neutral-800"
-              )}
-              onClick={() => setActiveSheetIndex(idx)}
-            >
-              {ws.name}
-            </button>
-          ))}
-        </div>
+        <ExcelSheets
+          worksheets={worksheets.map((ws) => ({ id: ws.id, name: ws.name }))}
+          activeSheetIndex={activeSheetIndex}
+          setActiveSheetIndex={setActiveSheetIndex}
+        />
         <div className="flex-1 overflow-auto">
           <table className="min-w-max border-collapse text-sm">
             <tbody>
