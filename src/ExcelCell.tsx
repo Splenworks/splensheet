@@ -50,7 +50,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
 
   return (
     <td
-      style={style}
+      // style={style}
       className={twMerge(
         "px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600",
       )}
