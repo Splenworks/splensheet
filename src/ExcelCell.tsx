@@ -3,18 +3,19 @@ import ExcelJS from "exceljs"
 import { twMerge } from "tailwind-merge"
 
 interface ExcelCellProps {
+  // get the cell properties for the future feature such as background color, font color, etc.
   cell: ExcelJS.Cell
   value: string | number | boolean | null
   rowHeight?: number
   colWidth?: number
 }
 
-const colorFrom = (argb: string): string => {
-  return `#${argb.slice(2)}`
-}
+// const colorFrom = (argb: string): string => {
+//   return `#${argb.slice(2)}`
+// }
 
 const ExcelCell: React.FC<ExcelCellProps> = ({
-  cell,
+  cell: _cell,
   value,
   rowHeight,
   colWidth,
