@@ -6,6 +6,7 @@ interface DarkModeSwitchIconProps {
   sunColor?: string
   moonColor?: string
   size?: number | string
+  className?: string
 }
 
 const DarkModeSwitchIcon: React.FC<DarkModeSwitchIconProps> = ({
@@ -13,6 +14,7 @@ const DarkModeSwitchIcon: React.FC<DarkModeSwitchIconProps> = ({
   sunColor = "white",
   moonColor = "white",
   size = 16,
+  className,
 }) => {
   return (
     <Icon
@@ -21,7 +23,8 @@ const DarkModeSwitchIcon: React.FC<DarkModeSwitchIconProps> = ({
       sunColor={sunColor}
       moonColor={moonColor}
       style={{ margin: "4px" }}
-      onChange={() => {}}
+      onChange={() => { }}
+      className={className}
     />
   )
 }

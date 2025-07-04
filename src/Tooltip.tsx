@@ -34,7 +34,7 @@ const Tooltip: React.FC<PropsWithChildren<TooltipProps>> = ({
         )}
         style={{ width: "max-content" }}
       >
-        <div className="bg-opacity-50 rounded-sm bg-zinc-400 px-2 py-1 dark:bg-zinc-500">
+        <div className="bg-opacity-50 rounded-sm px-2 py-1 bg-zinc-400 dark:bg-zinc-600">
           <p className="text-xs font-normal text-white">{text}</p>
         </div>
       </div>
@@ -42,8 +42,8 @@ const Tooltip: React.FC<PropsWithChildren<TooltipProps>> = ({
         className={twJoin(
           "border-opacity-50 absolute left-1/2 -translate-x-1/2 transform border-x-[6px] border-solid border-x-transparent opacity-0 transition-opacity duration-300 ease-in-out peer-hover:opacity-100",
           place === "bottom"
-            ? "top-full translate-y-[2px] border-t-0 border-b-[6px] border-b-zinc-400 dark:border-b-zinc-500"
-            : "bottom-full -translate-y-[2px] border-t-[6px] border-b-0 border-t-zinc-400 dark:border-t-zinc-500",
+            ? "top-full translate-y-[2px] border-t-0 border-b-[6px] border-b-zinc-400 dark:border-b-zinc-600"
+            : "bottom-full -translate-y-[2px] border-t-[6px] border-b-0 border-t-zinc-400 dark:border-t-zinc-600",
         )}
       ></div>
     </div>
