@@ -18,13 +18,13 @@ const IconButton: React.FC<IconButtonProps> = ({
     <button
       id={id}
       className={twMerge(
-        "hover:bg-opacity-50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition-colors duration-300 ease-in-out hover:bg-zinc-500",
+        "hover:bg-opacity-50 flex size-7 cursor-pointer items-center justify-center rounded-full transition-colors duration-300 ease-in-out hover:bg-zinc-500",
         className,
       )}
       onClick={onClick}
     >
-      {React.createElement(svgIcon, { className: "w-6 h-6 text-white" })}
-      {}
+      {React.createElement(svgIcon, { className: "size-4 text-black dark:text-white" })}
+      { }
     </button>
   )
 }
