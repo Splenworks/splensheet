@@ -4,6 +4,7 @@ import ExcelEditorHeader from "./ExcelEditorHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
 import { getDarkmode } from "./utils/darkmode"
 import { twJoin } from "tailwind-merge"
+import ExcelCell from "./ExcelCell"
 
 interface ExcelEditorProps {
   workbook: ExcelJS.Workbook
@@ -50,13 +51,22 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, fileName, onClose }
     return String(v)
   }
 
-  const rows: (string | number | boolean | null)[][] = []
-  activeSheet.eachRow((row) => {
-    const values = row.values as ExcelJS.CellValue[]
-    rows.push(values.slice(1).map(getDisplayValue))
+  const rowCount = activeSheet.rowCount
+  const colCount = activeSheet.columnCount
+
+  const columnWidths = Array.from({ length: colCount }).map((_, idx) => {
+    const col = activeSheet.getColumn(idx + 1)
+    return col.width
   })
 
-  const maxCols = rows.reduce((m, r) => Math.max(m, r.length), 0)
+  const rows = Array.from({ length: rowCount }).map((_, rIdx) => {
+    const row = activeSheet.getRow(rIdx + 1)
+    const cells = Array.from({ length: colCount }).map((_, cIdx) => {
+      const cell = row.getCell(cIdx + 1)
+      return { cell, value: getDisplayValue(cell.value) }
+    })
+    return { row, cells }
+  })
 
   return (
     <div className="fixed inset-0 flex flex-col bg-white dark:bg-neutral-900">
@@ -91,16 +101,14 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, fileName, onClose }
             <tbody>
               {rows.map((row, rIdx) => (
                 <tr key={rIdx}>
-                  {Array.from({ length: maxCols }).map((_, cIdx) => (
-                    <td
+                  {row.cells.map((cellData, cIdx) => (
+                    <ExcelCell
                       key={cIdx}
-                      className={twJoin(
-                        `px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600`,
-                        rIdx === 0 && "border-t-0",
-                      )}
-                    >
-                      {row[cIdx] ?? ""}
-                    </td>
+                      cell={cellData.cell}
+                      value={cellData.value}
+                      rowHeight={row.row.height}
+                      colWidth={columnWidths[cIdx]}
+                    />
                   ))}
                 </tr>
               ))}
