@@ -37,10 +37,14 @@ const ExcelEditorHeader: React.FC<ExcelEditorHeaderProps> = ({
   )
 
   return (
-    <header className="flex h-12 items-center justify-between bg-neutral-100 px-2 dark:bg-neutral-800">
+    <header className="flex h-9 items-center justify-between px-2 bg-gray-300 dark:bg-neutral-800">
       <div className="flex items-center space-x-2">
-        <Tooltip text={t("others.exit")} place="bottom">
-          <IconButton svgIcon={ExitIcon} onClick={onClose} />
+        <Tooltip text={t("others.exit")} place="bottom" align="left">
+          <IconButton
+            svgIcon={ExitIcon}
+            onClick={onClose}
+            className="transform -scale-x-100"
+          />
         </Tooltip>
       </div>
       <div className="flex items-center space-x-2">
