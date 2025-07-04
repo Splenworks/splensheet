@@ -2,8 +2,6 @@ import React, { useState } from "react"
 import ExcelJS from "exceljs"
 import ExcelEditorHeader from "./ExcelEditorHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
-import { getDarkmode } from "./utils/darkmode"
-import { twJoin } from "tailwind-merge"
 import ExcelCell from "./ExcelCell"
 import ExcelSheets from "./ExcelSheets"
 
@@ -15,7 +13,6 @@ interface ExcelEditorProps {
 
 const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, fileName, onClose }) => {
   const { isFullScreen, toggleFullScreen } = useFullScreen()
-  const [darkMode, setDarkMode] = useState(getDarkmode())
   const [activeSheetIndex, setActiveSheetIndex] = useState(0)
 
   const worksheets = workbook.worksheets
@@ -72,8 +69,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, fileName, onClose }
   return (
     <div className="fixed inset-0 flex flex-col bg-white dark:bg-neutral-900">
       <ExcelEditorHeader
-        darkMode={darkMode}
-        setDarkMode={setDarkMode}
         isFullScreen={isFullScreen}
         toggleFullScreen={toggleFullScreen}
         fileName={fileName}
