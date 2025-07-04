@@ -11,6 +11,7 @@ import ExcelJS from "exceljs"
 function App() {
   const { toggleFullScreen } = useFullScreen()
   const [workbook, setWorkbook] = useState<ExcelJS.Workbook | null>(null)
+  const [fileName, setFileName] = useState<string | null>(null)
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -36,7 +37,11 @@ function App() {
       <FullScreenProvider>
         <ExcelEditor
           workbook={workbook}
-          onClose={() => setWorkbook(null)}
+          fileName={fileName ?? ""}
+          onClose={() => {
+            setWorkbook(null)
+            setFileName(null)
+          }}
         />
       </FullScreenProvider>
     )
@@ -45,7 +50,7 @@ function App() {
   return (
     <>
       <Header />
-      <DragDropArea setWorkbook={setWorkbook} />
+      <DragDropArea setWorkbook={setWorkbook} setFileName={setFileName} />
       <Footer />
     </>
   )

@@ -14,6 +14,7 @@ interface ExcelEditorHeaderProps {
   isFullScreen: boolean
   toggleFullScreen: () => void
   onClose: () => void
+  fileName: string
 }
 
 const ExcelEditorHeader: React.FC<ExcelEditorHeaderProps> = ({
@@ -22,6 +23,7 @@ const ExcelEditorHeader: React.FC<ExcelEditorHeaderProps> = ({
   isFullScreen,
   toggleFullScreen,
   onClose,
+  fileName,
 }) => {
   const { t } = useTranslation()
 
@@ -46,6 +48,9 @@ const ExcelEditorHeader: React.FC<ExcelEditorHeaderProps> = ({
             className="transform -scale-x-100"
           />
         </Tooltip>
+      </div>
+      <div className="flex-1 overflow-hidden text-center text-sm font-medium text-black dark:text-white">
+        {fileName}
       </div>
       <div className="flex items-center space-x-2">
         <Tooltip text={t("others.toggleDarkMode")} place="bottom">
