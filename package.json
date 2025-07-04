@@ -47,7 +47,7 @@
     "vite-plugin-svgr": "^4.3.0"
   },
   "engines": {
-    "node": "20.19.2"
+    "node": "20.x"
   },
   "packageManager": "yarn@4.9.2"
 }
