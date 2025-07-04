@@ -39,12 +39,12 @@ const ExcelEditorHeader: React.FC<ExcelEditorHeaderProps> = ({
   return (
     <header className="flex h-12 items-center justify-between bg-neutral-100 px-2 dark:bg-neutral-800">
       <div className="flex items-center space-x-2">
-        <Tooltip text={t("others.exit")}>
+        <Tooltip text={t("others.exit")} place="bottom">
           <IconButton svgIcon={ExitIcon} onClick={onClose} />
         </Tooltip>
       </div>
       <div className="flex items-center space-x-2">
-        <Tooltip text={t("others.toggleDarkMode")}>
+        <Tooltip text={t("others.toggleDarkMode")} place="bottom">
           <IconButton
             svgIcon={DarkModeIcon}
             onClick={() => {
@@ -55,6 +55,7 @@ const ExcelEditorHeader: React.FC<ExcelEditorHeaderProps> = ({
         </Tooltip>
         <Tooltip
           text={isFullScreen ? t("others.exitFullscreen") : t("others.fullscreen")}
+          place="bottom"
         >
           <IconButton
             svgIcon={isFullScreen ? CompressIcon : ExpandIcon}
