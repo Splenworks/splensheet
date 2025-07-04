@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import ExcelJS from "exceljs"
 import ExcelEditorHeader from "./ExcelEditorHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
@@ -14,6 +14,10 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, onClose }) => {
   const { isFullScreen, toggleFullScreen } = useFullScreen()
   const [darkMode, setDarkMode] = useState(getDarkmode())
   const [activeSheetIndex, setActiveSheetIndex] = useState(0)
+  const [fillCols, setFillCols] = useState(0)
+  const [fillRows, setFillRows] = useState(0)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const tableRef = useRef<HTMLTableElement>(null)
 
   const worksheets = workbook.worksheets
   const activeSheet = worksheets[activeSheetIndex]
@@ -49,13 +53,59 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, onClose }) => {
     return String(v)
   }
 
-  const rows: (string | number | boolean | null)[][] = []
-  activeSheet.eachRow((row) => {
-    const values = row.values as ExcelJS.CellValue[]
-    rows.push(values.slice(1).map(getDisplayValue))
-  })
+  const rows = React.useMemo(() => {
+    const r: (string | number | boolean | null)[][] = []
+    activeSheet.eachRow((row) => {
+      const values = row.values as ExcelJS.CellValue[]
+      r.push(values.slice(1).map(getDisplayValue))
+    })
+    return r
+  }, [activeSheet])
 
-  const maxCols = rows.reduce((m, r) => Math.max(m, r.length), 0)
+  const maxCols = React.useMemo(
+    () => rows.reduce((m, r) => Math.max(m, r.length), 0),
+    [rows],
+  )
+
+  useEffect(() => {
+    const updateFill = () => {
+      const container = containerRef.current
+      const table = tableRef.current
+      if (!container || !table) return
+      const cell = table.querySelector("td") as HTMLTableCellElement | null
+      if (!cell) return
+      const cellWidth = cell.clientWidth || 1
+      const cellHeight = cell.clientHeight || 1
+
+      // reset
+      let cols = 0
+      let rowsCount = 0
+
+      const hasVScroll = container.scrollHeight > container.clientHeight
+      const hasHScroll = container.scrollWidth > container.clientWidth
+
+      if (!hasHScroll) {
+        const extraWidth = container.clientWidth - table.clientWidth
+        if (extraWidth > 0) {
+          cols = Math.floor(extraWidth / cellWidth)
+        }
+      }
+
+      if (!hasVScroll) {
+        const extraHeight = container.clientHeight - table.clientHeight
+        if (extraHeight > 0) {
+          rowsCount = Math.floor(extraHeight / cellHeight)
+        }
+      }
+
+      setFillCols(cols)
+      setFillRows(rowsCount)
+    }
+
+    updateFill()
+    window.addEventListener("resize", updateFill)
+    return () => window.removeEventListener("resize", updateFill)
+  }, [rows, maxCols, activeSheetIndex])
 
   return (
     <div className="fixed inset-0 flex flex-col bg-white dark:bg-neutral-900">
@@ -84,12 +134,12 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, onClose }) => {
             </button>
           ))}
         </div>
-        <div className="flex-1 overflow-auto">
-          <table className="min-w-max border-collapse text-sm">
+        <div ref={containerRef} className="flex-1 overflow-auto">
+          <table ref={tableRef} className="min-w-max border-collapse text-sm">
             <tbody>
               {rows.map((row, rIdx) => (
                 <tr key={rIdx}>
-                  {Array.from({ length: maxCols }).map((_, cIdx) => (
+                  {Array.from({ length: maxCols + fillCols }).map((_, cIdx) => (
                     <td
                       key={cIdx}
                       className={twJoin(
@@ -99,6 +149,16 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, onClose }) => {
                     >
                       {row[cIdx] ?? ""}
                     </td>
+                  ))}
+                </tr>
+              ))}
+              {Array.from({ length: fillRows }).map((_, rIdx) => (
+                <tr key={`empty-${rIdx}`}>
+                  {Array.from({ length: maxCols + fillCols }).map((_, cIdx) => (
+                    <td
+                      key={cIdx}
+                      className="px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600"
+                    ></td>
                   ))}
                 </tr>
               ))}
