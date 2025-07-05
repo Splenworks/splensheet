@@ -12,14 +12,7 @@
   "footer": {
     "checkOutProduct": "Check out our other product <link />"
   },
-  "messages": {
-    "reachedEnd": "You have reached the end of the list.",
-    "reachedBeginning": "You have reached the beginning of the list.",
-    "pressTab": "Press [tab] to reveal more information.",
-    "longTouch": "Press anywhere and hold for 1 sec to reveal more information."
-  },
   "others": {
-    "ad": "Ad",
     "close": "Close",
     "exit": "Exit",
     "fullscreen": "Fullscreen",

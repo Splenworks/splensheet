@@ -12,14 +12,7 @@
   "footer": {
     "checkOutProduct": "우리의 다른 제품 <link />도 확인해보세요"
   },
-  "messages": {
-    "reachedEnd": "마지막 이미지입니다.",
-    "reachedBeginning": "첫번째 이미지입니다.",
-    "pressTab": "자세한 정보를 보려면 [tab]을 누르세요.",
-    "longTouch": "자세한 정보를 보려면 1초 이상 길게 누르세요."
-  },
   "others": {
-    "ad": "광고",
     "close": "닫기",
     "exit": "나가기",
     "fullscreen": "전체화면",
