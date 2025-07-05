@@ -5,8 +5,8 @@ import CompressIcon from "./assets/icons/compress.svg?react"
 import XmarkIcon from "./assets/icons/xmark.svg?react"
 import IconButton from "./IconButton"
 import Tooltip from "./Tooltip"
-import DarkModeSwitchIcon from "./DarkModeSwitchIcon"
 import { getDarkmode, toggleDarkmode } from "./utils/darkmode"
+import ExcelDarkModeToggleIcon from "./ExcelDarkModeToggleIcon"
 
 interface ExcelEditorHeaderProps {
   isFullScreen: boolean
@@ -24,6 +24,15 @@ const ExcelEditorHeader: React.FC<ExcelEditorHeaderProps> = ({
   const { t } = useTranslation()
   const [darkMode, setDarkMode] = useState(getDarkmode())
 
+  const DarkModeToggleIcon: React.FC<{ className?: string }> = ({ className }) => {
+    return (
+      <ExcelDarkModeToggleIcon
+        darkMode={darkMode}
+        className={`text-black dark:text-white ${className}`}
+      />
+    )
+  }
+
   return (
     <header className="flex h-9 items-center justify-between px-2 bg-gray-300 dark:bg-neutral-800">
       <div className="flex items-center space-x-2">
@@ -34,11 +43,12 @@ const ExcelEditorHeader: React.FC<ExcelEditorHeaderProps> = ({
       <div className="flex items-center space-x-2">
         <Tooltip text={t("others.toggleDarkMode")} place="bottom">
           <IconButton
-            svgIcon={DarkModeSwitchIcon}
+            svgIcon={DarkModeToggleIcon}
             onClick={() => {
               toggleDarkmode()
               setDarkMode((d) => !d)
             }}
+            className="text-black"
           />
         </Tooltip>
         <Tooltip
