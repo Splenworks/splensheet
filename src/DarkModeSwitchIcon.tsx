@@ -1,5 +1,5 @@
 import { DarkModeSwitch as Icon } from "react-toggle-dark-mode"
-import { getDarkmode } from "./utils/darkmode"
+import { useDarkmode } from "./hooks/useDarkmode"
 
 interface DarkModeSwitchIconProps {
   darkMode?: boolean
@@ -16,10 +16,11 @@ const DarkModeSwitchIcon: React.FC<DarkModeSwitchIconProps> = ({
   size = 16,
   className,
 }) => {
+  const { darkMode: contextDarkMode } = useDarkmode()
   return (
     <Icon
       size={size}
-      checked={darkMode !== undefined ? darkMode : getDarkmode()}
+      checked={darkMode !== undefined ? darkMode : contextDarkMode}
       sunColor={sunColor}
       moonColor={moonColor}
       style={{ margin: "4px" }}
