@@ -3,7 +3,6 @@ import ExcelJS from "exceljs"
 import ExcelHeader from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
 import ExcelCell from "./ExcelCell"
-import ExcelSheets from "./ExcelSheets"
 
 interface ExcelEditorProps {
   workbook: ExcelJS.Workbook
@@ -73,13 +72,11 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, fileName, onClose }
         toggleFullScreen={toggleFullScreen}
         fileName={fileName}
         onClose={onClose}
+        worksheets={worksheets.map((ws) => ({ id: ws.id, name: ws.name }))}
+        activeSheetIndex={activeSheetIndex}
+        setActiveSheetIndex={setActiveSheetIndex}
       />
       <div className="flex flex-col flex-1 overflow-hidden">
-        <ExcelSheets
-          worksheets={worksheets.map((ws) => ({ id: ws.id, name: ws.name }))}
-          activeSheetIndex={activeSheetIndex}
-          setActiveSheetIndex={setActiveSheetIndex}
-        />
         <div className="flex-1 overflow-auto">
           <table className="min-w-max border-collapse text-sm">
             <tbody>
