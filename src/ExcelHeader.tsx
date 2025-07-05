@@ -8,14 +8,14 @@ import Tooltip from "./Tooltip"
 import { getDarkmode, toggleDarkmode } from "./utils/darkmode"
 import ExcelDarkModeToggleIcon from "./ExcelDarkModeToggleIcon"
 
-interface ExcelEditorHeaderProps {
+interface ExcelHeaderProps {
   isFullScreen: boolean
   toggleFullScreen: () => void
   onClose: () => void
   fileName: string
 }
 
-const ExcelEditorHeader: React.FC<ExcelEditorHeaderProps> = ({
+const ExcelHeader: React.FC<ExcelHeaderProps> = ({
   isFullScreen,
   toggleFullScreen,
   onClose,
@@ -71,4 +71,4 @@ const ExcelEditorHeader: React.FC<ExcelEditorHeaderProps> = ({
   )
 }
 
-export default ExcelEditorHeader
+export default ExcelHeader

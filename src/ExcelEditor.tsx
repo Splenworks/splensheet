@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import ExcelJS from "exceljs"
-import ExcelEditorHeader from "./ExcelEditorHeader"
+import ExcelHeader from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
 import ExcelCell from "./ExcelCell"
 import ExcelSheets from "./ExcelSheets"
@@ -68,7 +68,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, fileName, onClose }
 
   return (
     <div className="fixed inset-0 flex flex-col bg-white dark:bg-neutral-900">
-      <ExcelEditorHeader
+      <ExcelHeader
         isFullScreen={isFullScreen}
         toggleFullScreen={toggleFullScreen}
         fileName={fileName}
