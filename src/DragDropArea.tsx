@@ -5,6 +5,7 @@ import { twJoin, twMerge } from "tailwind-merge"
 import { useMediaQuery } from "usehooks-ts"
 import SheetIcon from "./assets/icons/sheet.svg?react"
 import Spinner from "./Spinner"
+import { useDarkmode } from "./hooks/useDarkmode"
 
 interface DragDropAreaProps {
   setWorkbook: (workbook: ExcelJS.Workbook) => void
@@ -19,6 +20,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [loading, setLoading] = useState(false)
   const smallScreen = useMediaQuery("(max-width: 640px) or (max-height: 640px)")
+  const { darkMode } = useDarkmode()
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -119,7 +121,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
         className={twJoin(
           "absolute inset-x-8 inset-y-0 flex cursor-pointer items-center justify-center rounded-xl border-4 border-dashed border-gray-300 transition-colors duration-300 ease-in-out md:inset-x-16",
           (dragging || loading) &&
-            "border-pink-900 bg-neutral-200 dark:border-pink-700 dark:bg-neutral-600",
+          "border-pink-900 bg-neutral-200 dark:border-pink-700 dark:bg-neutral-600",
         )}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
@@ -150,7 +152,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
               </p>
             ) : (
               <div className="flex flex-col items-center justify-center">
-                <SheetIcon className="mb-8 h-32 w-32" />
+                <SheetIcon className={twJoin("mb-8 h-32 w-32", darkMode ? "text-pink-800" : "text-pink-900")} />
                 <p className="mb-4 text-center text-xl font-bold">
                   <Trans
                     i18nKey="dragDropArea.mainMessage"
