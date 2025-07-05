@@ -154,14 +154,14 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({ setWorkbook, setFileName })
                     }}
                   />
                 </p>
-                {/* <p className="mb-4 text-center text-lg font-semibold">
+                <p className="mb-4 text-center text-lg font-semibold">
                   <Trans
                     i18nKey="dragDropArea.subMessage"
                     components={{
                       u: <span className="text-pink-900 dark:text-pink-700" />,
                     }}
                   />
-                </p> */}
+                </p>
                 {!smallScreen && (
                   <p className="text-center text-gray-800 dark:text-gray-300">
                     <Trans i18nKey="dragDropArea.neverStoreYourData" />

@@ -4,8 +4,8 @@
   },
   "dragDropArea": {
     "dropHere": "여기에 드롭하세요",
-    "mainMessage": "여기에 당신의 <u>스프레드시트</u> 파일을 드래그 드롭하세요!",
-    "subMessage": "여러 <u>zip 파일</u>이나 심지어 <u>폴더</u>도 가능합니다.",
+    "mainMessage": "여기에 <u>스프레드시트</u> 파일(.xlsx나 .csv)을 드래그 드롭하세요!",
+    "subMessage": "현재는 스프레드시트 파일을 보기만 할 수 있습니다. 편집 및 저장 기능은 곧 제공될 예정입니다.",
     "noImageFilesFound": "스프레드시트 파일을 찾을 수 없습니다.",
     "neverStoreYourData": "저희는 절대로 파일 정보를 서버에 저장하지 않습니다."
   },

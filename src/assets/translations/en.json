@@ -4,8 +4,8 @@
   },
   "dragDropArea": {
     "dropHere": "Drop here",
-    "mainMessage": "Drag and drop any <u>spreadsheet</u> files here!",
-    "subMessage": "You can drop <u>zip files</u> or <u>folders</u> too.",
+    "mainMessage": "Drag and drop <u>spreadsheet</u> files(.xlsx or .csv) here!",
+    "subMessage": "For now, you can only view spreadsheet files. Editing and saving features are coming soon.",
     "noImageFilesFound": "No spreadsheet files found.",
     "neverStoreYourData": "We never store your files in the server."
   },
