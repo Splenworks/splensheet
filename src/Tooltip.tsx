@@ -22,7 +22,7 @@ const Tooltip: React.FC<PropsWithChildren<TooltipProps>> = ({
       <div className="peer">{children}</div>
       <div
         className={twJoin(
-          "absolute transform opacity-0 transition-opacity duration-300 ease-in-out peer-hover:opacity-100",
+          "absolute transform opacity-0 transition-opacity duration-300 ease-in-out peer-hover:opacity-100 pointer-events-none",
           place === "top"
             ? "bottom-full -translate-y-2"
             : "top-full translate-y-2",
@@ -40,7 +40,7 @@ const Tooltip: React.FC<PropsWithChildren<TooltipProps>> = ({
       </div>
       <div
         className={twJoin(
-          "border-opacity-50 absolute left-1/2 -translate-x-1/2 transform border-x-[6px] border-solid border-x-transparent opacity-0 transition-opacity duration-300 ease-in-out peer-hover:opacity-100",
+          "border-opacity-50 absolute left-1/2 -translate-x-1/2 transform border-x-[6px] border-solid border-x-transparent opacity-0 transition-opacity duration-300 ease-in-out peer-hover:opacity-100 pointer-events-none",
           place === "bottom"
             ? "top-full translate-y-[2px] border-t-0 border-b-[6px] border-b-zinc-400 dark:border-b-zinc-600"
             : "bottom-full -translate-y-[2px] border-t-[6px] border-b-0 border-t-zinc-400 dark:border-t-zinc-600",
