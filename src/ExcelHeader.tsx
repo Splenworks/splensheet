@@ -32,6 +32,7 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
 }) => {
   const { t } = useTranslation()
   const [darkMode, setDarkMode] = useState(getDarkmode())
+  const isCsv = fileName.toLowerCase().endsWith('.csv')
 
   const DarkModeToggleIcon: React.FC<{ className?: string }> = ({ className }) => {
     return (
@@ -44,19 +45,21 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
 
   return (
     <header className="flex h-11 items-center justify-between px-2 bg-gray-200 dark:bg-neutral-800 border-b border-gray-300 dark:border-neutral-600">
-      <div className="flex items-center space-x-2">
-        <select
-          className="h-7 rounded border max-w-55 border-gray-300 bg-white px-1 text-xs dark:border-neutral-600 dark:bg-neutral-700 dark:text-white"
-          value={activeSheetIndex}
-          onChange={(e) => setActiveSheetIndex(Number(e.target.value))}
-        >
-          {worksheets.map((ws, idx) => (
-            <option key={ws.id} value={idx}>
-              {ws.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      {!isCsv && (
+        <div className="flex items-center space-x-2">
+          <select
+            className="h-7 rounded border max-w-55 border-gray-300 bg-white px-1 text-xs dark:border-neutral-600 dark:bg-neutral-700 dark:text-white"
+            value={activeSheetIndex}
+            onChange={(e) => setActiveSheetIndex(Number(e.target.value))}
+          >
+            {worksheets.map((ws, idx) => (
+              <option key={ws.id} value={idx}>
+                {ws.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       <div className="hidden md:block flex-1 overflow-hidden text-center text-base font-medium text-black dark:text-white">
         {fileName}
       </div>
