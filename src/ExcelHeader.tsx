@@ -57,7 +57,7 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
           ))}
         </select>
       </div>
-      <div className="flex-1 overflow-hidden text-center text-sm font-medium text-black dark:text-white">
+      <div className="hidden md:block flex-1 overflow-hidden text-center text-sm font-medium text-black dark:text-white">
         {fileName}
       </div>
       <div className="flex items-center space-x-2">
