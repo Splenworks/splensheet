@@ -1,11 +1,11 @@
-import React, { useState } from "react"
+import React from "react"
 import { useTranslation } from "react-i18next"
 import ExpandIcon from "./assets/icons/expand.svg?react"
 import CompressIcon from "./assets/icons/compress.svg?react"
 import XmarkIcon from "./assets/icons/xmark.svg?react"
 import IconButton from "./IconButton"
 import Tooltip from "./Tooltip"
-import { getDarkmode, toggleDarkmode } from "./utils/darkmode"
+import { useDarkmode } from "./hooks/useDarkmode"
 import ExcelDarkModeToggleIcon from "./ExcelDarkModeToggleIcon"
 
 interface ExcelHeaderProps {
@@ -31,7 +31,7 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
   setActiveSheetIndex,
 }) => {
   const { t } = useTranslation()
-  const [darkMode, setDarkMode] = useState(getDarkmode())
+  const { darkMode, toggleDarkMode } = useDarkmode()
   const isCsv = fileName.toLowerCase().endsWith('.csv')
 
   const DarkModeToggleIcon: React.FC<{ className?: string }> = ({ className }) => {
@@ -67,10 +67,7 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
         <Tooltip text={t("others.toggleDarkMode")} place="bottom">
           <IconButton
             svgIcon={DarkModeToggleIcon}
-            onClick={() => {
-              toggleDarkmode()
-              setDarkMode((d) => !d)
-            }}
+            onClick={toggleDarkMode}
             className="text-black"
           />
         </Tooltip>

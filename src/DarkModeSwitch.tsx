@@ -1,10 +1,9 @@
-import { useState } from "react"
 import { twJoin } from "tailwind-merge"
 import DarkModeSwitchIcon from "./DarkModeSwitchIcon"
-import { getDarkmode, toggleDarkmode } from "./utils/darkmode"
+import { useDarkmode } from "./hooks/useDarkmode"
 
 const DarkModeSwitch = () => {
-  const [darkMode, setDarkMode] = useState(getDarkmode())
+  const { darkMode, toggleDarkMode } = useDarkmode()
   return (
     <div className="relative inline-block w-[75px] text-left">
       <input
@@ -14,8 +13,7 @@ const DarkModeSwitch = () => {
         id="darkModeSwitch"
         checked={darkMode}
         onChange={() => {
-          setDarkMode((darkMode) => !darkMode)
-          toggleDarkmode()
+          toggleDarkMode()
         }}
       />
       <label
