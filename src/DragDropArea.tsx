@@ -1,17 +1,20 @@
+import ExcelJS from "exceljs"
 import React, { useRef, useState } from "react"
 import { Trans } from "react-i18next"
 import { twJoin, twMerge } from "tailwind-merge"
 import { useMediaQuery } from "usehooks-ts"
 import SheetIcon from "./assets/icons/sheet.svg?react"
 import Spinner from "./Spinner"
-import ExcelJS from "exceljs"
 
 interface DragDropAreaProps {
   setWorkbook: (workbook: ExcelJS.Workbook) => void
   setFileName: (name: string) => void
 }
 
-const DragDropArea: React.FC<DragDropAreaProps> = ({ setWorkbook, setFileName }) => {
+const DragDropArea: React.FC<DragDropAreaProps> = ({
+  setWorkbook,
+  setFileName,
+}) => {
   const [dragging, setDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [loading, setLoading] = useState(false)
@@ -45,14 +48,15 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({ setWorkbook, setFileName })
       if (!file) {
         throw new Error("No valid file found in the drop.")
       }
-      if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".csv")) {
+      const fileName = file.name.toLowerCase()
+      if (!fileName.endsWith(".xlsx") && !fileName.endsWith(".csv")) {
         throw new Error("Please upload a valid Excel (.xlsx) or CSV file.")
       }
       const workbook = new ExcelJS.Workbook()
-      if (file.name.endsWith(".xlsx")) {
-        const arrayBuffer = await file.arrayBuffer();
-        await workbook.xlsx.load(arrayBuffer);
-      } else if (file.name.endsWith(".csv")) {
+      if (fileName.endsWith(".xlsx")) {
+        const arrayBuffer = await file.arrayBuffer()
+        await workbook.xlsx.load(arrayBuffer)
+      } else if (fileName.endsWith(".csv")) {
         const csvData = await file.text()
         const worksheet = workbook.addWorksheet("Sheet1")
         csvData.split("\n").forEach((row) => {
@@ -83,14 +87,15 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({ setWorkbook, setFileName })
       const files = Array.from(e.target.files || [])
       const file = files[0]
       if (!file) return
-      if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".csv")) {
+      const fileName = file.name.toLowerCase()
+      if (!fileName.endsWith(".xlsx") && !fileName.endsWith(".csv")) {
         throw new Error("Please upload a valid Excel (.xlsx) or CSV file.")
       }
       const workbook = new ExcelJS.Workbook()
-      if (file.name.endsWith(".xlsx")) {
-        const arrayBuffer = await file.arrayBuffer();
-        await workbook.xlsx.load(arrayBuffer);
-      } else if (file.name.endsWith(".csv")) {
+      if (fileName.endsWith(".xlsx")) {
+        const arrayBuffer = await file.arrayBuffer()
+        await workbook.xlsx.load(arrayBuffer)
+      } else if (fileName.endsWith(".csv")) {
         const csvData = await file.text()
         const worksheet = workbook.addWorksheet("Sheet1")
         csvData.split("\n").forEach((row) => {
@@ -109,12 +114,12 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({ setWorkbook, setFileName })
   }
 
   return (
-    <div className="fixed bottom-16 left-0 right-0 top-16 bg-white dark:bg-neutral-900">
+    <div className="fixed top-16 right-0 bottom-16 left-0 bg-white dark:bg-neutral-900">
       <div
         className={twJoin(
           "absolute inset-x-8 inset-y-0 flex cursor-pointer items-center justify-center rounded-xl border-4 border-dashed border-gray-300 transition-colors duration-300 ease-in-out md:inset-x-16",
           (dragging || loading) &&
-          "border-pink-900 bg-neutral-200 dark:border-pink-700 dark:bg-neutral-600",
+            "border-pink-900 bg-neutral-200 dark:border-pink-700 dark:bg-neutral-600",
         )}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
