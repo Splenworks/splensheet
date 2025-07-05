@@ -85,6 +85,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, fileName, onClose }
                   {row.cells.map((cellData, cIdx) => (
                     <ExcelCell
                       key={cIdx}
+                      rowIndex={rIdx}
                       cell={cellData.cell}
                       value={cellData.value}
                       rowHeight={row.row.height}

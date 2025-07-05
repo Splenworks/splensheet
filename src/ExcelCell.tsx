@@ -3,6 +3,7 @@ import ExcelJS from "exceljs"
 import { twMerge } from "tailwind-merge"
 
 interface ExcelCellProps {
+  rowIndex: number
   // get the cell properties for the future feature such as background color, font color, etc.
   cell: ExcelJS.Cell
   value: string | number | boolean | null
@@ -15,6 +16,7 @@ interface ExcelCellProps {
 // }
 
 const ExcelCell: React.FC<ExcelCellProps> = ({
+  rowIndex,
   cell: _cell,
   value,
   rowHeight,
@@ -53,6 +55,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       // style={style}
       className={twMerge(
         "px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600",
+        rowIndex === 0 && "border-t-0"
       )}
     >
       {value ?? ""}

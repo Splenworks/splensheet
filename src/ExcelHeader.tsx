@@ -43,10 +43,10 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
   }
 
   return (
-    <header className="flex h-9 items-center justify-between px-2 bg-gray-300 dark:bg-neutral-800">
+    <header className="flex h-11 items-center justify-between px-2 bg-gray-200 dark:bg-neutral-800 border-b border-gray-300 dark:border-neutral-600">
       <div className="flex items-center space-x-2">
         <select
-          className="h-7 rounded border border-gray-400 bg-white px-1 text-sm dark:border-neutral-600 dark:bg-neutral-700 dark:text-white"
+          className="h-7 rounded border max-w-55 border-gray-300 bg-white px-1 text-xs dark:border-neutral-600 dark:bg-neutral-700 dark:text-white"
           value={activeSheetIndex}
           onChange={(e) => setActiveSheetIndex(Number(e.target.value))}
         >
@@ -57,7 +57,7 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
           ))}
         </select>
       </div>
-      <div className="hidden md:block flex-1 overflow-hidden text-center text-sm font-medium text-black dark:text-white">
+      <div className="hidden md:block flex-1 overflow-hidden text-center text-base font-medium text-black dark:text-white">
         {fileName}
       </div>
       <div className="flex items-center space-x-2">

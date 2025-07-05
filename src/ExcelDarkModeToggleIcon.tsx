@@ -15,7 +15,7 @@ const ExcelDarkModeToggleIcon: React.FC<ExcelDarkModeToggleIconProps> = ({ darkM
     >
       <DarkModeSwitchIcon
         darkMode={darkMode}
-        sunColor={hovered ? "white" : "#D1D5DB"} // white on hover, gray-300 otherwise
+        sunColor={hovered ? "white" : "#E5E7EB"} // white on hover, gray-200 otherwise
         moonColor="white"
         size={16}
         className={className}
