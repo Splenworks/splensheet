@@ -52,7 +52,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, fileName, onClose }
     let lastRowIdx = activeSheet.rowCount
     while (lastRowIdx > 0) {
       const row = activeSheet.getRow(lastRowIdx)
-      const hasData = row.values.some((v, idx) => {
+      const hasData = Array.isArray(row.values) && row.values.some((v, idx) => {
         if (idx === 0) return false
         return v !== null && v !== undefined && v !== ''
       })
