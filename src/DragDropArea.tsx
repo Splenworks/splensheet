@@ -6,6 +6,7 @@ import { useMediaQuery } from "usehooks-ts"
 import SheetIcon from "./assets/icons/sheet.svg?react"
 import Spinner from "./Spinner"
 import { useDarkmode } from "./hooks/useDarkmode"
+import { parseCsv } from "./utils/parseCsv"
 
 interface DragDropAreaProps {
   setWorkbook: (workbook: ExcelJS.Workbook) => void
@@ -60,11 +61,9 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
         await workbook.xlsx.load(arrayBuffer)
       } else if (fileName.endsWith(".csv")) {
         const csvData = await file.text()
+        const rows = parseCsv(csvData)
         const worksheet = workbook.addWorksheet("Sheet1")
-        csvData.split("\n").forEach((row) => {
-          const values = row.split(",")
-          worksheet.addRow(values)
-        })
+        rows.forEach((r) => worksheet.addRow(r))
       }
       setWorkbook(workbook)
       setFileName(file.name)
@@ -99,11 +98,9 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
         await workbook.xlsx.load(arrayBuffer)
       } else if (fileName.endsWith(".csv")) {
         const csvData = await file.text()
+        const rows = parseCsv(csvData)
         const worksheet = workbook.addWorksheet("Sheet1")
-        csvData.split("\n").forEach((row) => {
-          const values = row.split(",")
-          worksheet.addRow(values)
-        })
+        rows.forEach((r) => worksheet.addRow(r))
       }
       setWorkbook(workbook)
       setFileName(file.name)
