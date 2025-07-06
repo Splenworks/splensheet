@@ -63,7 +63,22 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, fileName, onClose }
   }
 
   const rowCount = getLastNonEmptyRow()
-  const colCount = activeSheet.columnCount
+
+  const getLastNonEmptyCol = (): number => {
+    let lastColIdx = activeSheet.columnCount
+    while (lastColIdx > 0) {
+      const col = activeSheet.getColumn(lastColIdx)
+      const hasData = col.values.some((v, idx) => {
+        if (idx === 0) return false
+        return v !== null && v !== undefined && v !== ''
+      })
+      if (hasData) break
+      lastColIdx--
+    }
+    return lastColIdx
+  }
+
+  const colCount = getLastNonEmptyCol()
 
   const columnWidths = Array.from({ length: colCount }).map((_, idx) => {
     const col = activeSheet.getColumn(idx + 1)
