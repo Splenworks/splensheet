@@ -6,7 +6,7 @@ import SheetIcon from "./assets/icons/sheet.svg?react"
 import Spinner from "./Spinner"
 import { useDarkmode } from "./hooks/useDarkmode"
 import { parseCsv } from "./utils/parseCsv"
-import { readXlsx } from "./utils/readXlsx"
+import { readSpreadsheet } from "./utils/readSpreadsheet"
 import { Workbook } from "./types"
 
 interface DragDropAreaProps {
@@ -53,13 +53,13 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
         throw new Error("No valid file found in the drop.")
       }
       const fileName = file.name.toLowerCase()
-      if (!fileName.endsWith(".xlsx") && !fileName.endsWith(".csv")) {
-        throw new Error("Please upload a valid Excel (.xlsx) or CSV file.")
+      if (!fileName.endsWith(".xlsx") && !fileName.endsWith(".xls") && !fileName.endsWith(".csv")) {
+        throw new Error("Please upload a valid Excel (.xlsx, .xls) or CSV file.")
       }
       let workbook: Workbook
-      if (fileName.endsWith(".xlsx")) {
+      if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
         const arrayBuffer = await file.arrayBuffer()
-        workbook = await readXlsx(arrayBuffer)
+        workbook = await readSpreadsheet(arrayBuffer)
       } else {
         const csvData = await file.text()
         const rows = parseCsv(csvData)
@@ -89,13 +89,13 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
       const file = files[0]
       if (!file) return
       const fileName = file.name.toLowerCase()
-      if (!fileName.endsWith(".xlsx") && !fileName.endsWith(".csv")) {
-        throw new Error("Please upload a valid Excel (.xlsx) or CSV file.")
+      if (!fileName.endsWith(".xlsx") && !fileName.endsWith(".xls") && !fileName.endsWith(".csv")) {
+        throw new Error("Please upload a valid Excel (.xlsx, .xls) or CSV file.")
       }
       let workbook: Workbook
-      if (fileName.endsWith(".xlsx")) {
+      if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
         const arrayBuffer = await file.arrayBuffer()
-        workbook = await readXlsx(arrayBuffer)
+        workbook = await readSpreadsheet(arrayBuffer)
       } else {
         const csvData = await file.text()
         const rows = parseCsv(csvData)
@@ -128,7 +128,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
         <input
           type="file"
           multiple={false}
-          accept=".xlsx, .csv"
+          accept=".xlsx,.xls,.csv"
           hidden
           ref={fileInputRef}
           onChange={handleFileInputChange}

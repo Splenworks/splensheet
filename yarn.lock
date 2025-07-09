@@ -4916,17 +4916,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jszip@npm:^3.10.1":
-  version: 3.10.1
-  resolution: "jszip@npm:3.10.1"
-  dependencies:
-    lie: "npm:~3.3.0"
-    pako: "npm:~1.0.2"
-    readable-stream: "npm:~2.3.6"
-    setimmediate: "npm:^1.0.5"
-  checksum: 10c0/58e01ec9c4960383fb8b38dd5f67b83ccc1ec215bf74c8a5b32f42b6e5fb79fada5176842a11409c4051b5b94275044851814a31076bf49e1be218d3ef57c863
-  languageName: node
-  linkType: hard
 
 "keyv@npm:^4.5.3":
   version: 4.5.4
@@ -6623,7 +6612,7 @@ __metadata:
     eslint: "npm:^8.56.0"
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-react-refresh: "npm:^0.4.5"
-    jszip: "npm:^3.10.1"
+    xlsx: "npm:^0.18.5"
     i18next: "npm:^23.10.1"
     i18next-browser-languagedetector: "npm:^7.2.1"
     prettier: "npm:^3.2.5"
