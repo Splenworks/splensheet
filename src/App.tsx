@@ -32,6 +32,22 @@ function App() {
     }
   }, [toggleFullScreen])
 
+  useEffect(() => {
+    if (!workbook) return
+
+    const handlePopState = () => {
+      setWorkbook(null)
+      setFileName(null)
+    }
+
+    window.history.pushState({ excelOpen: true }, "")
+    window.addEventListener("popstate", handlePopState)
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState)
+    }
+  }, [workbook])
+
   if (workbook) {
     return (
       <FullScreenProvider>
@@ -41,6 +57,7 @@ function App() {
           onClose={() => {
             setWorkbook(null)
             setFileName(null)
+            window.history.back()
           }}
         />
       </FullScreenProvider>
