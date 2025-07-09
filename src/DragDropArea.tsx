@@ -1,4 +1,3 @@
-import ExcelJS from "exceljs"
 import React, { useRef, useState } from "react"
 import { Trans } from "react-i18next"
 import { twJoin, twMerge } from "tailwind-merge"
@@ -7,9 +6,11 @@ import SheetIcon from "./assets/icons/sheet.svg?react"
 import Spinner from "./Spinner"
 import { useDarkmode } from "./hooks/useDarkmode"
 import { parseCsv } from "./utils/parseCsv"
+import { readXlsx } from "./utils/readXlsx"
+import { Workbook } from "./types"
 
 interface DragDropAreaProps {
-  setWorkbook: (workbook: ExcelJS.Workbook) => void
+  setWorkbook: (workbook: Workbook) => void
   setFileName: (name: string) => void
 }
 
@@ -55,15 +56,14 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
       if (!fileName.endsWith(".xlsx") && !fileName.endsWith(".csv")) {
         throw new Error("Please upload a valid Excel (.xlsx) or CSV file.")
       }
-      const workbook = new ExcelJS.Workbook()
+      let workbook: Workbook
       if (fileName.endsWith(".xlsx")) {
         const arrayBuffer = await file.arrayBuffer()
-        await workbook.xlsx.load(arrayBuffer)
-      } else if (fileName.endsWith(".csv")) {
+        workbook = await readXlsx(arrayBuffer)
+      } else {
         const csvData = await file.text()
         const rows = parseCsv(csvData)
-        const worksheet = workbook.addWorksheet("Sheet1")
-        rows.forEach((r) => worksheet.addRow(r))
+        workbook = { worksheets: [{ id: 1, name: "Sheet1", data: rows }] }
       }
       setWorkbook(workbook)
       setFileName(file.name)
@@ -92,15 +92,14 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
       if (!fileName.endsWith(".xlsx") && !fileName.endsWith(".csv")) {
         throw new Error("Please upload a valid Excel (.xlsx) or CSV file.")
       }
-      const workbook = new ExcelJS.Workbook()
+      let workbook: Workbook
       if (fileName.endsWith(".xlsx")) {
         const arrayBuffer = await file.arrayBuffer()
-        await workbook.xlsx.load(arrayBuffer)
-      } else if (fileName.endsWith(".csv")) {
+        workbook = await readXlsx(arrayBuffer)
+      } else {
         const csvData = await file.text()
         const rows = parseCsv(csvData)
-        const worksheet = workbook.addWorksheet("Sheet1")
-        rows.forEach((r) => worksheet.addRow(r))
+        workbook = { worksheets: [{ id: 1, name: "Sheet1", data: rows }] }
       }
       setWorkbook(workbook)
       setFileName(file.name)
