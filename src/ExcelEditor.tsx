@@ -1,8 +1,8 @@
-import React, { useState } from "react"
 import ExcelJS from "exceljs"
+import React, { useEffect, useState } from "react"
+import ExcelCell from "./ExcelCell"
 import ExcelHeader from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
-import ExcelCell from "./ExcelCell"
 
 interface ExcelEditorProps {
   workbook: ExcelJS.Workbook
@@ -10,9 +10,29 @@ interface ExcelEditorProps {
   onClose: () => void
 }
 
-const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, fileName, onClose }) => {
+const ExcelEditor: React.FC<ExcelEditorProps> = ({
+  workbook,
+  fileName,
+  onClose,
+}) => {
   const { isFullScreen, toggleFullScreen } = useFullScreen()
   const [activeSheetIndex, setActiveSheetIndex] = useState(0)
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        if (isFullScreen) {
+          toggleFullScreen()
+        } else {
+          onClose()
+        }
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [isFullScreen, toggleFullScreen, onClose])
 
   const worksheets = workbook.worksheets
   const activeSheet = worksheets[activeSheetIndex]
@@ -38,7 +58,9 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, fileName, onClose }
         return v.richText.map((t) => t.text).join("")
       }
       if ("formula" in v || "sharedFormula" in v) {
-        const result = (v as ExcelJS.CellFormulaValue | ExcelJS.CellSharedFormulaValue).result
+        const result = (
+          v as ExcelJS.CellFormulaValue | ExcelJS.CellSharedFormulaValue
+        ).result
         return result === undefined || result === null ? "" : String(result)
       }
       if ("error" in v && typeof v.error === "string") {
@@ -52,10 +74,12 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, fileName, onClose }
     let lastRowIdx = activeSheet.rowCount
     while (lastRowIdx > 0) {
       const row = activeSheet.getRow(lastRowIdx)
-      const hasData = Array.isArray(row.values) && row.values.some((v, idx) => {
-        if (idx === 0) return false
-        return v !== null && v !== undefined && v !== ''
-      })
+      const hasData =
+        Array.isArray(row.values) &&
+        row.values.some((v, idx) => {
+          if (idx === 0) return false
+          return v !== null && v !== undefined && v !== ""
+        })
       if (hasData) break
       lastRowIdx--
     }
@@ -70,7 +94,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, fileName, onClose }
       const col = activeSheet.getColumn(lastColIdx)
       const hasData = col.values.some((v, idx) => {
         if (idx === 0) return false
-        return v !== null && v !== undefined && v !== ''
+        return v !== null && v !== undefined && v !== ""
       })
       if (hasData) break
       lastColIdx--
@@ -105,7 +129,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({ workbook, fileName, onClose }
         activeSheetIndex={activeSheetIndex}
         setActiveSheetIndex={setActiveSheetIndex}
       />
-      <div className="flex flex-col flex-1 overflow-hidden">
+      <div className="flex flex-1 flex-col overflow-hidden">
         <div className="flex-1 overflow-auto">
           <table className="min-w-max border-collapse text-sm">
             <tbody>
