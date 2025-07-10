@@ -39,12 +39,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   const [hasChanges, setHasChanges] = useState(false)
   const activeSheet = worksheets[activeSheetIndex]
 
-  const getDisplayValue = (c: Cell | undefined): string => {
-    if (!c) return ""
-    if (c.v === null || c.v === undefined) return ""
-    return String(c.v)
-  }
-
   const getLastNonEmptyRow = (): number => {
     let lastRowIdx = activeSheet.data.length
     while (lastRowIdx > 0) {
