@@ -37,7 +37,9 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   }
 
   const handleBlur = () => {
-    commit()
+    if (inputValue !== (cell?.f ? `=${cell.f}` : cell?.v ?? "")) {
+      commit()
+    }
     setEditing(false)
   }
 
