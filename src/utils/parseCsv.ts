@@ -1,6 +1,9 @@
-export function parseCsv(data: string): string[][] {
-  const rows: string[][] = []
-  let row: string[] = []
+import type { Cell } from '../types'
+import { evaluateFormula } from './evaluateFormula'
+
+export function parseCsv(data: string): Cell[][] {
+  const rows: Cell[][] = []
+  let row: Cell[] = []
   let field = ""
   let inQuotes = false
   for (let i = 0; i < data.length; i++) {
@@ -20,23 +23,39 @@ export function parseCsv(data: string): string[][] {
       if (char === '"') {
         inQuotes = true
       } else if (char === ',') {
-        row.push(field)
+        if (field.startsWith('=')) {
+          row.push({ v: null, f: field.slice(1) })
+        } else {
+          row.push({ v: field })
+        }
         field = ""
       } else if (char === '\n') {
-        row.push(field)
+        if (field.startsWith('=')) {
+          row.push({ v: null, f: field.slice(1) })
+        } else {
+          row.push({ v: field })
+        }
         rows.push(row)
         row = []
         field = ""
       } else if (char === '\r') {
         // handle CRLF or standalone CR
         if (data[i + 1] === '\n') {
-          row.push(field)
+          if (field.startsWith('=')) {
+            row.push({ v: null, f: field.slice(1) })
+          } else {
+            row.push({ v: field })
+          }
           rows.push(row)
           row = []
           field = ""
           i++
         } else {
-          row.push(field)
+          if (field.startsWith('=')) {
+            row.push({ v: null, f: field.slice(1) })
+          } else {
+            row.push({ v: field })
+          }
           rows.push(row)
           row = []
           field = ""
@@ -47,7 +66,19 @@ export function parseCsv(data: string): string[][] {
     }
   }
   // push last field
-  row.push(field)
+  if (field.startsWith('=')) {
+    row.push({ v: null, f: field.slice(1) })
+  } else {
+    row.push({ v: field })
+  }
   rows.push(row)
+  for (let r = 0; r < rows.length; r++) {
+    for (let c = 0; c < rows[r].length; c++) {
+      const cell = rows[r][c]
+      if (cell.f) {
+        cell.v = evaluateFormula(cell.f, rows)
+      }
+    }
+  }
   return rows
 }

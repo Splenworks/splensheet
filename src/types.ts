@@ -1,7 +1,12 @@
+export interface Cell {
+  v: string | number | boolean | null
+  f?: string
+}
+
 export interface Worksheet {
   id: number
   name: string
-  data: (string | number | boolean | null)[][]
+  data: Cell[][]
 }
 
 export interface Workbook {

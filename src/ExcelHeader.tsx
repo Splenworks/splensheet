@@ -5,6 +5,7 @@ import CompressIcon from "./assets/icons/compress.svg?react"
 import XmarkIcon from "./assets/icons/xmark.svg?react"
 import IconButton from "./IconButton"
 import Tooltip from "./Tooltip"
+import { ArrowDownTrayIcon } from "@heroicons/react/24/solid"
 import { useDarkmode } from "./hooks/useDarkmode"
 import ExcelDarkModeToggleIcon from "./ExcelDarkModeToggleIcon"
 
@@ -19,6 +20,8 @@ interface ExcelHeaderProps {
   }>
   activeSheetIndex: number
   setActiveSheetIndex: (index: number) => void
+  hasChanges?: boolean
+  onDownload?: () => void
 }
 
 const ExcelHeader: React.FC<ExcelHeaderProps> = ({
@@ -29,6 +32,8 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
   worksheets,
   activeSheetIndex,
   setActiveSheetIndex,
+  hasChanges,
+  onDownload,
 }) => {
   const { t } = useTranslation()
   const { darkMode, toggleDarkMode } = useDarkmode()
@@ -80,6 +85,11 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
             onClick={toggleFullScreen}
           />
         </Tooltip>
+        {hasChanges && (
+          <Tooltip text={t("others.download") ?? "Download"} place="bottom">
+            <IconButton svgIcon={ArrowDownTrayIcon} onClick={onDownload} />
+          </Tooltip>
+        )}
         <Tooltip text={t("others.exit")} place="bottom" align="right">
           <IconButton
             svgIcon={XmarkIcon}
