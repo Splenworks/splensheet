@@ -6,8 +6,7 @@ import SheetIcon from "./assets/icons/sheet.svg?react"
 import Spinner from "./Spinner"
 import { useDarkmode } from "./hooks/useDarkmode"
 import { parseCsv } from "./utils/parseCsv"
-import { readSpreadsheet } from "./utils/readSpreadsheet"
-import type { WorkBook } from "xlsx"
+import { read, type WorkBook } from "xlsx"
 
 interface DragDropAreaProps {
   setWorkbook: (workbook: WorkBook) => void
@@ -63,7 +62,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
       let workbook: WorkBook
       if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
         const arrayBuffer = await file.arrayBuffer()
-        workbook = await readSpreadsheet(arrayBuffer)
+        workbook = read(arrayBuffer, { type: "array" })
       } else {
         const csvData = await file.text()
         workbook = parseCsv(csvData)
@@ -100,7 +99,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
       let workbook: WorkBook
       if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
         const arrayBuffer = await file.arrayBuffer()
-        workbook = await readSpreadsheet(arrayBuffer)
+        workbook = read(arrayBuffer, { type: "array" })
       } else {
         const csvData = await file.text()
         workbook = parseCsv(csvData)

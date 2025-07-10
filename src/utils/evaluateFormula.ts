@@ -1,10 +1,8 @@
 import type { CellObject } from "xlsx"
-
-type CellData = Partial<CellObject> & { v?: string | number | boolean | null }
 import { HyperFormula } from "hyperformula"
 
 export function evaluateFormula(
-  data: Array<Array<CellData>>,
+  data: Array<Array<Partial<CellObject>>>,
   row: number,
   col: number,
 ): string | number | boolean | null {

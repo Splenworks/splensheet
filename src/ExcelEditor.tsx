@@ -5,8 +5,6 @@ import { useFullScreen } from "./hooks/useFullScreen"
 import { utils, writeFile } from "xlsx"
 import type { WorkBook, CellObject, WorkSheet } from "xlsx"
 
-type CellData = Partial<CellObject> & { v?: string | number | boolean | null }
-
 interface ExcelEditorProps {
   workbook: WorkBook
   fileName: string
@@ -27,14 +25,14 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   type SheetData = {
     id: number
     name: string
-    data: Array<Array<CellData>>
+    data: Array<Array<Partial<CellObject>>>
   }
 
-  const sheetToData = (ws: WorkSheet): Array<Array<CellData>> => {
+  const sheetToData = (ws: WorkSheet): Array<Array<Partial<CellObject>>> => {
     const range = utils.decode_range(ws['!ref'] || 'A1')
     const rowCount = range.e.r + 1
     const colCount = range.e.c + 1
-    const data: Array<Array<CellData>> = Array.from(
+    const data: Array<Array<Partial<CellObject>>> = Array.from(
       { length: rowCount },
       () => Array.from({ length: colCount }, () => ({})),
     )
@@ -49,7 +47,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   }
 
   const dataToSheet = (
-    data: Array<Array<CellData>>,
+    data: Array<Array<Partial<CellObject>>>,
     ws: WorkSheet,
   ) => {
     for (let r = 0; r < data.length; r++) {
@@ -149,7 +147,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   const updateCell = (
     r: number,
     c: number,
-    cell: CellData,
+    cell: Partial<CellObject>,
   ) => {
     setSheets((prev) => {
       const copy = [...prev]
