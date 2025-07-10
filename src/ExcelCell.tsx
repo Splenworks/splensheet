@@ -37,8 +37,13 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       const copy = data.map((row) => row.map((c) => (c ? { ...c } : { v: null })))
       if (!copy[rowIndex]) copy[rowIndex] = []
       copy[rowIndex][colIndex] = { v: null, f: formula }
-      const result = evaluateFormula(copy, rowIndex, colIndex)
-      onChange(rowIndex, colIndex, { v: result, f: formula })
+      try {
+        const result = evaluateFormula(copy, rowIndex, colIndex)
+        onChange(rowIndex, colIndex, { v: result, f: formula })
+      } catch (err) {
+        setInputValue(cell?.f ? `=${cell.f}` : cell?.v != null ? String(cell.v) : "")
+        window.alert((err as Error).message)
+      }
     } else {
       onChange(rowIndex, colIndex, { v: val })
     }
