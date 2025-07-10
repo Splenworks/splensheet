@@ -12,6 +12,7 @@ function App() {
   const { toggleFullScreen } = useFullScreen()
   const [workbook, setWorkbook] = useState<Workbook | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
+  const [editorOpen, setEditorOpen] = useState(false)
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -32,15 +33,14 @@ function App() {
     }
   }, [toggleFullScreen])
 
-  if (workbook) {
+  if (workbook && editorOpen) {
     return (
       <FullScreenProvider>
         <ExcelEditor
           workbook={workbook}
           fileName={fileName ?? ""}
           onClose={() => {
-            setWorkbook(null)
-            setFileName(null)
+            setEditorOpen(false)
           }}
         />
       </FullScreenProvider>
@@ -49,8 +49,15 @@ function App() {
 
   return (
     <>
-      <Header />
-      <DragDropArea setWorkbook={setWorkbook} setFileName={setFileName} />
+      <Header
+        showGoBack={!!workbook && !editorOpen}
+        onGoBack={() => setEditorOpen(true)}
+      />
+      <DragDropArea
+        setWorkbook={setWorkbook}
+        setFileName={setFileName}
+        onOpenEditor={() => setEditorOpen(true)}
+      />
       <Footer />
     </>
   )

@@ -18,6 +18,9 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
 }) => {
   const { isFullScreen, toggleFullScreen } = useFullScreen()
   const [activeSheetIndex, setActiveSheetIndex] = useState(0)
+  const [worksheets, setWorksheets] = useState<Worksheet[]>(workbook.worksheets)
+  const [hasChanges, setHasChanges] = useState(false)
+  const activeSheet = worksheets[activeSheetIndex]
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -34,16 +37,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       window.removeEventListener("keydown", handleKeyDown)
     }
   }, [isFullScreen, toggleFullScreen, onClose])
-
-  const [worksheets, setWorksheets] = useState<Worksheet[]>(workbook.worksheets)
-  const [hasChanges, setHasChanges] = useState(false)
-  const activeSheet = worksheets[activeSheetIndex]
-
-  const getDisplayValue = (c: Cell | undefined): string => {
-    if (!c) return ""
-    if (c.v === null || c.v === undefined) return ""
-    return String(c.v)
-  }
 
   const getLastNonEmptyRow = (): number => {
     let lastRowIdx = activeSheet.data.length
