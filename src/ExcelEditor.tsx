@@ -114,6 +114,12 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     worksheets.forEach((ws) => {
       const aoa = ws.data.map((row) => row.map((c) => c?.v ?? null))
       const sheet = utils.aoa_to_sheet(aoa)
+      const rowCount = ws.data.length
+      const colCount = ws.data.reduce((m, r) => Math.max(m, r.length), 0)
+      sheet['!ref'] = utils.encode_range({
+        s: { r: 0, c: 0 },
+        e: { r: rowCount - 1, c: colCount - 1 },
+      })
       ws.data.forEach((row, r) => {
         row.forEach((cell, c) => {
           if (cell?.f) {
