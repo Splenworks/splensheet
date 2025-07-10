@@ -17,3 +17,7 @@ To start the development server, use the following command:
 ```bash
 yarn dev
 ```
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
