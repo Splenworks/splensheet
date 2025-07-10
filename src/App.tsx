@@ -13,6 +13,7 @@ function App() {
   const [workbook, setWorkbook] = useState<Workbook | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
   const [editorOpen, setEditorOpen] = useState(false)
+  const [hasChanges, setHasChanges] = useState(false)
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -42,6 +43,9 @@ function App() {
           onClose={() => {
             setEditorOpen(false)
           }}
+          onWorkbookChange={setWorkbook}
+          initialHasChanges={hasChanges}
+          onHasChangesChange={setHasChanges}
         />
       </FullScreenProvider>
     )
@@ -57,6 +61,7 @@ function App() {
         setWorkbook={setWorkbook}
         setFileName={setFileName}
         onOpenEditor={() => setEditorOpen(true)}
+        setHasChanges={setHasChanges}
       />
       <Footer />
     </>

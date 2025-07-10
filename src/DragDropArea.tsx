@@ -13,12 +13,14 @@ interface DragDropAreaProps {
   setWorkbook: (workbook: Workbook) => void
   setFileName: (name: string) => void
   onOpenEditor: () => void
+  setHasChanges: (changes: boolean) => void
 }
 
 const DragDropArea: React.FC<DragDropAreaProps> = ({
   setWorkbook,
   setFileName,
   onOpenEditor,
+  setHasChanges,
 }) => {
   const [dragging, setDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -69,6 +71,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
       }
       setWorkbook(workbook)
       setFileName(file.name)
+      setHasChanges(false)
       onOpenEditor()
     } catch (error) {
       alert(error instanceof Error ? error.message : error)
@@ -106,6 +109,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
       }
       setWorkbook(workbook)
       setFileName(file.name)
+      setHasChanges(false)
       onOpenEditor()
     } catch (error) {
       alert(error instanceof Error ? error.message : error)
