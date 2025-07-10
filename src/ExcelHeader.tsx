@@ -5,6 +5,7 @@ import CompressIcon from "./assets/icons/compress.svg?react"
 import XmarkIcon from "./assets/icons/xmark.svg?react"
 import IconButton from "./IconButton"
 import Tooltip from "./Tooltip"
+import { ArrowDownTrayIcon } from "@heroicons/react/24/solid"
 import { useDarkmode } from "./hooks/useDarkmode"
 import ExcelDarkModeToggleIcon from "./ExcelDarkModeToggleIcon"
 
@@ -19,6 +20,8 @@ interface ExcelHeaderProps {
   }>
   activeSheetIndex: number
   setActiveSheetIndex: (index: number) => void
+  hasChanges?: boolean
+  onDownload?: () => void
 }
 
 const ExcelHeader: React.FC<ExcelHeaderProps> = ({
@@ -29,6 +32,8 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
   worksheets,
   activeSheetIndex,
   setActiveSheetIndex,
+  hasChanges,
+  onDownload,
 }) => {
   const { t } = useTranslation()
   const { darkMode, toggleDarkMode } = useDarkmode()
@@ -64,7 +69,12 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
         {fileName}
       </div>
       <div className="flex items-center space-x-2">
-        <Tooltip text={t("others.toggleDarkMode")} place="bottom">
+        {hasChanges && (
+          <Tooltip text={t("others.download")} place="bottom" className="rounded-full animate-bounce hover:animate-none">
+            <IconButton svgIcon={ArrowDownTrayIcon} onClick={onDownload} />
+          </Tooltip>
+        )}
+        <Tooltip text={t("others.toggleDarkMode")} place="bottom" className="rounded-full">
           <IconButton
             svgIcon={DarkModeToggleIcon}
             onClick={toggleDarkMode}
@@ -74,13 +84,14 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
         <Tooltip
           text={isFullScreen ? t("others.exitFullscreen") : t("others.fullscreen")}
           place="bottom"
+          className="rounded-full"
         >
           <IconButton
             svgIcon={isFullScreen ? CompressIcon : ExpandIcon}
             onClick={toggleFullScreen}
           />
         </Tooltip>
-        <Tooltip text={t("others.exit")} place="bottom" align="right">
+        <Tooltip text={t("others.exit")} place="bottom" align="right" className="rounded-full">
           <IconButton
             svgIcon={XmarkIcon}
             onClick={onClose}

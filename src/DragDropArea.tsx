@@ -7,7 +7,7 @@ import Spinner from "./Spinner"
 import { useDarkmode } from "./hooks/useDarkmode"
 import { parseCsv } from "./utils/parseCsv"
 import { readSpreadsheet } from "./utils/readSpreadsheet"
-import { Workbook } from "./types"
+import type { Workbook } from "./types"
 
 interface DragDropAreaProps {
   setWorkbook: (workbook: Workbook) => void
