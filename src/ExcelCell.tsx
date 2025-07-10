@@ -1,14 +1,16 @@
 import React, { useEffect, useRef, useState } from "react"
 import { twMerge } from "tailwind-merge"
-import type { Cell } from "./types"
+import type { CellObject } from "xlsx"
+
+type CellData = Partial<CellObject> & { v?: string | number | boolean | null }
 import { evaluateFormula } from "./utils/evaluateFormula"
 
 interface ExcelCellProps {
   rowIndex: number
   colIndex: number
-  cell: Cell | undefined
-  data: Cell[][]
-  onChange: (r: number, c: number, cell: Cell) => void
+  cell: CellData | undefined
+  data: Array<Array<CellData>>
+  onChange: (r: number, c: number, cell: CellData) => void
 }
 
 const ExcelCell: React.FC<ExcelCellProps> = ({
@@ -34,13 +36,15 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     const val = inputValue
     if (val.startsWith("=")) {
       const formula = val.slice(1)
-      const copy = data.map((row) => row.map((c) => (c ? { ...c } : { v: null })))
+      const copy: CellData[][] = data.map((row) =>
+        row.map((c) => (c ? { ...c } : {} as CellData)),
+      )
       if (!copy[rowIndex]) copy[rowIndex] = []
-      copy[rowIndex][colIndex] = { v: null, f: formula }
+      copy[rowIndex][colIndex] = { f: formula } as CellData
       const result = evaluateFormula(copy, rowIndex, colIndex)
-      onChange(rowIndex, colIndex, { v: result, f: formula })
+      onChange(rowIndex, colIndex, { v: result, f: formula } as CellData)
     } else {
-      onChange(rowIndex, colIndex, { v: val })
+      onChange(rowIndex, colIndex, { v: val } as CellData)
     }
   }
 

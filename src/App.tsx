@@ -6,11 +6,11 @@ import { useFullScreen } from "./hooks/useFullScreen"
 import { FullScreenProvider } from "./providers/FullScreenProvider"
 import { isMac } from "./utils/isMac"
 import ExcelEditor from "./ExcelEditor"
-import { Workbook } from "./types"
+import type { WorkBook } from "xlsx"
 
 function App() {
   const { toggleFullScreen } = useFullScreen()
-  const [workbook, setWorkbook] = useState<Workbook | null>(null)
+  const [workbook, setWorkbook] = useState<WorkBook | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
   const [editorOpen, setEditorOpen] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)

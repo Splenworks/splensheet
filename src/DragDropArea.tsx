@@ -7,10 +7,10 @@ import Spinner from "./Spinner"
 import { useDarkmode } from "./hooks/useDarkmode"
 import { parseCsv } from "./utils/parseCsv"
 import { readSpreadsheet } from "./utils/readSpreadsheet"
-import type { Workbook } from "./types"
+import type { WorkBook } from "xlsx"
 
 interface DragDropAreaProps {
-  setWorkbook: (workbook: Workbook) => void
+  setWorkbook: (workbook: WorkBook) => void
   setFileName: (name: string) => void
   onOpenEditor: () => void
   setHasChanges: (changes: boolean) => void
@@ -60,14 +60,13 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
       if (!fileName.endsWith(".xlsx") && !fileName.endsWith(".xls") && !fileName.endsWith(".csv")) {
         throw new Error("Please upload a valid Excel (.xlsx, .xls) or CSV file.")
       }
-      let workbook: Workbook
+      let workbook: WorkBook
       if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
         const arrayBuffer = await file.arrayBuffer()
         workbook = await readSpreadsheet(arrayBuffer)
       } else {
         const csvData = await file.text()
-        const rows = parseCsv(csvData)
-        workbook = { worksheets: [{ id: 1, name: "Sheet1", data: rows }] }
+        workbook = parseCsv(csvData)
       }
       setWorkbook(workbook)
       setFileName(file.name)
@@ -98,14 +97,13 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
       if (!fileName.endsWith(".xlsx") && !fileName.endsWith(".xls") && !fileName.endsWith(".csv")) {
         throw new Error("Please upload a valid Excel (.xlsx, .xls) or CSV file.")
       }
-      let workbook: Workbook
+      let workbook: WorkBook
       if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
         const arrayBuffer = await file.arrayBuffer()
         workbook = await readSpreadsheet(arrayBuffer)
       } else {
         const csvData = await file.text()
-        const rows = parseCsv(csvData)
-        workbook = { worksheets: [{ id: 1, name: "Sheet1", data: rows }] }
+        workbook = parseCsv(csvData)
       }
       setWorkbook(workbook)
       setFileName(file.name)
