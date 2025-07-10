@@ -32,7 +32,7 @@ const Footer: React.FC = () => {
                 <a
                   href={randomProduct.url}
                   target="_blank"
-                  className="underline"
+                  className="underline focus:outline-pink-900 dark:focus:outline-pink-700"
                 >
                   {randomProduct.name}
                 </a>
