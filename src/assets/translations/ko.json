@@ -17,6 +17,7 @@
     "exit": "나가기",
     "fullscreen": "전체화면",
     "exitFullscreen": "전체화면 나가기",
-    "toggleDarkMode": "다크 모드 전환"
+    "toggleDarkMode": "다크 모드 전환",
+    "download": "다운로드"
   }
 }
