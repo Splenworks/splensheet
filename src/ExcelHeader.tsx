@@ -69,6 +69,11 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
         {fileName}
       </div>
       <div className="flex items-center space-x-2">
+        {hasChanges && (
+          <Tooltip text={t("others.download")} place="bottom">
+            <IconButton svgIcon={ArrowDownTrayIcon} onClick={onDownload} className="animate-bounce hover:animate-none" />
+          </Tooltip>
+        )}
         <Tooltip text={t("others.toggleDarkMode")} place="bottom">
           <IconButton
             svgIcon={DarkModeToggleIcon}
@@ -85,11 +90,6 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
             onClick={toggleFullScreen}
           />
         </Tooltip>
-        {hasChanges && (
-          <Tooltip text={t("others.download") ?? "Download"} place="bottom">
-            <IconButton svgIcon={ArrowDownTrayIcon} onClick={onDownload} />
-          </Tooltip>
-        )}
         <Tooltip text={t("others.exit")} place="bottom" align="right">
           <IconButton
             svgIcon={XmarkIcon}
