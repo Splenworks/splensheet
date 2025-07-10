@@ -9,15 +9,32 @@ interface ExcelEditorProps {
   workbook: Workbook
   fileName: string
   onClose: () => void
+  onWorkbookChange?: (workbook: Workbook) => void
+  initialHasChanges?: boolean
+  onHasChangesChange?: (hasChanges: boolean) => void
 }
 
 const ExcelEditor: React.FC<ExcelEditorProps> = ({
   workbook,
   fileName,
   onClose,
+  onWorkbookChange,
+  initialHasChanges = false,
+  onHasChangesChange,
 }) => {
   const { isFullScreen, toggleFullScreen } = useFullScreen()
   const [activeSheetIndex, setActiveSheetIndex] = useState(0)
+  const [worksheets, setWorksheets] = useState<Worksheet[]>(workbook.worksheets)
+  const [hasChanges, setHasChanges] = useState(initialHasChanges)
+  const activeSheet = worksheets[activeSheetIndex]
+
+  useEffect(() => {
+    setWorksheets(workbook.worksheets)
+  }, [workbook])
+
+  useEffect(() => {
+    setHasChanges(initialHasChanges)
+  }, [initialHasChanges])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -34,16 +51,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       window.removeEventListener("keydown", handleKeyDown)
     }
   }, [isFullScreen, toggleFullScreen, onClose])
-
-  const [worksheets, setWorksheets] = useState<Worksheet[]>(workbook.worksheets)
-  const [hasChanges, setHasChanges] = useState(false)
-  const activeSheet = worksheets[activeSheetIndex]
-
-  const getDisplayValue = (c: Cell | undefined): string => {
-    if (!c) return ""
-    if (c.v === null || c.v === undefined) return ""
-    return String(c.v)
-  }
 
   const getLastNonEmptyRow = (): number => {
     let lastRowIdx = activeSheet.data.length
@@ -87,9 +94,11 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       data[r][c] = cell
       sheet.data = data
       copy[activeSheetIndex] = sheet
+      onWorkbookChange?.({ worksheets: copy })
       return copy
     })
     setHasChanges(true)
+    onHasChangesChange?.(true)
   }
 
   const rows = Array.from({ length: rowCount }).map((_, rIdx) => {
@@ -117,6 +126,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     })
     writeFile(wb, fileName)
     setHasChanges(false)
+    onHasChangesChange?.(false)
   }
 
   return (
