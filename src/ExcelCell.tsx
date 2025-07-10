@@ -40,7 +40,10 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       const result = evaluateFormula(copy, rowIndex, colIndex)
       onChange(rowIndex, colIndex, { v: result, f: formula })
     } else {
-      onChange(rowIndex, colIndex, { v: val })
+      const trimmed = val.trim()
+      const num = Number(trimmed)
+      const value = trimmed !== "" && !Number.isNaN(num) ? num : val
+      onChange(rowIndex, colIndex, { v: value })
     }
   }
 
@@ -66,14 +69,18 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     <td
       className={twMerge(
         "px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600 relative",
-        rowIndex === 0 && "border-t-0"
+        rowIndex === 0 && "border-t-0",
+        typeof cell?.v === "number" && "text-right"
       )}
       onClick={() => setEditing(true)}
     >
       {editing && (
         <input
           ref={inputRef}
-          className="absolute left-0 top-0 right-0 bottom-0 px-2 py-1 box-border border-none bg-white dark:bg-neutral-900 focus:outline-pink-900 focus:outline-2 focus:[outline-offset:-2px] dark:focus:outline-pink-700"
+          className={twMerge(
+            "absolute left-0 top-0 right-0 bottom-0 px-2 py-1 box-border border-none bg-white dark:bg-neutral-900 focus:outline-pink-900 focus:outline-2 focus:[outline-offset:-2px] dark:focus:outline-pink-700",
+            typeof cell?.v === "number" && "text-right"
+          )}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onBlur={handleBlur}
