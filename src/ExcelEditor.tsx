@@ -154,6 +154,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
                       rowIndex={rIdx}
                       colIndex={cIdx}
                       cell={cellData}
+                      data={activeSheet.data}
                       onChange={updateCell}
                     />
                   ))}

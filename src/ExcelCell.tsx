@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import type { Cell } from "./types"
+import { evaluateFormula } from "./utils/evaluateFormula"
 
 interface ExcelCellProps {
   rowIndex: number
   colIndex: number
   cell: Cell | undefined
+  data: Cell[][]
   onChange: (r: number, c: number, cell: Cell) => void
 }
 
@@ -13,6 +15,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   rowIndex,
   colIndex,
   cell,
+  data,
   onChange,
 }) => {
   const [editing, setEditing] = useState(false)
@@ -30,7 +33,12 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   const commit = () => {
     const val = inputValue
     if (val.startsWith("=")) {
-      onChange(rowIndex, colIndex, { v: null, f: val.slice(1) })
+      const formula = val.slice(1)
+      const copy = data.map((row) => row.map((c) => (c ? { ...c } : { v: null })))
+      if (!copy[rowIndex]) copy[rowIndex] = []
+      copy[rowIndex][colIndex] = { v: null, f: formula }
+      const result = evaluateFormula(copy, rowIndex, colIndex)
+      onChange(rowIndex, colIndex, { v: result, f: formula })
     } else {
       onChange(rowIndex, colIndex, { v: val })
     }
