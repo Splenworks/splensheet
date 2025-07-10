@@ -78,8 +78,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
 
   const colCount = getLastNonEmptyCol()
 
-  const columnWidths = Array.from({ length: colCount }).map(() => undefined)
-
   const updateCell = (r: number, c: number, cell: Cell) => {
     setWorksheets((prev) => {
       const copy = [...prev]
