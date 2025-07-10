@@ -63,7 +63,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       {editing && (
         <input
           ref={inputRef}
-          className="absolute left-0 top-0 right-0 bottom-0 px-[6px] py-[2px] box-border border-2 border-transparent focus:border-black dark:focus:border-neutral-300 focus:outline-none bg-white dark:bg-neutral-900"
+          className="absolute left-0 top-0 right-0 bottom-0 px-[6px] py-[2px] box-border border-none bg-white dark:bg-neutral-900"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onBlur={handleBlur}
