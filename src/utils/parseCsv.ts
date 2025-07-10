@@ -22,23 +22,23 @@ export function parseCsv(data: string): Cell[][] {
       if (char === '"') {
         inQuotes = true
       } else if (char === ',') {
-        row.push({ v: field })
+        row.push({ v: field, t: 's' })
         field = ""
       } else if (char === '\n') {
-        row.push({ v: field })
+        row.push({ v: field, t: 's' })
         rows.push(row)
         row = []
         field = ""
       } else if (char === '\r') {
         // handle CRLF or standalone CR
         if (data[i + 1] === '\n') {
-          row.push({ v: field })
+          row.push({ v: field, t: 's' })
           rows.push(row)
           row = []
           field = ""
           i++
         } else {
-          row.push({ v: field })
+          row.push({ v: field, t: 's' })
           rows.push(row)
           row = []
           field = ""
@@ -49,7 +49,7 @@ export function parseCsv(data: string): Cell[][] {
     }
   }
   // push last field
-  row.push({ v: field })
+  row.push({ v: field, t: 's' })
   rows.push(row)
   return rows
 }

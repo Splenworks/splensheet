@@ -38,12 +38,16 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       if (!copy[rowIndex]) copy[rowIndex] = []
       copy[rowIndex][colIndex] = { v: null, f: formula }
       const result = evaluateFormula(copy, rowIndex, colIndex)
-      onChange(rowIndex, colIndex, { v: result, f: formula })
+      const type = typeof result === "number" ? "n" : typeof result === "boolean" ? "b" : "s"
+      onChange(rowIndex, colIndex, { v: result, f: formula, t: type })
     } else {
       const trimmed = val.trim()
       const num = Number(trimmed)
-      const value = trimmed !== "" && !Number.isNaN(num) ? num : val
-      onChange(rowIndex, colIndex, { v: value })
+      if (trimmed !== "" && !Number.isNaN(num)) {
+        onChange(rowIndex, colIndex, { v: num, t: "n" })
+      } else {
+        onChange(rowIndex, colIndex, { v: val, t: "s" })
+      }
     }
   }
 
@@ -70,7 +74,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       className={twMerge(
         "px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600 relative",
         rowIndex === 0 && "border-t-0",
-        typeof cell?.v === "number" && "text-right"
+        cell?.t === "n" && "text-right"
       )}
       onClick={() => setEditing(true)}
     >
@@ -79,7 +83,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
           ref={inputRef}
           className={twMerge(
             "absolute left-0 top-0 right-0 bottom-0 px-2 py-1 box-border border-none bg-white dark:bg-neutral-900 focus:outline-pink-900 focus:outline-2 focus:[outline-offset:-2px] dark:focus:outline-pink-700",
-            typeof cell?.v === "number" && "text-right"
+            cell?.t === "n" && "text-right"
           )}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}

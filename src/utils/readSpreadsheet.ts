@@ -17,12 +17,15 @@ export async function readSpreadsheet(buffer: ArrayBuffer): Promise<Workbook> {
       for (let C = range.s.c; C <= range.e.c; C++) {
         const addr = utils.encode_cell({ r: R, c: C })
         const cell = ws[addr] as
-          | { v?: string | number | boolean; f?: string }
+          | { v?: string | number | boolean; f?: string; t?: string }
           | undefined
         if (cell) {
           const value = cell.v ?? null
           const formula = cell.f as string | undefined
-          data[R][C] = formula ? { v: value, f: formula } : { v: value }
+          const type = cell.t as Cell['t'] | undefined
+          const cellData: Cell = formula ? { v: value, f: formula } : { v: value }
+          if (type) cellData.t = type
+          data[R][C] = cellData
         }
       }
     }
