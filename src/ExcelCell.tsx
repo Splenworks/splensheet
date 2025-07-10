@@ -81,7 +81,11 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
           spellCheck="false"
         />
       )}
-      {cell?.v ?? ""}
+      {cell?.t === "d" && cell.v != null
+        ? new Date(cell.v as Date | string).toLocaleDateString()
+        : cell?.v != null
+        ? String(cell.v)
+        : ""}
     </td>
   )
 }

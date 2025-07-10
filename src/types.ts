@@ -1,6 +1,7 @@
 export interface Cell {
-  v: string | number | boolean | null
+  v: string | number | boolean | Date | null
   f?: string
+  t?: string
 }
 
 export interface Worksheet {
