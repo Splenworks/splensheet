@@ -86,17 +86,17 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   const colCount = getLastNonEmptyCol()
 
   const updateCell = (r: number, c: number, cell: Cell) => {
-    setWorksheets((prev) => {
-      const copy = [...prev]
-      const sheet = { ...copy[activeSheetIndex] }
-      const data = sheet.data.map((row) => [...row])
-      if (!data[r]) data[r] = []
-      data[r][c] = cell
-      sheet.data = data
-      copy[activeSheetIndex] = sheet
-      onWorkbookChange?.({ worksheets: copy })
-      return copy
-    })
+    const nextWorksheets = [...worksheets]
+    const sheet = { ...nextWorksheets[activeSheetIndex] }
+    const data = sheet.data.map((row) => [...row])
+    if (!data[r]) data[r] = []
+    data[r][c] = cell
+    sheet.data = data
+    nextWorksheets[activeSheetIndex] = sheet
+
+    setWorksheets(nextWorksheets)
+    onWorkbookChange?.({ worksheets: nextWorksheets })
+
     setHasChanges(true)
     onHasChangesChange?.(true)
   }
