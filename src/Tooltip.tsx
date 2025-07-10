@@ -1,10 +1,11 @@
 import React, { PropsWithChildren } from "react"
-import { twJoin } from "tailwind-merge"
+import { twJoin, twMerge } from "tailwind-merge"
 
 interface TooltipProps {
   text: string
   place?: "bottom" | "top"
   align?: "left" | "right" | "center"
+  className?: string
 }
 
 const Tooltip: React.FC<PropsWithChildren<TooltipProps>> = ({
@@ -12,6 +13,7 @@ const Tooltip: React.FC<PropsWithChildren<TooltipProps>> = ({
   text,
   place = "top",
   align = "center",
+  className,
 }) => {
   if (!text) {
     return <>{children}</>
@@ -19,7 +21,7 @@ const Tooltip: React.FC<PropsWithChildren<TooltipProps>> = ({
 
   return (
     <div className="relative cursor-pointer z-10">
-      <div className="peer">{children}</div>
+      <div className={twMerge("peer", className)}>{children}</div>
       <div
         className={twJoin(
           "absolute transform opacity-0 transition-opacity duration-300 ease-in-out peer-hover:opacity-100 pointer-events-none",
