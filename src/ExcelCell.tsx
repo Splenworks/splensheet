@@ -45,27 +45,33 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     if (e.key === "Enter") {
       commit()
       setEditing(false)
+    } else if (e.key === "Escape") {
+      e.stopPropagation()
+      setEditing(false)
+      setInputValue("")
     }
   }
 
   return (
     <td
       className={twMerge(
-        "px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600",
+        "px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600 relative",
         rowIndex === 0 && "border-t-0"
       )}
       onClick={() => setEditing(true)}
     >
-      {editing ? (
+      {editing && (
         <input
           ref={inputRef}
-          className="w-full h-full box-border border-2 border-transparent focus:border-black focus:outline-none bg-transparent"
+          className="absolute left-0 top-0 right-0 bottom-0 px-[6px] py-[2px] box-border border-2 border-transparent focus:border-black dark:focus:border-neutral-300 focus:outline-none bg-white dark:bg-neutral-900"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
+          spellCheck="false"
         />
-      ) : cell?.v ?? ""}
+      )}
+      {cell?.v ?? ""}
     </td>
   )
 }
