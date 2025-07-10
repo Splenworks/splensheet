@@ -6,11 +6,11 @@ import { useFullScreen } from "./hooks/useFullScreen"
 import { FullScreenProvider } from "./providers/FullScreenProvider"
 import { isMac } from "./utils/isMac"
 import ExcelEditor from "./ExcelEditor"
-import ExcelJS from "exceljs"
+import { Workbook } from "./types"
 
 function App() {
   const { toggleFullScreen } = useFullScreen()
-  const [workbook, setWorkbook] = useState<ExcelJS.Workbook | null>(null)
+  const [workbook, setWorkbook] = useState<Workbook | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
 
   useEffect(() => {
