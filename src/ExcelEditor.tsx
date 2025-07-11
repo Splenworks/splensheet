@@ -3,13 +3,13 @@ import ExcelCell from "./ExcelCell"
 import ExcelHeader from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
 import { utils, writeFile } from "xlsx"
-import type { Workbook, Cell, Worksheet } from "./types"
+import type { WorkBook, CellObject, WorkSheet } from "xlsx"
 
 interface ExcelEditorProps {
-  workbook: Workbook
+  workbook: WorkBook
   fileName: string
   onClose: () => void
-  onWorkbookChange?: (workbook: Workbook) => void
+  onWorkbookChange?: (workbook: WorkBook) => void
   initialHasChanges?: boolean
   onHasChangesChange?: (hasChanges: boolean) => void
 }
@@ -22,14 +22,73 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   initialHasChanges = false,
   onHasChangesChange,
 }) => {
+  type SheetData = {
+    id: number
+    name: string
+    data: Array<Array<Partial<CellObject>>>
+  }
+
+  const sheetToData = (ws: WorkSheet): Array<Array<Partial<CellObject>>> => {
+    const range = utils.decode_range(ws['!ref'] || 'A1')
+    const rowCount = range.e.r + 1
+    const colCount = range.e.c + 1
+    const data: Array<Array<Partial<CellObject>>> = Array.from(
+      { length: rowCount },
+      () => Array.from({ length: colCount }, () => ({})),
+    )
+    for (let R = range.s.r; R <= range.e.r; R++) {
+      for (let C = range.s.c; C <= range.e.c; C++) {
+        const addr = utils.encode_cell({ r: R, c: C })
+        const cell: CellObject = ws[addr]
+        if (cell) data[R][C] = cell
+      }
+    }
+    return data
+  }
+
+  const dataToSheet = (
+    data: Array<Array<Partial<CellObject>>>,
+    ws: WorkSheet,
+  ) => {
+    for (let r = 0; r < data.length; r++) {
+      for (let c = 0; c < data[r].length; c++) {
+        const cell = data[r][c]
+        const addr = utils.encode_cell({ r, c })
+        if (cell && (cell.v !== undefined || cell.f)) {
+          ws[addr] = { v: cell.v ?? undefined, f: cell.f } as CellObject
+        } else {
+          delete ws[addr]
+        }
+      }
+    }
+    const rowCount = data.length
+    const colCount = data.reduce((m, r) => Math.max(m, r.length), 0)
+    ws['!ref'] = utils.encode_range({
+      s: { r: 0, c: 0 },
+      e: { r: rowCount - 1, c: colCount - 1 },
+    })
+  }
+
   const { isFullScreen, toggleFullScreen } = useFullScreen()
   const [activeSheetIndex, setActiveSheetIndex] = useState(0)
-  const [worksheets, setWorksheets] = useState<Worksheet[]>(workbook.worksheets)
+  const [sheets, setSheets] = useState<SheetData[]>(
+    workbook.SheetNames.map((name, idx) => ({
+      id: idx + 1,
+      name,
+      data: sheetToData(workbook.Sheets[name]),
+    })),
+  )
   const [hasChanges, setHasChanges] = useState(initialHasChanges)
-  const activeSheet = worksheets[activeSheetIndex]
+  const activeSheet = sheets[activeSheetIndex]
 
   useEffect(() => {
-    setWorksheets(workbook.worksheets)
+    setSheets(
+      workbook.SheetNames.map((name, idx) => ({
+        id: idx + 1,
+        name,
+        data: sheetToData(workbook.Sheets[name]),
+      })),
+    )
   }, [workbook])
 
   useEffect(() => {
@@ -57,7 +116,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     while (lastRowIdx > 0) {
       const row = activeSheet.data[lastRowIdx - 1] || []
       const hasData = row.some((c) =>
-        c && (c.f || (c.v !== null && c.v !== undefined && c.v !== "")),
+        c && (c.f || (c.v !== undefined && c.v !== "")),
       )
       if (hasData) break
       lastRowIdx--
@@ -85,18 +144,22 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
 
   const colCount = getLastNonEmptyCol()
 
-  const updateCell = (r: number, c: number, cell: Cell) => {
-    const nextWorksheets = [...worksheets]
-    const sheet = { ...nextWorksheets[activeSheetIndex] }
+  const updateCell = (
+    r: number,
+    c: number,
+    cell: Partial<CellObject>,
+  ) => {
+    const copy = [...sheets]
+    const sheet = { ...copy[activeSheetIndex] }
     const data = sheet.data.map((row) => [...row])
     if (!data[r]) data[r] = []
     data[r][c] = cell
     sheet.data = data
-    nextWorksheets[activeSheetIndex] = sheet
-
-    setWorksheets(nextWorksheets)
-    onWorkbookChange?.({ worksheets: nextWorksheets })
-
+    copy[activeSheetIndex] = sheet
+    const sheetName = workbook.SheetNames[activeSheetIndex]
+    dataToSheet(sheet.data, workbook.Sheets[sheetName])
+    onWorkbookChange?.(workbook)
+    setSheets(copy)
     setHasChanges(true)
     onHasChangesChange?.(true)
   }
@@ -110,27 +173,12 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   })
 
   const handleDownload = () => {
-    const wb = utils.book_new()
-    worksheets.forEach((ws) => {
-      const aoa = ws.data.map((row) => row.map((c) => c?.v ?? null))
-      const sheet = utils.aoa_to_sheet(aoa)
-      const rowCount = ws.data.length
-      const colCount = ws.data.reduce((m, r) => Math.max(m, r.length), 0)
-      sheet['!ref'] = utils.encode_range({
-        s: { r: 0, c: 0 },
-        e: { r: rowCount - 1, c: colCount - 1 },
-      })
-      ws.data.forEach((row, r) => {
-        row.forEach((cell, c) => {
-          if (cell?.f) {
-            const addr = utils.encode_cell({ r, c })
-            if (sheet[addr]) sheet[addr].f = cell.f
-          }
-        })
-      })
-      utils.book_append_sheet(wb, sheet, ws.name)
+    sheets.forEach((sd, idx) => {
+      const sheetName = workbook.SheetNames[idx]
+      const ws = workbook.Sheets[sheetName]
+      dataToSheet(sd.data, ws)
     })
-    writeFile(wb, fileName)
+    writeFile(workbook, fileName)
     setHasChanges(false)
     onHasChangesChange?.(false)
   }
@@ -142,7 +190,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         toggleFullScreen={toggleFullScreen}
         fileName={fileName}
         onClose={onClose}
-        worksheets={worksheets.map((ws) => ({ id: ws.id, name: ws.name }))}
+        worksheets={sheets.map((ws) => ({ id: ws.id, name: ws.name }))}
         activeSheetIndex={activeSheetIndex}
         setActiveSheetIndex={setActiveSheetIndex}
         hasChanges={hasChanges}
