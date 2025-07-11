@@ -149,19 +149,17 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     c: number,
     cell: Partial<CellObject>,
   ) => {
-    setSheets((prev) => {
-      const copy = [...prev]
-      const sheet = { ...copy[activeSheetIndex] }
-      const data = sheet.data.map((row) => [...row])
-      if (!data[r]) data[r] = []
-      data[r][c] = cell
-      sheet.data = data
-      copy[activeSheetIndex] = sheet
-      const sheetName = workbook.SheetNames[activeSheetIndex]
-      dataToSheet(sheet.data, workbook.Sheets[sheetName])
-      onWorkbookChange?.(workbook)
-      return copy
-    })
+    const copy = [...sheets]
+    const sheet = { ...copy[activeSheetIndex] }
+    const data = sheet.data.map((row) => [...row])
+    if (!data[r]) data[r] = []
+    data[r][c] = cell
+    sheet.data = data
+    copy[activeSheetIndex] = sheet
+    const sheetName = workbook.SheetNames[activeSheetIndex]
+    dataToSheet(sheet.data, workbook.Sheets[sheetName])
+    onWorkbookChange?.(workbook)
+    setSheets(copy)
     setHasChanges(true)
     onHasChangesChange?.(true)
   }
