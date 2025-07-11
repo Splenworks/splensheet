@@ -25,6 +25,24 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   const [inputValue, setInputValue] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
 
+  const getDisplayValue = (c: Partial<CellObject> | undefined) => {
+    if (!c || c.v === undefined) return ""
+    if (c.t === "b" || typeof c.v === "boolean") return c.v ? "TRUE" : "FALSE"
+    if (c.t === "d" || c.v instanceof Date) {
+      const d = new Date(c.v as string | number | Date)
+      if (!isNaN(d.getTime())) return d.toLocaleDateString()
+    }
+    return String(c.v)
+  }
+
+  const getCellType = (value: unknown): "n" | "s" | "b" | "d" => {
+    if (typeof value === "number") return "n"
+    if (typeof value === "string") return "s"
+    if (typeof value === "boolean") return "b"
+    if (value instanceof Date) return "d"
+    return "s"
+  }
+
   useEffect(() => {
     if (editing) {
       if (cell?.f) setInputValue("=" + cell.f)
@@ -38,9 +56,32 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     if (val.startsWith("=")) {
       const formula = val.slice(1)
       const result = evaluate(rowIndex, colIndex, formula)
-      onChange(rowIndex, colIndex, { v: result, f: formula })
+      const type = getCellType(result)
+      onChange(rowIndex, colIndex, { v: result, f: formula, t: type })
     } else {
-      onChange(rowIndex, colIndex, { v: val })
+      if (cell?.t === "n") {
+        const num = Number(val)
+        if (!Number.isNaN(num)) {
+          onChange(rowIndex, colIndex, { v: num, t: "n" })
+          return
+        }
+      }
+      if (cell?.t === "d") {
+        const d = new Date(val)
+        if (!isNaN(d.getTime())) {
+          onChange(rowIndex, colIndex, { v: d, t: "d" })
+          return
+        }
+      }
+      if (cell?.t === "b") {
+        const isTrue = val === "TRUE"
+        const isFalse = val === "FALSE"
+        if (isTrue || isFalse) {
+          onChange(rowIndex, colIndex, { v: isTrue, t: "b" })
+          return
+        }
+      }
+      onChange(rowIndex, colIndex, { v: String(val), t: "s" })
     }
   }
 
@@ -66,7 +107,8 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     <td
       className={twMerge(
         "px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600 relative",
-        rowIndex === 0 && "border-t-0"
+        rowIndex === 0 && "border-t-0",
+        cell?.t === "n" && !editing && "text-right"
       )}
       onClick={() => setEditing(true)}
     >
@@ -81,7 +123,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
           spellCheck="false"
         />
       )}
-      {cell?.v != undefined ? String(cell.v) : ""}
+      {getDisplayValue(cell)}
     </td>
   )
 }
