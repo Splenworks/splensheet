@@ -26,18 +26,27 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   const inputRef = useRef<HTMLInputElement>(null)
 
   const getDisplayValue = (c: Partial<CellObject> | undefined) => {
-    if (!c) return ""
-    if (c.f) return "=" + c.f
-    if (c.t === "d" && c.v != undefined) {
-      const d = new Date(c.v as never)
+    if (!c || c.v === undefined) return ""
+    if (c.t === "b") return c.v ? "TRUE" : "FALSE"
+    if (c.t === "d") {
+      const d = new Date(c.v as string | number | Date)
       if (!isNaN(d.getTime())) return d.toLocaleDateString()
     }
-    return c.v != undefined ? String(c.v) : ""
+    return String(c.v)
+  }
+
+  const getCellType = (value: unknown): "n" | "s" | "b" | "d" => {
+    if (typeof value === "number") return "n"
+    if (typeof value === "string") return "s"
+    if (typeof value === "boolean") return "b"
+    if (value instanceof Date) return "d"
+    return "s"
   }
 
   useEffect(() => {
     if (editing) {
-      setInputValue(getDisplayValue(cell))
+      if (cell?.f) setInputValue("=" + cell.f)
+      else setInputValue(cell?.v != undefined ? String(cell.v) : "")
       inputRef.current?.focus()
     }
   }, [editing, cell])
@@ -47,9 +56,10 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     if (val.startsWith("=")) {
       const formula = val.slice(1)
       const result = evaluate(rowIndex, colIndex, formula)
-      onChange(rowIndex, colIndex, { v: result, f: formula })
+      const type = getCellType(result)
+      onChange(rowIndex, colIndex, { v: result, f: formula, t: type })
     } else {
-      if (cell?.t === "n" || cell?.v === undefined || cell?.v === "") {
+      if (cell?.t === "n") {
         const num = Number(val)
         if (!Number.isNaN(num)) {
           onChange(rowIndex, colIndex, { v: num, t: "n" })
@@ -60,6 +70,14 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
         const d = new Date(val)
         if (!isNaN(d.getTime())) {
           onChange(rowIndex, colIndex, { v: d, t: "d" })
+          return
+        }
+      }
+      if (cell?.t === "b") {
+        const isTrue = val === "TRUE"
+        const isFalse = val === "FALSE"
+        if (isTrue || isFalse) {
+          onChange(rowIndex, colIndex, { v: isTrue, t: "b" })
           return
         }
       }
