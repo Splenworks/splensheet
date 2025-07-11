@@ -39,8 +39,8 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     for (let R = range.s.r; R <= range.e.r; R++) {
       for (let C = range.s.c; C <= range.e.c; C++) {
         const addr = utils.encode_cell({ r: R, c: C })
-        const cell = ws[addr] as CellObject | undefined
-        if (cell) data[R][C] = { v: (cell.v as any) ?? null, f: cell.f }
+        const cell: CellObject = ws[addr]
+        if (cell) data[R][C] = cell
       }
     }
     return data
@@ -54,7 +54,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       for (let c = 0; c < data[r].length; c++) {
         const cell = data[r][c]
         const addr = utils.encode_cell({ r, c })
-        if (cell && (cell.v !== null || cell.f)) {
+        if (cell && (cell.v !== undefined || cell.f)) {
           ws[addr] = { v: cell.v ?? undefined, f: cell.f } as CellObject
         } else {
           delete ws[addr]
@@ -116,7 +116,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     while (lastRowIdx > 0) {
       const row = activeSheet.data[lastRowIdx - 1] || []
       const hasData = row.some((c) =>
-        c && (c.f || (c.v !== null && c.v !== undefined && c.v !== "")),
+        c && (c.f || (c.v !== undefined && c.v !== "")),
       )
       if (hasData) break
       lastRowIdx--

@@ -25,7 +25,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   useEffect(() => {
     if (editing) {
       if (cell?.f) setInputValue("=" + cell.f)
-      else setInputValue(cell?.v != null ? String(cell.v) : "")
+      else setInputValue(cell?.v != undefined ? String(cell.v) : "")
       inputRef.current?.focus()
     }
   }, [editing, cell])
@@ -40,9 +40,9 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       if (!copy[rowIndex]) copy[rowIndex] = []
       copy[rowIndex][colIndex] = { f: formula }
       const result = evaluateFormula(copy, rowIndex, colIndex)
-      onChange(rowIndex, colIndex, { v: result as any, f: formula })
+      onChange(rowIndex, colIndex, { v: result, f: formula })
     } else {
-      onChange(rowIndex, colIndex, { v: val as any })
+      onChange(rowIndex, colIndex, { v: val })
     }
   }
 
@@ -83,7 +83,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
           spellCheck="false"
         />
       )}
-      {cell?.v != null ? String(cell.v) : ""}
+      {cell?.v != undefined ? String(cell.v) : ""}
     </td>
   )
 }
