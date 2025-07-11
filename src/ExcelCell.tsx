@@ -81,7 +81,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
           return
         }
       }
-      onChange(rowIndex, colIndex, { v: val, t: "s" })
+      onChange(rowIndex, colIndex, { v: String(val), t: "s" })
     }
   }
 
