@@ -22,10 +22,19 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   const [inputValue, setInputValue] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
 
+  const getDisplayValue = (c: Partial<CellObject> | undefined) => {
+    if (!c) return ""
+    if (c.f) return "=" + c.f
+    if (c.t === "d" && c.v != undefined) {
+      const d = new Date(c.v as never)
+      if (!isNaN(d.getTime())) return d.toLocaleDateString()
+    }
+    return c.v != undefined ? String(c.v) : ""
+  }
+
   useEffect(() => {
     if (editing) {
-      if (cell?.f) setInputValue("=" + cell.f)
-      else setInputValue(cell?.v != undefined ? String(cell.v) : "")
+      setInputValue(getDisplayValue(cell))
       inputRef.current?.focus()
     }
   }, [editing, cell])
@@ -42,7 +51,21 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       const result = evaluateFormula(copy, rowIndex, colIndex)
       onChange(rowIndex, colIndex, { v: result, f: formula })
     } else {
-      onChange(rowIndex, colIndex, { v: val })
+      if (cell?.t === "n" || cell?.v === undefined || cell?.v === "") {
+        const num = Number(val)
+        if (!Number.isNaN(num)) {
+          onChange(rowIndex, colIndex, { v: num, t: "n" })
+          return
+        }
+      }
+      if (cell?.t === "d") {
+        const d = new Date(val)
+        if (!isNaN(d.getTime())) {
+          onChange(rowIndex, colIndex, { v: d, t: "d" })
+          return
+        }
+      }
+      onChange(rowIndex, colIndex, { v: val, t: "s" })
     }
   }
 
@@ -68,7 +91,8 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     <td
       className={twMerge(
         "px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600 relative",
-        rowIndex === 0 && "border-t-0"
+        rowIndex === 0 && "border-t-0",
+        cell?.t === "n" && !editing && "text-right"
       )}
       onClick={() => setEditing(true)}
     >
@@ -83,7 +107,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
           spellCheck="false"
         />
       )}
-      {cell?.v != undefined ? String(cell.v) : ""}
+      {!editing && getDisplayValue(cell)}
     </td>
   )
 }
