@@ -1,13 +1,16 @@
 import React, { useEffect, useRef, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import type { CellObject } from "xlsx"
-import { evaluateFormula } from "./utils/evaluateFormula"
 
 interface ExcelCellProps {
   rowIndex: number
   colIndex: number
   cell: Partial<CellObject> | undefined
-  data: Array<Array<Partial<CellObject>>>
+  evaluate: (
+    r: number,
+    c: number,
+    formula: string,
+  ) => string | number | boolean | undefined
   onChange: (r: number, c: number, cell: Partial<CellObject>) => void
 }
 
@@ -15,7 +18,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   rowIndex,
   colIndex,
   cell,
-  data,
+  evaluate,
   onChange,
 }) => {
   const [editing, setEditing] = useState(false)
@@ -43,12 +46,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     const val = inputValue
     if (val.startsWith("=")) {
       const formula = val.slice(1)
-      const copy: Array<Array<Partial<CellObject>>> = data.map((row) =>
-        row.map((c) => (c ? { ...c } : {})),
-      )
-      if (!copy[rowIndex]) copy[rowIndex] = []
-      copy[rowIndex][colIndex] = { f: formula }
-      const result = evaluateFormula(copy, rowIndex, colIndex)
+      const result = evaluate(rowIndex, colIndex, formula)
       onChange(rowIndex, colIndex, { v: result, f: formula })
     } else {
       if (cell?.t === "n" || cell?.v === undefined || cell?.v === "") {
@@ -112,4 +110,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   )
 }
 
-export default ExcelCell
+export default React.memo(
+  ExcelCell,
+  (prev, next) => prev.cell === next.cell,
+)

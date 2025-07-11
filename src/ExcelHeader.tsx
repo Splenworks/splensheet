@@ -3,9 +3,9 @@ import { useTranslation } from "react-i18next"
 import ExpandIcon from "./assets/icons/expand.svg?react"
 import CompressIcon from "./assets/icons/compress.svg?react"
 import XmarkIcon from "./assets/icons/xmark.svg?react"
+import DownloadIcon from "./assets/icons/download.svg?react"
 import IconButton from "./IconButton"
 import Tooltip from "./Tooltip"
-import { ArrowDownTrayIcon } from "@heroicons/react/24/solid"
 import { useDarkmode } from "./hooks/useDarkmode"
 import ExcelDarkModeToggleIcon from "./ExcelDarkModeToggleIcon"
 
@@ -71,7 +71,7 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
       <div className="flex items-center space-x-2">
         {hasChanges && (
           <Tooltip text={t("others.download")} place="bottom" className="rounded-full animate-bounce hover:animate-none">
-            <IconButton svgIcon={ArrowDownTrayIcon} onClick={onDownload} />
+            <IconButton svgIcon={DownloadIcon} onClick={onDownload} />
           </Tooltip>
         )}
         <Tooltip text={t("others.toggleDarkMode")} place="bottom" className="rounded-full">
