@@ -27,8 +27,8 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
 
   const getDisplayValue = (c: Partial<CellObject> | undefined) => {
     if (!c || c.v === undefined) return ""
-    if (c.t === "b") return c.v ? "TRUE" : "FALSE"
-    if (c.t === "d") {
+    if (c.t === "b" || typeof c.v === "boolean") return c.v ? "TRUE" : "FALSE"
+    if (c.t === "d" || c.v instanceof Date) {
       const d = new Date(c.v as string | number | Date)
       if (!isNaN(d.getTime())) return d.toLocaleDateString()
     }
