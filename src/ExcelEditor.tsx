@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState, useCallback } from "react"
 import ExcelCell from "./ExcelCell"
 import ExcelHeader from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
 import { utils, writeFile } from "xlsx"
 import type { WorkBook, CellObject, WorkSheet } from "xlsx"
+import { evaluateFormula } from "./utils/evaluateFormula"
 
 interface ExcelEditorProps {
   workbook: WorkBook
@@ -80,6 +81,27 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   )
   const [hasChanges, setHasChanges] = useState(initialHasChanges)
   const activeSheet = sheets[activeSheetIndex]
+  const activeDataRef = useRef(activeSheet.data)
+
+  useEffect(() => {
+    activeDataRef.current = sheets[activeSheetIndex].data
+  }, [sheets, activeSheetIndex])
+
+  const evaluateAt = useCallback(
+    (
+      r: number,
+      c: number,
+      formula: string,
+    ): string | number | boolean | undefined => {
+      const copy = activeDataRef.current.map((row) =>
+        row.map((cell) => (cell ? { ...cell } : {})),
+      )
+      if (!copy[r]) copy[r] = []
+      copy[r][c] = { f: formula }
+      return evaluateFormula(copy, r, c)
+    },
+    [],
+  )
 
   useEffect(() => {
     setSheets(
@@ -151,9 +173,10 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   ) => {
     const copy = [...sheets]
     const sheet = { ...copy[activeSheetIndex] }
-    const data = sheet.data.map((row) => [...row])
-    if (!data[r]) data[r] = []
-    data[r][c] = cell
+    const data = [...sheet.data]
+    const row = [...(data[r] || [])]
+    row[c] = cell
+    data[r] = row
     sheet.data = data
     copy[activeSheetIndex] = sheet
     const sheetName = workbook.SheetNames[activeSheetIndex]
@@ -208,7 +231,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
                       rowIndex={rIdx}
                       colIndex={cIdx}
                       cell={cellData}
-                      data={activeSheet.data}
+                      evaluate={evaluateAt}
                       onChange={updateCell}
                     />
                   ))}
