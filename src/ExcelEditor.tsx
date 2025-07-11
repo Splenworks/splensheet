@@ -93,12 +93,11 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       c: number,
       formula: string,
     ): string | number | boolean | undefined => {
-      const copy = activeDataRef.current.map((row) =>
-        row.map((cell) => (cell ? { ...cell } : {})),
-      )
-      if (!copy[r]) copy[r] = []
-      copy[r][c] = { f: formula }
-      return evaluateFormula(copy, r, c)
+      const data = [...activeDataRef.current]
+      const row = [...(data[r] || [])]
+      row[c] = { f: formula }
+      data[r] = row
+      return evaluateFormula(data, r, c)
     },
     [],
   )
