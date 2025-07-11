@@ -123,7 +123,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
           spellCheck="false"
         />
       )}
-      {!editing && getDisplayValue(cell)}
+      {getDisplayValue(cell)}
     </td>
   )
 }
