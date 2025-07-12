@@ -4,13 +4,13 @@
   },
   "dragDropArea": {
     "dropHere": "ここにドロップしてください",
-    "mainMessage": "ここに<u>スプレッドシート</u>ファイル(.xlsx、.xls、.csv)をドロップしてください！",
+    "mainMessage": "ここに<0>スプレッドシート</0>ファイル(.xlsx、.xls、.csv)をドロップしてください！",
     "subMessage": "現在はスプレッドシートファイルの閲覧のみ可能です。編集や保存機能は近日中に追加される予定です。",
     "noImageFilesFound": "スプレッドシートファイルが見つかりません。",
     "neverStoreYourData": "お客様のデータをサーバに保存することは決してありません。"
   },
   "footer": {
-    "checkOutProduct": "弊社の他のプロダクト<link />もご確認ください"
+    "checkOutProduct": "弊社の他のプロダクト<0 />もご確認ください"
   },
   "others": {
     "close": "閉じる",

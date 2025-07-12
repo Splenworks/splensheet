@@ -27,18 +27,16 @@ const Footer: React.FC = () => {
         <p className="text-sm text-black dark:text-white">
           <Trans
             i18nKey="footer.checkOutProduct"
-            components={{
-              link: (
-                <a
-                  key="random-product-link"
-                  href={randomProduct.url}
-                  target="_blank"
-                  className="underline focus:outline-pink-900 dark:focus:outline-pink-700"
-                >
-                  {randomProduct.name}
-                </a>
-              ),
-            }}
+            components={[
+              <a
+                key="random-product-link"
+                href={randomProduct.url}
+                target="_blank"
+                className="underline focus:outline-pink-900 dark:focus:outline-pink-700"
+              >
+                {randomProduct.name}
+              </a>,
+            ]}
           />
         </p>
         <div className="hidden flex-1 text-right text-sm text-white sm:block dark:text-neutral-900">

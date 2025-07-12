@@ -157,28 +157,16 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
                 <p className="mb-4 text-center text-xl font-bold">
                   <Trans
                     i18nKey="dragDropArea.mainMessage"
-                    components={{
-                      u: (
-                        <span
-                          key="underline-main"
-                          className="text-pink-900 dark:text-pink-700"
-                        />
-                      ),
-                    }}
+                    components={[
+                      <span
+                        key="underline-main"
+                        className="text-pink-900 dark:text-pink-700"
+                      />,
+                    ]}
                   />
                 </p>
                 <p className="mb-4 text-center text-lg font-semibold">
-                  <Trans
-                    i18nKey="dragDropArea.subMessage"
-                    components={{
-                      u: (
-                        <span
-                          key="underline-sub"
-                          className="text-pink-900 dark:text-pink-700"
-                        />
-                      ),
-                    }}
-                  />
+                  <Trans i18nKey="dragDropArea.subMessage" />
                 </p>
                 {!smallScreen && (
                   <p className="text-center text-gray-800 dark:text-gray-300">
