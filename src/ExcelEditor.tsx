@@ -4,6 +4,7 @@ import ExcelHeader from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
 import { utils, writeFile } from "xlsx"
 import type { WorkBook, CellObject, WorkSheet } from "xlsx"
+import { DetailedCellError, HyperFormula, type Sheets } from "hyperformula"
 import { evaluateFormula } from "./utils/evaluateFormula"
 
 interface ExcelEditorProps {
@@ -79,9 +80,18 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       data: sheetToData(workbook.Sheets[name]),
     })),
   )
+  const hfRef = useRef<HyperFormula | null>(null)
   const [hasChanges, setHasChanges] = useState(initialHasChanges)
   const activeSheet = sheets[activeSheetIndex]
   const activeDataRef = useRef(activeSheet.data)
+
+  const getCellType = (value: unknown): "n" | "s" | "b" | "d" => {
+    if (typeof value === "number") return "n"
+    if (typeof value === "string") return "s"
+    if (typeof value === "boolean") return "b"
+    if (value instanceof Date) return "d"
+    return "s"
+  }
 
   useEffect(() => {
     activeDataRef.current = sheets[activeSheetIndex].data
@@ -110,6 +120,17 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         data: sheetToData(workbook.Sheets[name]),
       })),
     )
+    const sheetsData: Sheets = {}
+    workbook.SheetNames.forEach((name) => {
+      const wsData = sheetToData(workbook.Sheets[name])
+      sheetsData[name] = wsData.map((r) =>
+        r.map((c) => (c?.f ? `=${c.f}` : c?.v)),
+      )
+    })
+    hfRef.current?.destroy()
+    hfRef.current = HyperFormula.buildFromSheets(sheetsData, {
+      licenseKey: "gpl-v3",
+    })
   }, [workbook])
 
   useEffect(() => {
@@ -129,6 +150,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     window.addEventListener("keydown", handleKeyDown)
     return () => {
       window.removeEventListener("keydown", handleKeyDown)
+      hfRef.current?.destroy()
     }
   }, [isFullScreen, toggleFullScreen, onClose])
 
@@ -167,17 +189,62 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
 
   const updateCell = useCallback(
     (r: number, c: number, cell: Partial<CellObject>) => {
+      const hf = hfRef.current
+      let changes: ReturnType<HyperFormula["setCellContents"]> = []
+      if (hf) {
+        const content = cell.f ? `=${cell.f}` : cell.v
+        changes = hf.setCellContents(
+          { sheet: activeSheetIndex, row: r, col: c },
+          [[content]],
+        )
+      }
+
       setSheets((prev) => {
-        const copy = [...prev]
-        const sheet = { ...copy[activeSheetIndex] }
-        const data = [...sheet.data]
-        const row = [...(data[r] || [])]
-        row[c] = cell
-        data[r] = row
-        sheet.data = data
-        copy[activeSheetIndex] = sheet
-        return copy
+        const updated = [...prev]
+
+        const applyChange = (
+          sheetIdx: number,
+          rowIdx: number,
+          colIdx: number,
+        ) => {
+          const formula = hf?.getCellFormula({
+            sheet: sheetIdx,
+            row: rowIdx,
+            col: colIdx,
+          })
+          const value = hf?.getCellValue({
+            sheet: sheetIdx,
+            row: rowIdx,
+            col: colIdx,
+          })
+          const v =
+            value instanceof DetailedCellError || value === null
+              ? undefined
+              : value
+          const t = getCellType(v)
+          const sheet = { ...updated[sheetIdx] }
+          const data = [...sheet.data]
+          const row = [...(data[rowIdx] || [])]
+          row[colIdx] = { v, t }
+          if (formula) row[colIdx].f = formula.slice(1)
+          data[rowIdx] = row
+          sheet.data = data
+          updated[sheetIdx] = sheet
+        }
+
+        if (hf) {
+          changes.forEach((ch) => {
+            if ("address" in ch) {
+              applyChange(ch.address.sheet, ch.address.row, ch.address.col)
+            }
+          })
+        } else {
+          applyChange(activeSheetIndex, r, c)
+        }
+
+        return updated
       })
+
       setHasChanges(true)
       onHasChangesChange?.(true)
     },
