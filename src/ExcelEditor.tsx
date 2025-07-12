@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState, useCallback } from "react"
 import ExcelCell from "./ExcelCell"
 import ExcelHeader from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
-import { utils, writeFile } from "xlsx"
-import type { WorkBook, CellObject, WorkSheet } from "xlsx"
+import { writeFile } from "xlsx"
+import type { WorkBook, CellObject } from "xlsx"
 import { evaluateFormula } from "./utils/evaluateFormula"
-import { getCellType } from "./utils/xlsx"
+import { sheetToData, dataToSheet } from "./utils/xlsx"
 
 interface ExcelEditorProps {
   workbook: WorkBook
@@ -28,50 +28,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     id: number
     name: string
     data: Array<Array<Partial<CellObject>>>
-  }
-
-  const sheetToData = (ws: WorkSheet): Array<Array<Partial<CellObject>>> => {
-    const range = utils.decode_range(ws['!ref'] || 'A1')
-    const rowCount = range.e.r + 1
-    const colCount = range.e.c + 1
-    const data: Array<Array<Partial<CellObject>>> = Array.from(
-      { length: rowCount },
-      () => Array.from({ length: colCount }, () => ({})),
-    )
-    for (let R = range.s.r; R <= range.e.r; R++) {
-      for (let C = range.s.c; C <= range.e.c; C++) {
-        const addr = utils.encode_cell({ r: R, c: C })
-        const cell: CellObject = ws[addr]
-        if (cell) {
-          cell.t = cell.t || getCellType(cell.v)
-          data[R][C] = cell
-        }
-      }
-    }
-    return data
-  }
-
-  const dataToSheet = (
-    data: Array<Array<Partial<CellObject>>>,
-    ws: WorkSheet,
-  ) => {
-    for (let r = 0; r < data.length; r++) {
-      for (let c = 0; c < data[r].length; c++) {
-        const cell = data[r][c]
-        const addr = utils.encode_cell({ r, c })
-        if (cell && (cell.v !== undefined || cell.f)) {
-          ws[addr] = { v: cell.v ?? undefined, f: cell.f } as CellObject
-        } else {
-          delete ws[addr]
-        }
-      }
-    }
-    const rowCount = data.length
-    const colCount = data.reduce((m, r) => Math.max(m, r.length), 0)
-    ws['!ref'] = utils.encode_range({
-      s: { r: 0, c: 0 },
-      e: { r: rowCount - 1, c: colCount - 1 },
-    })
   }
 
   const { isFullScreen, toggleFullScreen } = useFullScreen()
