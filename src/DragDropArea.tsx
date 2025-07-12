@@ -62,7 +62,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
       let workbook: WorkBook
       if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
         const arrayBuffer = await file.arrayBuffer()
-        workbook = read(arrayBuffer, { type: "array" })
+        workbook = read(arrayBuffer, { type: "array", cellDates: true })
       } else {
         const csvData = await file.text()
         workbook = parseCsv(csvData)
@@ -99,7 +99,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
       let workbook: WorkBook
       if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
         const arrayBuffer = await file.arrayBuffer()
-        workbook = read(arrayBuffer, { type: "array" })
+        workbook = read(arrayBuffer, { type: "array", cellDates: true })
       } else {
         const csvData = await file.text()
         workbook = parseCsv(csvData)

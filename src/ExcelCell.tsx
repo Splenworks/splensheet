@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import type { CellObject } from "xlsx"
+import { getCellType } from "./utils/xlsx"
 
 interface ExcelCellProps {
   rowIndex: number
@@ -33,14 +34,6 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       if (!isNaN(d.getTime())) return d.toLocaleDateString()
     }
     return String(c.v)
-  }
-
-  const getCellType = (value: unknown): "n" | "s" | "b" | "d" => {
-    if (typeof value === "number") return "n"
-    if (typeof value === "string") return "s"
-    if (typeof value === "boolean") return "b"
-    if (value instanceof Date) return "d"
-    return "s"
   }
 
   useEffect(() => {

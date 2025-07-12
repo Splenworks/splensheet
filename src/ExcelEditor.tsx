@@ -5,6 +5,7 @@ import { useFullScreen } from "./hooks/useFullScreen"
 import { utils, writeFile } from "xlsx"
 import type { WorkBook, CellObject, WorkSheet } from "xlsx"
 import { evaluateFormula } from "./utils/evaluateFormula"
+import { getCellType } from "./utils/xlsx"
 
 interface ExcelEditorProps {
   workbook: WorkBook
@@ -41,7 +42,10 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       for (let C = range.s.c; C <= range.e.c; C++) {
         const addr = utils.encode_cell({ r: R, c: C })
         const cell: CellObject = ws[addr]
-        if (cell) data[R][C] = cell
+        if (cell) {
+          cell.t = cell.t || getCellType(cell.v)
+          data[R][C] = cell
+        }
       }
     }
     return data
