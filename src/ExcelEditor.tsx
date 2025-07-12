@@ -165,26 +165,27 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
 
   const colCount = getLastNonEmptyCol()
 
-  const updateCell = (
-    r: number,
-    c: number,
-    cell: Partial<CellObject>,
-  ) => {
-    const copy = [...sheets]
-    const sheet = { ...copy[activeSheetIndex] }
-    const data = [...sheet.data]
-    const row = [...(data[r] || [])]
-    row[c] = cell
-    data[r] = row
-    sheet.data = data
-    copy[activeSheetIndex] = sheet
-    const sheetName = workbook.SheetNames[activeSheetIndex]
-    dataToSheet(sheet.data, workbook.Sheets[sheetName])
-    onWorkbookChange?.(workbook)
-    setSheets(copy)
-    setHasChanges(true)
-    onHasChangesChange?.(true)
-  }
+  const updateCell = useCallback(
+    (r: number, c: number, cell: Partial<CellObject>) => {
+      setSheets((prev) => {
+        const copy = [...prev]
+        const sheet = { ...copy[activeSheetIndex] }
+        const data = [...sheet.data]
+        const row = [...(data[r] || [])]
+        row[c] = cell
+        data[r] = row
+        sheet.data = data
+        copy[activeSheetIndex] = sheet
+        const sheetName = workbook.SheetNames[activeSheetIndex]
+        dataToSheet(sheet.data, workbook.Sheets[sheetName])
+        onWorkbookChange?.(workbook)
+        return copy
+      })
+      setHasChanges(true)
+      onHasChangesChange?.(true)
+    },
+    [activeSheetIndex, workbook, onWorkbookChange, onHasChangesChange],
+  )
 
   const rows = Array.from({ length: rowCount }).map((_, rIdx) => {
     const rowData = activeSheet.data[rIdx] || []

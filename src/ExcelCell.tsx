@@ -128,9 +128,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   )
 }
 
-export default ExcelCell
-
-// export default React.memo(
-//   ExcelCell,
-//   (prev, next) => prev.cell === next.cell,
-// )
+export default React.memo(
+  ExcelCell,
+  (prev, next) => prev.cell === next.cell,
+)
