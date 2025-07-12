@@ -100,6 +100,20 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       e.stopPropagation()
       setEditing(false)
       setInputValue("")
+    } else if (e.key === "Tab") {
+      e.preventDefault()
+      commit()
+      setEditing(false)
+      const td = inputRef.current?.closest("td") as HTMLTableCellElement | null
+      if (!td) return
+      let next: HTMLTableCellElement | null = td.nextElementSibling as
+        | HTMLTableCellElement
+        | null
+      if (!next) {
+        const nextRow = td.parentElement?.nextElementSibling as HTMLTableRowElement | null
+        next = nextRow?.querySelector("td") || null
+      }
+      next?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
     }
   }
 
