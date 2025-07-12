@@ -176,16 +176,19 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         data[r] = row
         sheet.data = data
         copy[activeSheetIndex] = sheet
-        const sheetName = workbook.SheetNames[activeSheetIndex]
-        dataToSheet(sheet.data, workbook.Sheets[sheetName])
-        onWorkbookChange?.(workbook)
         return copy
       })
       setHasChanges(true)
       onHasChangesChange?.(true)
     },
-    [activeSheetIndex, workbook, onWorkbookChange, onHasChangesChange],
+    [activeSheetIndex, onHasChangesChange],
   )
+
+  useEffect(() => {
+    const sheetName = workbook.SheetNames[activeSheetIndex]
+    dataToSheet(sheets[activeSheetIndex].data, workbook.Sheets[sheetName])
+    onWorkbookChange?.(workbook)
+  }, [sheets, activeSheetIndex, workbook, onWorkbookChange])
 
   const rows = Array.from({ length: rowCount }).map((_, rIdx) => {
     const rowData = activeSheet.data[rIdx] || []
