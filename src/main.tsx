@@ -29,6 +29,9 @@ i18n
     interpolation: {
       escapeValue: false,
     },
+    react: {
+      transWrapTextNodes: "span",
+    },
   })
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
