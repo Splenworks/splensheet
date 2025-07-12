@@ -30,6 +30,7 @@ const Footer: React.FC = () => {
             components={{
               link: (
                 <a
+                  key="random-product-link"
                   href={randomProduct.url}
                   target="_blank"
                   className="underline focus:outline-pink-900 dark:focus:outline-pink-700"
