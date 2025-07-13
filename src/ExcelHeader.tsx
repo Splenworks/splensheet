@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import ExpandIcon from "./assets/icons/expand.svg?react"
 import CompressIcon from "./assets/icons/compress.svg?react"
@@ -8,6 +8,7 @@ import IconButton from "./IconButton"
 import Tooltip from "./Tooltip"
 import { useDarkmode } from "./hooks/useDarkmode"
 import ExcelDarkModeToggleIcon from "./ExcelDarkModeToggleIcon"
+import { twJoin } from "tailwind-merge"
 
 interface ExcelHeaderProps {
   isFullScreen: boolean
@@ -38,6 +39,16 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
   const { t } = useTranslation()
   const { darkMode, toggleDarkMode } = useDarkmode()
   const isCsv = fileName.toLowerCase().endsWith('.csv')
+
+  const [showBounce, setShowBounce] = useState(false)
+
+  useEffect(() => {
+    if (hasChanges) {
+      setShowBounce(true)
+      const timer = setTimeout(() => setShowBounce(false), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [hasChanges])
 
   const DarkModeToggleIcon: React.FC<{ className?: string }> = ({ className }) => {
     return (
@@ -70,8 +81,12 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
       </div>
       <div className="flex items-center space-x-2">
         {hasChanges && (
-          <Tooltip text={t("others.download")} place="bottom" className="rounded-full animate-bounce hover:animate-none">
-            <IconButton svgIcon={DownloadIcon} onClick={onDownload} />
+          <Tooltip text={t("others.download")} place="bottom" className="rounded-full">
+            <IconButton
+              svgIcon={DownloadIcon}
+              onClick={onDownload}
+              className={twJoin(showBounce && "animate-bounce hover:animate-none")}
+            />
           </Tooltip>
         )}
         <Tooltip text={t("others.toggleDarkMode")} place="bottom" className="rounded-full">
