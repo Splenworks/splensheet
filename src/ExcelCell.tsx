@@ -28,10 +28,10 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   const inputRef = useRef<HTMLInputElement>(null)
 
   const getDisplayValue = (c: Partial<CellObject> | undefined) => {
-    if (!c || c.v === undefined) return ""
-    if (c.t === "b" || typeof c.v === "boolean") return c.v ? "TRUE" : "FALSE"
-    if (c.t === "d" || c.v instanceof Date) {
-      const d = new Date(c.v as string | number | Date)
+    if (!c || c.v === undefined) return "\u00A0"
+    if (c.t === "b") return c.v ? "TRUE" : "FALSE"
+    if (c.t === "d" && c.v instanceof Date) {
+      const d = new Date(c.v)
       if (!isNaN(d.getTime())) return d.toLocaleDateString()
     }
     return String(c.v)
@@ -41,8 +41,10 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     if (!c || c.v === undefined) return ""
     if (c.f) return `=${c.f}`
     if (c.t === "b") return c.v ? "TRUE" : "FALSE"
-    if (c.t === "d" && c.v instanceof Date)
-      return formatDate(c.v)
+    if (c.t === "d" && c.v instanceof Date) {
+      const d = new Date(c.v)
+      if (!isNaN(d.getTime())) return formatDate(c.v)
+    }
     return String(c.v)
   }
 
@@ -140,7 +142,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
           spellCheck="false"
         />
       )}
-      {getDisplayValue(cell) || "\u00A0"}
+      {getDisplayValue(cell)}
     </td>
   )
 }
