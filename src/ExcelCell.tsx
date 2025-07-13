@@ -1,18 +1,12 @@
 import React, { useEffect, useRef, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import type { CellObject } from "xlsx"
-import { getCellType } from "./utils/xlsx"
 import { formatDate } from "./utils/date"
 
 interface ExcelCellProps {
   rowIndex: number
   colIndex: number
   cell: Partial<CellObject> | undefined
-  evaluate: (
-    r: number,
-    c: number,
-    formula: string,
-  ) => string | number | boolean | undefined
   onChange: (r: number, c: number, cell: Partial<CellObject>) => void
 }
 
@@ -20,7 +14,6 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   rowIndex,
   colIndex,
   cell,
-  evaluate,
   onChange,
 }) => {
   const [editing, setEditing] = useState(false)
@@ -59,9 +52,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     const val = inputValue
     if (val.startsWith("=")) {
       const formula = val.slice(1)
-      const result = evaluate(rowIndex, colIndex, formula)
-      const type = getCellType(result)
-      onChange(rowIndex, colIndex, { v: result, f: formula, t: type })
+      onChange(rowIndex, colIndex, { f: formula })
     } else {
       if (cell?.t === "n") {
         const num = Number(val)
