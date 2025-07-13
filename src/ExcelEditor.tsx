@@ -4,7 +4,7 @@ import ExcelHeader from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
 import { writeFile } from "xlsx"
 import type { WorkBook, CellObject } from "xlsx"
-import { evaluateFormula } from "./utils/evaluateFormula"
+import { evaluateFormula, recalculateSheet } from "./utils/evaluateFormula"
 import { sheetToData, dataToSheet } from "./utils/xlsx"
 
 interface ExcelEditorProps {
@@ -134,7 +134,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         const row = [...(data[r] || [])]
         row[c] = cell
         data[r] = row
-        sheet.data = data
+        sheet.data = recalculateSheet(data)
         copy[activeSheetIndex] = sheet
         return copy
       })
