@@ -4,7 +4,7 @@ import ExcelHeader from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
 import { writeFile } from "xlsx"
 import type { WorkBook, CellObject } from "xlsx"
-import { recalculateSheet } from "./utils/evaluateFormula"
+import { recalculateSheet } from "./utils/recalculateSheet"
 import { sheetToData, dataToSheet } from "./utils/xlsx"
 
 interface ExcelEditorProps {
