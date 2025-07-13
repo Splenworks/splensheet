@@ -41,7 +41,11 @@ export const dataToSheet = (
       const cell = data[r][c]
       const addr = utils.encode_cell({ r, c })
       if (cell && (cell.v !== undefined || cell.f)) {
-        ws[addr] = { v: cell.v ?? undefined, f: cell.f } as CellObject
+        ws[addr] = {
+          v: cell.v ?? undefined,
+          f: cell.f,
+          t: cell.t,
+        } as CellObject
       } else {
         delete ws[addr]
       }
