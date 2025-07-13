@@ -42,7 +42,6 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       if (cell?.f) setInputValue("=" + cell.f)
       else if (cell?.t === "b") setInputValue(cell.v ? "TRUE" : "FALSE")
       else if (cell?.t === "d" && cell.v instanceof Date) {
-        console.log("Date cell value:", cell.v)
         setInputValue(formatDate(cell.v))
       }
       else setInputValue(cell?.v != undefined ? String(cell.v) : "")
