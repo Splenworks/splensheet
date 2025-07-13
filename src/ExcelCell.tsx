@@ -37,14 +37,18 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     return String(c.v)
   }
 
+  const getEditableValue = (c: Partial<CellObject> | undefined) => {
+    if (!c || c.v === undefined) return ""
+    if (c.f) return `=${c.f}`
+    if (c.t === "b") return c.v ? "TRUE" : "FALSE"
+    if (c.t === "d" && c.v instanceof Date)
+      return formatDate(c.v)
+    return String(c.v)
+  }
+
   useEffect(() => {
     if (editing) {
-      if (cell?.f) setInputValue("=" + cell.f)
-      else if (cell?.t === "b") setInputValue(cell.v ? "TRUE" : "FALSE")
-      else if (cell?.t === "d" && cell.v instanceof Date) {
-        setInputValue(formatDate(cell.v))
-      }
-      else setInputValue(cell?.v != undefined ? String(cell.v) : "")
+      setInputValue(getEditableValue(cell))
       inputRef.current?.focus()
     }
   }, [editing, cell])
@@ -84,7 +88,8 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   }
 
   const handleBlur = () => {
-    if (inputValue !== (cell?.f ? `=${cell.f}` : cell?.v ?? "")) {
+    const originalValue = getEditableValue(cell)
+    if (inputValue !== originalValue) {
       commit()
     }
     setEditing(false)
