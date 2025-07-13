@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import type { CellObject } from "xlsx"
 import { getCellType } from "./utils/xlsx"
+import { formatDate } from "./utils/date"
 
 interface ExcelCellProps {
   rowIndex: number
@@ -39,6 +40,11 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   useEffect(() => {
     if (editing) {
       if (cell?.f) setInputValue("=" + cell.f)
+      else if (cell?.t === "b") setInputValue(cell.v ? "TRUE" : "FALSE")
+      else if (cell?.t === "d" && cell.v instanceof Date) {
+        console.log("Date cell value:", cell.v)
+        setInputValue(formatDate(cell.v))
+      }
       else setInputValue(cell?.v != undefined ? String(cell.v) : "")
       inputRef.current?.focus()
     }
