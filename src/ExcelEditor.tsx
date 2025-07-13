@@ -4,7 +4,7 @@ import ExcelHeader from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
 import { writeFile } from "xlsx"
 import type { WorkBook, CellObject } from "xlsx"
-import { evaluateFormula, recalculateSheet } from "./utils/evaluateFormula"
+import { recalculateSheet } from "./utils/recalculateSheet"
 import { sheetToData, dataToSheet } from "./utils/xlsx"
 
 interface ExcelEditorProps {
@@ -47,20 +47,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     activeDataRef.current = sheets[activeSheetIndex].data
   }, [sheets, activeSheetIndex])
 
-  const evaluateAt = useCallback(
-    (
-      r: number,
-      c: number,
-      formula: string,
-    ): string | number | boolean | undefined => {
-      const data = [...activeDataRef.current]
-      const row = [...(data[r] || [])]
-      row[c] = { f: formula }
-      data[r] = row
-      return evaluateFormula(data, r, c)
-    },
-    [],
-  )
 
   useEffect(() => {
     setSheets(
@@ -194,7 +180,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
                       rowIndex={rIdx}
                       colIndex={cIdx}
                       cell={cellData}
-                      evaluate={evaluateAt}
                       onChange={updateCell}
                     />
                   ))}
