@@ -6,6 +6,7 @@ import { writeFile } from "xlsx"
 import type { WorkBook, CellObject } from "xlsx"
 import { recalculateSheet } from "./utils/recalculateSheet"
 import { sheetToData, dataToSheet } from "./utils/xlsx"
+import { isMac } from "./utils/isMac"
 
 interface ExcelEditorProps {
   workbook: WorkBook
@@ -42,6 +43,14 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   const [hasChanges, setHasChanges] = useState(initialHasChanges)
   const activeSheet = sheets[activeSheetIndex]
   const activeDataRef = useRef(activeSheet.data)
+  const undoStack = useRef<
+    Array<{
+      sheetIndex: number
+      r: number
+      c: number
+      prev: Partial<CellObject>
+    }>
+  >([])
 
   useEffect(() => {
     activeDataRef.current = sheets[activeSheetIndex].data
@@ -62,9 +71,36 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     setHasChanges(initialHasChanges)
   }, [initialHasChanges])
 
+  const handleUndo = useCallback(() => {
+    const last = undoStack.current.pop()
+    if (!last) return
+    setSheets((prev) => {
+      const copy = [...prev]
+      const sheet = { ...copy[last.sheetIndex] }
+      const data = [...sheet.data]
+      const row = [...(data[last.r] || [])]
+      row[last.c] = last.prev
+      data[last.r] = row
+      sheet.data = recalculateSheet(data)
+      copy[last.sheetIndex] = sheet
+      return copy
+    })
+    setHasChanges(true)
+    onHasChangesChange?.(true)
+  }, [onHasChangesChange])
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      const key = event.key.toLowerCase()
+      if (
+        (isMac && event.metaKey && key === "z") ||
+        (!isMac && event.ctrlKey && key === "z")
+      ) {
+        event.preventDefault()
+        handleUndo()
+        return
+      }
+      if (key === "escape") {
         if (isFullScreen) {
           toggleFullScreen()
         } else {
@@ -76,7 +112,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     return () => {
       window.removeEventListener("keydown", handleKeyDown)
     }
-  }, [isFullScreen, toggleFullScreen, onClose])
+  }, [isFullScreen, toggleFullScreen, onClose, handleUndo])
 
   const getLastNonEmptyRow = (): number => {
     let lastRowIdx = activeSheet.data.length
@@ -118,6 +154,12 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         const sheet = { ...copy[activeSheetIndex] }
         const data = [...sheet.data]
         const row = [...(data[r] || [])]
+        undoStack.current.push({
+          sheetIndex: activeSheetIndex,
+          r,
+          c,
+          prev: row[c] ?? {},
+        })
         row[c] = cell
         data[r] = row
         sheet.data = recalculateSheet(data)
@@ -129,6 +171,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     },
     [activeSheetIndex, onHasChangesChange],
   )
+
 
   useEffect(() => {
     const sheetName = workbook.SheetNames[activeSheetIndex]
