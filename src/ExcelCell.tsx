@@ -43,10 +43,19 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
 
   useEffect(() => {
     if (editing) {
-      setInputValue(getEditableValue(cell))
       inputRef.current?.focus()
     }
-  }, [editing, cell])
+  }, [editing])
+
+  const startEdit = () => {
+    setInputValue(getEditableValue(cell))
+    setEditing(true)
+  }
+
+  const stopEdit = () => {
+    setEditing(false)
+    setInputValue("")
+  }
 
   const commit = () => {
     const val = inputValue
@@ -85,21 +94,20 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     if (inputValue !== originalValue) {
       commit()
     }
-    setEditing(false)
+    stopEdit()
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       commit()
-      setEditing(false)
+      stopEdit()
     } else if (e.key === "Escape") {
       e.stopPropagation()
-      setEditing(false)
-      setInputValue("")
+      stopEdit()
     } else if (e.key === "Tab") {
       e.preventDefault()
       commit()
-      setEditing(false)
+      stopEdit()
       const td = inputRef.current?.closest("td") as HTMLTableCellElement | null
       if (!td) return
       let next: HTMLTableCellElement | null = td.nextElementSibling as
@@ -120,7 +128,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
         rowIndex === 0 && "border-t-0",
         cell?.t === "n" && !editing && "text-right"
       )}
-      onClick={() => setEditing(true)}
+      onClick={startEdit}
     >
       {editing && (
         <input
