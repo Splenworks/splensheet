@@ -27,7 +27,8 @@ const Header: React.FC<HeaderProps> = ({ showGoBack = false, onGoBack }) => {
           )}
         </div>
         <p className="text-xl font-semibold text-black dark:text-white">
-          Splen<span className="text-pink-900 dark:text-pink-700">Sheet</span>
+          <span className="bg-gradient-to-r from-pink-700 to-pink-900 dark:from-pink-700 dark:to-pink-500 text-transparent bg-clip-text">Splen</span>
+          Sheet
         </p>
         <div className="flex flex-1 items-center justify-end">
           <DarkModeSwitch />
