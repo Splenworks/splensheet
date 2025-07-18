@@ -18,6 +18,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
 }) => {
   const [editing, setEditing] = useState(false)
   const [inputValue, setInputValue] = useState("")
+  const committedRef = useRef(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const getDisplayValue = (c: Partial<CellObject> | undefined) => {
@@ -49,6 +50,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
 
   const startEdit = () => {
     setInputValue(getEditableValue(cell))
+    committedRef.current = false
     setEditing(true)
   }
 
@@ -91,7 +93,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
 
   const handleBlur = () => {
     const originalValue = getEditableValue(cell)
-    if (inputValue !== originalValue) {
+    if (!committedRef.current && inputValue !== originalValue) {
       commit()
     }
     stopEdit()
@@ -100,13 +102,16 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       commit()
+      committedRef.current = true
       stopEdit()
     } else if (e.key === "Escape") {
       e.stopPropagation()
+      committedRef.current = true
       stopEdit()
     } else if (e.key === "Tab") {
       e.preventDefault()
       commit()
+      committedRef.current = true
       stopEdit()
       const td = inputRef.current?.closest("td") as HTMLTableCellElement | null
       if (!td) return
