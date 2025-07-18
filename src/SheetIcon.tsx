@@ -18,8 +18,8 @@ const SheetIcon: FC<{ className?: string }> = ({ className }) => {
       <path
         fill="url(#gradient)"
         d="m4 7c0-1.6568 1.3432-3 3-3h10c1.6569 0 3 1.3432 3 3v10c0 1.6569-1.3431 3-3 3h-10c-1.6568 0-3-1.3431-3-3v-10zm3-1c-0.55228 0-1 0.44772-1 1v4h5v-5h-4zm6 0v5h5v-4c0-0.55228-0.4477-1-1-1h-4zm5 7h-5v5h4c0.5523 0 1-0.4477 1-1v-4zm-7 5v-5h-5v4c0 0.5523 0.44772 1 1 1h4z"
-        clip-rule="evenodd"
-        fill-rule="evenodd" />
+        clipRule="evenodd"
+        fillRule="evenodd" />
     </svg>
   )
 }
