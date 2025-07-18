@@ -120,9 +120,8 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
     <div className="fixed top-16 right-0 bottom-16 left-0 bg-white dark:bg-neutral-900">
       <div
         className={twJoin(
-          "absolute inset-x-8 inset-y-0 flex cursor-pointer items-center justify-center rounded-xl border-4 border-dashed border-gray-300 transition-colors duration-300 ease-in-out md:inset-x-16",
-          (dragging || loading) &&
-          "border-pink-800 bg-neutral-200 dark:border-pink-600 dark:bg-neutral-600",
+          "absolute inset-x-8 inset-y-0 flex cursor-pointer items-center justify-center rounded-xl p-1 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 animate-shimmer transition-opacity duration-300 ease-in-out md:inset-x-16",
+          (dragging || loading) && "opacity-75",
         )}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
@@ -130,14 +129,21 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
         onDrop={handleDrop}
         onClick={handleClick}
       >
-        <input
-          type="file"
-          multiple={false}
-          accept=".xlsx,.xls,.csv"
-          hidden
-          ref={fileInputRef}
-          onChange={handleFileInputChange}
-        />
+        <div
+          className={twJoin(
+            "flex h-full w-full items-center justify-center rounded-xl border-4 border-dashed border-gray-300 bg-white dark:bg-neutral-900 transition-colors duration-300 ease-in-out",
+            (dragging || loading) &&
+              "border-pink-800 bg-neutral-200 dark:border-pink-600 dark:bg-neutral-600",
+          )}
+        >
+          <input
+            type="file"
+            multiple={false}
+            accept=".xlsx,.xls,.csv"
+            hidden
+            ref={fileInputRef}
+            onChange={handleFileInputChange}
+          />
         {loading ? (
           <Spinner />
         ) : (
@@ -179,6 +185,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
             )}
           </div>
         )}
+        </div>
       </div>
     </div>
   )
