@@ -124,7 +124,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
           "hover:bg-gradient-to-r hover:from-transparent hover:to-transparent hover:bg-[length:200%_100%] hover:animate-shimmer",
           "hover:via-pink-200/50 dark:hover:via-pink-800/20",
           (dragging || loading) &&
-          "border-pink-800 bg-neutral-200 dark:border-pink-600 dark:bg-neutral-600",
+          "border-pink-800 bg-gray-300 dark:border-pink-600 dark:bg-neutral-600",
         )}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
@@ -150,7 +150,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
             )}
           >
             {dragging ? (
-              <p className="text-center text-xl font-bold text-gray-50 shadow-gray-600 [text-shadow:_0_5px_5px_var(--tw-shadow-color,0.5)] dark:text-white dark:shadow-black">
+              <p className="text-center text-xl font-bold text-white shadow-gray-700 [text-shadow:_0_5px_5px_var(--tw-shadow-color,0.5)] dark:text-white dark:shadow-black">
                 <Trans i18nKey="dragDropArea.dropHere" />
               </p>
             ) : (
