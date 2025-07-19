@@ -150,7 +150,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
             )}
           >
             {dragging ? (
-              <p className="text-center text-xl font-bold text-white shadow-gray-700 [text-shadow:_0_5px_5px_var(--tw-shadow-color,0.5)] dark:text-white dark:shadow-black">
+              <p className="text-center text-xl font-bold text-white shadow-gray-700 [text-shadow:_0_5px_5px_var(--tw-shadow-color,0.5)] dark:shadow-black">
                 <Trans i18nKey="dragDropArea.dropHere" />
               </p>
             ) : (
