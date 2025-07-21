@@ -211,26 +211,24 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         hasChanges={hasChanges}
         onDownload={handleDownload}
       />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <div className="flex-1 overflow-auto">
-          <table className="min-w-max border-collapse text-sm">
-            <tbody>
-              {rows.map((row, rIdx) => (
-                <tr key={rIdx}>
-                  {row.cells.map((cellData, cIdx) => (
-                    <ExcelCell
-                      key={cIdx}
-                      rowIndex={rIdx}
-                      colIndex={cIdx}
-                      cell={cellData}
-                      onChange={updateCell}
-                    />
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      <div className="flex-1 overflow-auto">
+        <table className="min-w-max border-collapse text-sm">
+          <tbody>
+            {rows.map((row, rIdx) => (
+              <tr key={rIdx}>
+                {row.cells.map((cellData, cIdx) => (
+                  <ExcelCell
+                    key={cIdx}
+                    rowIndex={rIdx}
+                    colIndex={cIdx}
+                    cell={cellData}
+                    onChange={updateCell}
+                  />
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   )
