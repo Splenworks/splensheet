@@ -35,8 +35,9 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   }
 
   const getEditableValue = (c: Partial<CellObject> | undefined) => {
-    if (!c || c.v === undefined) return ""
+    if (!c) return ""
     if (c.f) return `=${c.f}`
+    if (c.v === undefined) return ""
     if (c.t === "b") return c.v ? "TRUE" : "FALSE"
     if (c.t === "d" && c.v instanceof Date) {
       const d = new Date(c.v)
