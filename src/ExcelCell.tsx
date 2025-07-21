@@ -135,7 +135,10 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       if (suggestion) {
         handleInputChange(inputValue + suggestion)
         setTimeout(() => {
-          inputRef.current?.setSelectionRange(inputValue.length + suggestion.length, inputValue.length + suggestion.length)
+          if (inputRef.current) {
+            inputRef.current.setSelectionRange(inputValue.length + suggestion.length, inputValue.length + suggestion.length)
+            inputRef.current.scrollLeft = inputRef.current.scrollWidth || 0
+          }
         }, 0)
       } else {
         commit()
@@ -164,10 +167,10 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       onClick={startEdit}
     >
       {editing && (
-        <div className="absolute left-0 top-0 right-0 bottom-0 px-2 py-1 box-border">
+        <div className="absolute left-0 top-0 right-0 bottom-0 box-border">
           <input
             ref={inputRef}
-            className="w-full h-full box-border border-none bg-white dark:bg-neutral-900 focus:outline-pink-900 focus:outline-2 focus:[outline-offset:-2px] dark:focus:outline-pink-700"
+            className="w-full h-full px-2 py-1 box-border border-none bg-white dark:bg-neutral-900 focus:outline-pink-900 focus:outline-2 focus:[outline-offset:-2px] dark:focus:outline-pink-700"
             value={inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
             onBlur={handleBlur}
@@ -175,7 +178,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
             spellCheck="false"
           />
           {suggestion && (
-            <div className="pointer-events-none absolute inset-0 flex items-center text-gray-400 whitespace-pre">
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 right-0 px-2 py-1 flex items-center text-gray-400 whitespace-pre">
               <span className="invisible">{inputValue}</span>
               <span>{suggestion}</span>
             </div>
