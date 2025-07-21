@@ -52,6 +52,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   }, [editing])
 
   const startEdit = () => {
+    if (editing) return
     const value = getEditableValue(cell)
     setInputValue(value)
     updateSuggestion(value)
