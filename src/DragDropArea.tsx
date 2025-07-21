@@ -3,7 +3,6 @@ import { Trans } from "react-i18next"
 import { twJoin, twMerge } from "tailwind-merge"
 import { useMediaQuery } from "usehooks-ts"
 import Spinner from "./Spinner"
-import { useDarkmode } from "./hooks/useDarkmode"
 import { parseCsv } from "./utils/parseCsv"
 import { read, type WorkBook } from "xlsx"
 import SheetIcon from "./SheetIcon"
@@ -25,7 +24,6 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [loading, setLoading] = useState(false)
   const smallScreen = useMediaQuery("(max-width: 640px), (max-height: 640px)")
-  const { darkMode } = useDarkmode()
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
