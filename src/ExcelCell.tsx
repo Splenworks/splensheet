@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import type { CellObject } from "xlsx"
+import { HyperFormula } from "hyperformula"
 import { formatDate } from "./utils/date"
+
+const FUNCTION_NAMES = HyperFormula.getRegisteredFunctionNames("enGB").sort()
 
 interface ExcelCellProps {
   rowIndex: number
@@ -18,6 +21,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
 }) => {
   const [editing, setEditing] = useState(false)
   const [inputValue, setInputValue] = useState("")
+  const [suggestion, setSuggestion] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
 
   const getDisplayValue = (c: Partial<CellObject> | undefined) => {
@@ -48,13 +52,35 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   }, [editing])
 
   const startEdit = () => {
-    setInputValue(getEditableValue(cell))
+    const value = getEditableValue(cell)
+    setInputValue(value)
+    updateSuggestion(value)
     setEditing(true)
+  }
+
+  const updateSuggestion = (val: string) => {
+    if (val.startsWith("=")) {
+      const prefix = val.slice(1).toUpperCase()
+      if (prefix.length === 0) {
+        setSuggestion("")
+        return
+      }
+      const match = FUNCTION_NAMES.find((n) => n.startsWith(prefix))
+      setSuggestion(match ? match.slice(prefix.length) : "")
+    } else {
+      setSuggestion("")
+    }
+  }
+
+  const handleInputChange = (val: string) => {
+    setInputValue(val)
+    updateSuggestion(val)
   }
 
   const stopEdit = () => {
     setEditing(false)
     setInputValue("")
+    setSuggestion("")
   }
 
   const commit = () => {
@@ -106,18 +132,25 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       stopEdit()
     } else if (e.key === "Tab") {
       e.preventDefault()
-      commit()
-      stopEdit()
-      const td = inputRef.current?.closest("td") as HTMLTableCellElement | null
-      if (!td) return
-      let next: HTMLTableCellElement | null = td.nextElementSibling as
-        | HTMLTableCellElement
-        | null
-      if (!next) {
-        const nextRow = td.parentElement?.nextElementSibling as HTMLTableRowElement | null
-        next = nextRow?.querySelector("td") || null
+      if (suggestion) {
+        handleInputChange(inputValue + suggestion)
+        setTimeout(() => {
+          inputRef.current?.setSelectionRange(inputValue.length + suggestion.length, inputValue.length + suggestion.length)
+        }, 0)
+      } else {
+        commit()
+        stopEdit()
+        const td = inputRef.current?.closest("td") as HTMLTableCellElement | null
+        if (!td) return
+        let next: HTMLTableCellElement | null = td.nextElementSibling as
+          | HTMLTableCellElement
+          | null
+        if (!next) {
+          const nextRow = td.parentElement?.nextElementSibling as HTMLTableRowElement | null
+          next = nextRow?.querySelector("td") || null
+        }
+        next?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
       }
-      next?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
     }
   }
 
@@ -131,15 +164,23 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       onClick={startEdit}
     >
       {editing && (
-        <input
-          ref={inputRef}
-          className="absolute left-0 top-0 right-0 bottom-0 px-2 py-1 box-border border-none bg-white dark:bg-neutral-900 focus:outline-pink-900 focus:outline-2 focus:[outline-offset:-2px] dark:focus:outline-pink-700"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-          spellCheck="false"
-        />
+        <div className="absolute left-0 top-0 right-0 bottom-0 px-2 py-1 box-border">
+          <input
+            ref={inputRef}
+            className="w-full h-full box-border border-none bg-white dark:bg-neutral-900 focus:outline-pink-900 focus:outline-2 focus:[outline-offset:-2px] dark:focus:outline-pink-700"
+            value={inputValue}
+            onChange={(e) => handleInputChange(e.target.value)}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            spellCheck="false"
+          />
+          {suggestion && (
+            <div className="pointer-events-none absolute inset-0 flex items-center text-gray-400 whitespace-pre">
+              <span className="invisible">{inputValue}</span>
+              <span>{suggestion}</span>
+            </div>
+          )}
+        </div>
       )}
       {getDisplayValue(cell)}
     </td>
