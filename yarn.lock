@@ -4141,13 +4141,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hyperformula@npm:^2.5.0":
-  version: 2.7.1
-  resolution: "hyperformula@npm:2.7.1"
+"hyperformula@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "hyperformula@npm:3.0.0"
   dependencies:
     chevrotain: "npm:^6.5.0"
     tiny-emitter: "npm:^2.1.0"
-  checksum: 10c0/2ba1e342f51f31c2756fdb5cbfddba6837daed90dbc6aa562e8c2999b8eb8bec5177ca589e58df51aaae225f6e795b6af90003af4246b07511eb416209b5222a
+  checksum: 10c0/1ac1ce42365b81c0ca0f512b9dca21f1716b82ea1279a193e7f6bf93c5a4dc7fc467cbb1eb4f8788703bdc7ca3855e412623bf8739061e03e8a1c1d4d447db1b
   languageName: node
   linkType: hard
 
@@ -6188,7 +6188,7 @@ __metadata:
     eslint: "npm:^8.56.0"
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-react-refresh: "npm:^0.4.5"
-    hyperformula: "npm:^2.5.0"
+    hyperformula: "npm:^3.0.0"
     i18next: "npm:^23.10.1"
     i18next-browser-languagedetector: "npm:^7.2.1"
     papaparse: "npm:^5.3.0"
