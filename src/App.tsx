@@ -34,6 +34,14 @@ function App() {
     }
   }, [toggleFullScreen])
 
+  useEffect(() => {
+    if (editorOpen && fileName) {
+      document.title = `${fileName} - SplenSheet`;
+    } else {
+      document.title = "Splensheet - Free Online Spreadsheet Editor with Formula Support";
+    }
+  }, [fileName, editorOpen]);
+
   if (workbook && editorOpen) {
     return (
       <FullScreenProvider>
