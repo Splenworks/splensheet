@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useState, useCallback } from "react"
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useLayoutEffect,
+} from "react"
 import ExcelCell from "./ExcelCell"
 import ExcelHeader from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
@@ -41,7 +47,11 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     })),
   )
   const [hasChanges, setHasChanges] = useState(initialHasChanges)
+  const containerRef = useRef<HTMLDivElement>(null)
   const activeSheet = sheets[activeSheetIndex]
+  const [displayRowCount, setDisplayRowCount] = useState(0)
+  const [displayColCount, setDisplayColCount] = useState(0)
+  const [resizeTick, setResizeTick] = useState(0)
   const activeDataRef = useRef(activeSheet.data)
   const undoStack = useRef<
     Array<{
@@ -114,6 +124,14 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     }
   }, [isFullScreen, toggleFullScreen, onClose, handleUndo])
 
+  useEffect(() => {
+    const onResize = () => setResizeTick((t) => t + 1)
+    window.addEventListener("resize", onResize)
+    return () => {
+      window.removeEventListener("resize", onResize)
+    }
+  }, [])
+
   const getLastNonEmptyRow = (): number => {
     let lastRowIdx = activeSheet.data.length
     while (lastRowIdx > 0) {
@@ -128,7 +146,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   }
 
   const rowCount = getLastNonEmptyRow()
-
+  
   const getLastNonEmptyCol = (): number => {
     let lastColIdx = activeSheet.data.reduce(
       (max, row) => Math.max(max, row.length),
@@ -146,6 +164,25 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   }
 
   const colCount = getLastNonEmptyCol()
+
+  useEffect(() => {
+    setDisplayRowCount((prev) => Math.max(prev, rowCount))
+  }, [rowCount])
+
+  useEffect(() => {
+    setDisplayColCount((prev) => Math.max(prev, colCount))
+  }, [colCount])
+
+  useLayoutEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+    if (container.scrollHeight <= container.clientHeight && displayRowCount < 200) {
+      setDisplayRowCount((prev) => prev + 1)
+    }
+    if (container.scrollWidth <= container.clientWidth && displayColCount < 50) {
+      setDisplayColCount((prev) => prev + 1)
+    }
+  }, [displayRowCount, displayColCount, rowCount, colCount, isFullScreen, resizeTick])
 
   const updateCell = useCallback(
     (r: number, c: number, cell: Partial<CellObject>) => {
@@ -179,9 +216,9 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     onWorkbookChange?.(workbook)
   }, [sheets, activeSheetIndex, workbook, onWorkbookChange])
 
-  const rows = Array.from({ length: rowCount }).map((_, rIdx) => {
+  const rows = Array.from({ length: displayRowCount }).map((_, rIdx) => {
     const rowData = activeSheet.data[rIdx] || []
-    const cells = Array.from({ length: colCount }).map((_, cIdx) => {
+    const cells = Array.from({ length: displayColCount }).map((_, cIdx) => {
       return rowData[cIdx]
     })
     return { cells }
@@ -211,7 +248,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         hasChanges={hasChanges}
         onDownload={handleDownload}
       />
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto" ref={containerRef}>
         <table className="min-w-max border-collapse text-sm">
           <tbody>
             {rows.map((row, rIdx) => (
