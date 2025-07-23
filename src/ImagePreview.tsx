@@ -9,6 +9,7 @@ interface ImagePreviewProps {
 const ImagePreview: React.FC<ImagePreviewProps> = ({ url, delay = 500, children }) => {
   const [show, setShow] = useState(false)
   const [showAbove, setShowAbove] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false)
   const timerRef = useRef<number | null>(null)
   const containerRef = useRef<HTMLSpanElement>(null)
 
@@ -28,6 +29,15 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ url, delay = 500, children 
       timerRef.current = null
     }
     setShow(false)
+    setImageLoaded(false)
+  }
+
+  const handleImageLoad = () => {
+    setImageLoaded(true)
+  }
+
+  const handleImageError = () => {
+    setImageLoaded(false)
   }
 
   return (
@@ -43,12 +53,19 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ url, delay = 500, children 
           className={
             showAbove
               ?
-                "absolute left-1/2 bottom-full z-20 mb-2 -translate-x-1/2 rounded border border-gray-300 bg-white p-1 shadow-lg dark:border-neutral-600 dark:bg-neutral-800"
+              "absolute left-1/2 bottom-full z-20 mb-2 -translate-x-1/2 rounded border border-gray-300 bg-white p-1 shadow-lg dark:border-neutral-600 dark:bg-neutral-800"
               :
-                "absolute left-1/2 top-full z-20 mt-2 -translate-x-1/2 rounded border border-gray-300 bg-white p-1 shadow-lg dark:border-neutral-600 dark:bg-neutral-800"
+              "absolute left-1/2 top-full z-20 mt-2 -translate-x-1/2 rounded border border-gray-300 bg-white p-1 shadow-lg dark:border-neutral-600 dark:bg-neutral-800"
           }
+          style={{ display: imageLoaded ? 'block' : 'none' }}
         >
-          <img src={url} alt="preview" className="max-h-64 max-w-[16rem] object-contain" />
+          <img
+            src={url}
+            alt="preview"
+            className="max-h-64 max-w-[16rem] object-contain"
+            onLoad={handleImageLoad}
+            onError={handleImageError}
+          />
         </div>
       )}
     </span>
