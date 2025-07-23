@@ -177,7 +177,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   return (
     <td
       className={twMerge(
-        "min-w-12 px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600 relative",
+        "min-w-12 px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600 relative cursor-default",
         rowIndex === 0 && "border-t-0",
         cell?.t === "n" && !editing && "text-right"
       )}

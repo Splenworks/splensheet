@@ -7,7 +7,7 @@ interface ImagePreviewProps {
   children: React.ReactNode
 }
 
-const ImagePreview: React.FC<ImagePreviewProps> = ({ url, delay = 500, children }) => {
+const ImagePreview: React.FC<ImagePreviewProps> = ({ url, delay = 300, children }) => {
   const [show, setShow] = useState(false)
   const [showAbove, setShowAbove] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
