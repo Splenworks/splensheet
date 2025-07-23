@@ -53,7 +53,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ url, delay = 300, children 
       {show && (
         <div
           className={twJoin(
-            "absolute left-1/2 z-20 -translate-x-1/2 rounded border border-gray-300 bg-white p-1 shadow-lg dark:border-neutral-600 dark:bg-neutral-800",
+            "absolute left-1/2 z-20 -translate-x-1/2 rounded-md border border-gray-300 bg-white p-1 shadow-lg dark:border-neutral-600 dark:bg-neutral-800",
             showAbove ? "bottom-full mb-2" : "top-full mt-2",
             imageLoaded ? "block" : "hidden",
           )}
@@ -61,7 +61,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ url, delay = 300, children 
           <img
             src={url}
             alt="preview"
-            className="max-h-64 max-w-[16rem] object-contain"
+            className="max-h-64 max-w-[16rem] object-contain rounded-sm"
             onLoad={handleImageLoad}
             onError={handleImageError}
           />
