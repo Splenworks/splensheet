@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react"
+import { twJoin } from "tailwind-merge"
 
 interface ImagePreviewProps {
   url: string
@@ -20,6 +21,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ url, delay = 500, children 
         setShowAbove(rect.top > window.innerHeight / 2)
       }
       setShow(true)
+      setImageLoaded(false)
     }, delay)
   }
 
@@ -50,14 +52,11 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ url, delay = 500, children 
       {children}
       {show && (
         <div
-          className={
-            showAbove
-              ?
-              "absolute left-1/2 bottom-full z-20 mb-2 -translate-x-1/2 rounded border border-gray-300 bg-white p-1 shadow-lg dark:border-neutral-600 dark:bg-neutral-800"
-              :
-              "absolute left-1/2 top-full z-20 mt-2 -translate-x-1/2 rounded border border-gray-300 bg-white p-1 shadow-lg dark:border-neutral-600 dark:bg-neutral-800"
-          }
-          style={{ display: imageLoaded ? 'block' : 'none' }}
+          className={twJoin(
+            "absolute left-1/2 z-20 -translate-x-1/2 rounded border border-gray-300 bg-white p-1 shadow-lg dark:border-neutral-600 dark:bg-neutral-800",
+            showAbove ? "bottom-full mb-2" : "top-full mt-2",
+            imageLoaded ? "block" : "hidden",
+          )}
         >
           <img
             src={url}
