@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import ImagePreview from "./ImagePreview"
+import LinkPreview from "./LinkPreview"
 import type { CellObject } from "xlsx"
 import { HyperFormula } from "hyperformula"
 import { formatDate } from "./utils/date"
@@ -13,6 +14,15 @@ const isImageUrl = (val: string): boolean => {
   try {
     const u = new URL(val)
     return IMAGE_EXT_RE.test(u.pathname)
+  } catch {
+    return false
+  }
+}
+
+const isHttpUrl = (val: string): boolean => {
+  try {
+    const u = new URL(val)
+    return u.protocol === "http:" || u.protocol === "https:"
   } catch {
     return false
   }
@@ -173,6 +183,8 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
 
   const displayValue = getDisplayValue(cell)
   const showImagePreview = !editing && isImageUrl(displayValue)
+  const showLinkPreview =
+    !editing && !showImagePreview && isHttpUrl(displayValue)
 
   return (
     <td
@@ -204,6 +216,8 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       )}
       {showImagePreview ? (
         <ImagePreview url={displayValue}>{displayValue}</ImagePreview>
+      ) : showLinkPreview ? (
+        <LinkPreview url={displayValue}>{displayValue}</LinkPreview>
       ) : (
         displayValue
       )}
