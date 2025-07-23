@@ -1,10 +1,22 @@
 import React, { useEffect, useRef, useState } from "react"
 import { twMerge } from "tailwind-merge"
+import ImagePreview from "./ImagePreview"
 import type { CellObject } from "xlsx"
 import { HyperFormula } from "hyperformula"
 import { formatDate } from "./utils/date"
 
 const FUNCTION_NAMES = HyperFormula.getRegisteredFunctionNames("enGB").sort()
+
+const IMAGE_EXT_RE = /\.(png|jpe?g|gif|webp|svg)$/i
+
+const isImageUrl = (val: string): boolean => {
+  try {
+    const u = new URL(val)
+    return IMAGE_EXT_RE.test(u.pathname)
+  } catch {
+    return false
+  }
+}
 
 interface ExcelCellProps {
   rowIndex: number
@@ -159,6 +171,9 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     }
   }
 
+  const displayValue = getDisplayValue(cell)
+  const showImagePreview = !editing && isImageUrl(displayValue)
+
   return (
     <td
       className={twMerge(
@@ -187,7 +202,11 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
           )}
         </div>
       )}
-      {getDisplayValue(cell)}
+      {showImagePreview ? (
+        <ImagePreview url={displayValue}>{displayValue}</ImagePreview>
+      ) : (
+        displayValue
+      )}
     </td>
   )
 }
