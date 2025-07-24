@@ -89,7 +89,7 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url, delay = 300, children })
       {show && (
         <div
           className={twJoin(
-            "absolute max-w-64 left-1/2 z-20 -translate-x-1/2 rounded-md border border-gray-300 bg-white p-2 shadow-lg dark:border-neutral-600 dark:bg-neutral-800 text-xs",
+            "absolute max-w-64 left-1/2 z-20 -translate-x-1/2 rounded-md border border-gray-300 bg-white p-2 shadow-lg dark:border-neutral-600 dark:bg-neutral-800 text-xs transition-all",
             showAbove ? "bottom-full mb-2" : "top-full mt-2",
           )}
         >
