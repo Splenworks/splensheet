@@ -89,35 +89,25 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url, delay = 300, children })
       {show && (
         <div
           className={twJoin(
-            "absolute left-1/2 z-20 -translate-x-1/2 rounded-md border border-gray-300 bg-white p-2 shadow-lg dark:border-neutral-600 dark:bg-neutral-800 text-xs",
+            "absolute max-w-64 left-1/2 z-20 -translate-x-1/2 rounded-md border border-gray-300 bg-white p-2 shadow-lg dark:border-neutral-600 dark:bg-neutral-800 text-xs",
             showAbove ? "bottom-full mb-2" : "top-full mt-2",
           )}
-          style={{ width: "16rem" }}
         >
           {loading && <Spinner />}
           {metadata && (
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2">
+              {metadata.title && (
+                <div className="font-bold truncate" title={metadata.title}>
+                  {metadata.title}
+                </div>
+              )}
               {metadata.thumbnail && (
                 <img
                   src={metadata.thumbnail}
                   alt="thumbnail"
-                  className="h-16 w-16 flex-shrink-0 object-cover rounded"
+                  className="object-cover rounded"
                 />
               )}
-              <div className="space-y-1 overflow-hidden">
-                {metadata.title && (
-                  <div className="font-bold truncate" title={metadata.title}>
-                    {metadata.title}
-                  </div>
-                )}
-                {metadata.author && (
-                  <div className="text-gray-500">{metadata.author}</div>
-                )}
-                {metadata.text && <div className="line-clamp-3">{metadata.text}</div>}
-                {metadata.lastModified && (
-                  <div className="text-gray-500">Last modified {metadata.lastModified}</div>
-                )}
-              </div>
             </div>
           )}
         </div>
