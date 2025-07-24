@@ -93,7 +93,7 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url, delay = 300, children })
             showAbove ? "bottom-full mb-2" : "top-full mt-2",
           )}
         >
-          {loading && <Spinner />}
+          {loading && <Spinner size="small" />}
           {metadata && (
             <div className="flex flex-col gap-2">
               {metadata.title && (
