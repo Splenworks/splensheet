@@ -23,20 +23,6 @@ const fetchYouTube = async (url: string): Promise<Metadata> => {
   return { title: data.title as string, thumbnail: data.thumbnail_url as string }
 }
 
-const fetchFigma = async (url: string): Promise<Metadata> => {
-  const res = await fetch(`https://www.figma.com/api/oembed?url=${encodeURIComponent(url)}`)
-  if (!res.ok) throw new Error("oembed failed")
-  const data = await res.json()
-  return { title: data.title as string, lastModified: data.last_modified as string }
-}
-
-const fetchTwitter = async (url: string): Promise<Metadata> => {
-  const res = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(url)}`)
-  if (!res.ok) throw new Error("noembed failed")
-  const data = await res.json()
-  return { title: data.title as string, author: data.author_name as string }
-}
-
 const fetchGeneric = async (url: string): Promise<Metadata> => {
   const res = await fetch(url)
   const text = await res.text()
@@ -58,10 +44,6 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url, delay = 300, children })
       setLoading(true)
       if (u.hostname.includes("youtube.com") || u.hostname.includes("youtu.be")) {
         setMetadata(await fetchYouTube(url))
-      } else if (u.hostname.includes("figma.com")) {
-        setMetadata(await fetchFigma(url))
-      } else if (u.hostname.includes("twitter.com") || u.hostname.includes("x.com")) {
-        setMetadata(await fetchTwitter(url))
       } else {
         setMetadata(await fetchGeneric(url))
       }
