@@ -61,7 +61,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ url, delay = 300, children 
           <img
             src={url}
             alt="preview"
-            className="max-h-64 max-w-[16rem] object-contain rounded-sm"
+            className="max-h-64 max-w-64 object-contain rounded-sm"
             onLoad={handleImageLoad}
             onError={handleImageError}
           />
