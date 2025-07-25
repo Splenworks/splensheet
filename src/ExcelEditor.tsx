@@ -51,6 +51,14 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       prev: Partial<CellObject>
     }>
   >([])
+  const redoStack = useRef<
+    Array<{
+      sheetIndex: number
+      r: number
+      c: number
+      prev: Partial<CellObject>
+    }>
+  >([])
 
   useEffect(() => {
     activeDataRef.current = sheets[activeSheetIndex].data
@@ -79,6 +87,42 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       const sheet = { ...copy[last.sheetIndex] }
       const data = [...sheet.data]
       const row = [...(data[last.r] || [])]
+
+      // Push current state to redo stack before undoing
+      redoStack.current.push({
+        sheetIndex: last.sheetIndex,
+        r: last.r,
+        c: last.c,
+        prev: row[last.c] ?? {},
+      })
+
+      row[last.c] = last.prev
+      data[last.r] = row
+      sheet.data = recalculateSheet(data)
+      copy[last.sheetIndex] = sheet
+      return copy
+    })
+    setHasChanges(true)
+    onHasChangesChange?.(true)
+  }, [onHasChangesChange])
+
+  const handleRedo = useCallback(() => {
+    const last = redoStack.current.pop()
+    if (!last) return
+    setSheets((prev) => {
+      const copy = [...prev]
+      const sheet = { ...copy[last.sheetIndex] }
+      const data = [...sheet.data]
+      const row = [...(data[last.r] || [])]
+
+      // Push current state to undo stack before redoing
+      undoStack.current.push({
+        sheetIndex: last.sheetIndex,
+        r: last.r,
+        c: last.c,
+        prev: row[last.c] ?? {},
+      })
+
       row[last.c] = last.prev
       data[last.r] = row
       sheet.data = recalculateSheet(data)
@@ -100,6 +144,14 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         handleUndo()
         return
       }
+      if (
+        (isMac && event.metaKey && key === "y") ||
+        (!isMac && event.ctrlKey && key === "y")
+      ) {
+        event.preventDefault()
+        handleRedo()
+        return
+      }
       if (key === "escape") {
         if (isFullScreen) {
           toggleFullScreen()
@@ -112,7 +164,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     return () => {
       window.removeEventListener("keydown", handleKeyDown)
     }
-  }, [isFullScreen, toggleFullScreen, onClose, handleUndo])
+  }, [isFullScreen, toggleFullScreen, onClose, handleUndo, handleRedo])
 
   const getLastNonEmptyRow = (): number => {
     let lastRowIdx = activeSheet.data.length
@@ -160,6 +212,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
           c,
           prev: row[c] ?? {},
         })
+        redoStack.current = []
         row[c] = cell
         data[r] = row
         sheet.data = recalculateSheet(data)
