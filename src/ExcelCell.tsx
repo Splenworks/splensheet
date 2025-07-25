@@ -5,6 +5,7 @@ import LinkPreview from "./LinkPreview"
 import type { CellObject } from "xlsx"
 import { HyperFormula } from "hyperformula"
 import { formatDate } from "./utils/date"
+import { RectangleGroupIcon } from "@heroicons/react/16/solid"
 
 const FUNCTION_NAMES = HyperFormula.getRegisteredFunctionNames("enGB").sort()
 
@@ -177,6 +178,58 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
           next = nextRow?.querySelector("td") || null
         }
         next?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+      }
+    } else if (e.key === "ArrowRight" || e.key === "ArrowLeft" || e.key === "ArrowDown" || e.key === "ArrowUp") {
+      const input = inputRef.current
+      if (!input) return
+
+      const cursorAtStart = input.selectionStart === 0
+      const cursorAtEnd = input.selectionStart === input.value.length
+
+      if (e.key === "ArrowRight" && !cursorAtEnd) {
+        return
+      }
+      if (e.key === "ArrowLeft" && !cursorAtStart) {
+        return
+      }
+
+      const td = inputRef.current?.closest("td") as HTMLTableCellElement | null
+      if (!td) return
+
+      let next: HTMLTableCellElement | null = null
+
+      if (e.key === "ArrowRight") {
+        next = td.nextElementSibling as HTMLTableCellElement | null
+        if (!next) {
+          const nextRow = td.parentElement?.nextElementSibling as HTMLTableRowElement | null
+          next = nextRow?.querySelector("td") || null
+        }
+      } else if (e.key === "ArrowLeft") {
+        next = td.previousElementSibling as HTMLTableCellElement | null
+        if (!next) {
+          const prevRow = td.parentElement?.previousElementSibling as HTMLTableRowElement | null
+          if (prevRow) {
+            const cells = prevRow.querySelectorAll("td")
+            next = cells[cells.length - 1] || null
+          }
+        }
+      } else if (e.key === "ArrowDown") {
+        const currentRowIndex = Array.from(td.parentElement?.parentElement?.children || []).indexOf(td.parentElement!)
+        const currentCellIndex = Array.from(td.parentElement?.children || []).indexOf(td)
+        const nextRow = td.parentElement?.parentElement?.children[currentRowIndex + 1] as HTMLTableRowElement | null
+        next = nextRow?.children[currentCellIndex] as HTMLTableCellElement | null
+      } else if (e.key === "ArrowUp") {
+        const currentRowIndex = Array.from(td.parentElement?.parentElement?.children || []).indexOf(td.parentElement!)
+        const currentCellIndex = Array.from(td.parentElement?.children || []).indexOf(td)
+        const prevRow = td.parentElement?.parentElement?.children[currentRowIndex - 1] as HTMLTableRowElement | null
+        next = prevRow?.children[currentCellIndex] as HTMLTableCellElement | null
+      }
+
+      if (next) {
+        e.preventDefault()
+        commit()
+        stopEdit()
+        next.dispatchEvent(new MouseEvent("click", { bubbles: true }))
       }
     }
   }
