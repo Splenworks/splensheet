@@ -44,11 +44,11 @@ const VirtualizedGrid: React.FC<VirtualizedGridProps> = ({
   // Get column letter (A, B, C, ..., AA, AB, etc.)
   const getColumnLetter = useCallback((colIndex: number): string => {
     let result = ""
-    let num = colIndex
-    while (num >= 0) {
+    let num = colIndex + 1 // Convert to 1-based indexing
+    while (num > 0) {
+      num-- // Adjust for 0-based alphabet
       result = String.fromCharCode(65 + (num % 26)) + result
-      num = Math.floor(num / 26) - 1
-      if (num < 0) break
+      num = Math.floor(num / 26)
     }
     return result
   }, [])
@@ -100,8 +100,9 @@ const VirtualizedGrid: React.FC<VirtualizedGridProps> = ({
       cells.push(
         <div
           key={`row-header-${rowIndex}`}
-          className="sticky left-0 z-10 flex items-center justify-center bg-gray-100 dark:bg-neutral-800 border-r border-b border-gray-300 dark:border-neutral-600 text-xs font-medium text-gray-600 dark:text-gray-300"
+          className="absolute left-0 z-10 flex items-center justify-center bg-gray-100 dark:bg-neutral-800 border-r border-b border-gray-300 dark:border-neutral-600 text-xs font-medium text-gray-600 dark:text-gray-300"
           style={{
+            top: rowIndex * CELL_HEIGHT + COLUMN_HEADER_HEIGHT,
             width: ROW_HEADER_WIDTH,
             height: CELL_HEIGHT,
             minWidth: ROW_HEADER_WIDTH,
@@ -111,47 +112,40 @@ const VirtualizedGrid: React.FC<VirtualizedGridProps> = ({
         </div>
       )
 
-      // Data cells - wrapped in a table structure for ExcelCell compatibility
+      // Data cells - positioned absolutely
       for (let colIndex = visibleRange.startCol; colIndex < visibleRange.endCol; colIndex++) {
         const cellData = getCellData(rowIndex, colIndex)
         cells.push(
-          <table
+          <div
             key={`cell-${rowIndex}-${colIndex}`}
-            className="border-collapse"
+            className="virtual-cell-wrapper absolute"
             style={{
+              left: ROW_HEADER_WIDTH + colIndex * CELL_WIDTH,
+              top: rowIndex * CELL_HEIGHT + COLUMN_HEADER_HEIGHT,
               width: CELL_WIDTH,
               height: CELL_HEIGHT,
               minWidth: CELL_WIDTH,
+              maxWidth: CELL_WIDTH,
+              overflow: "hidden",
             }}
           >
-            <tbody>
-              <tr>
-                <ExcelCell
-                  rowIndex={rowIndex}
-                  colIndex={colIndex}
-                  cell={cellData}
-                  onChange={handleCellChange}
-                />
-              </tr>
-            </tbody>
-          </table>
+            <table className="border-collapse w-full h-full">
+              <tbody>
+                <tr>
+                  <ExcelCell
+                    rowIndex={rowIndex}
+                    colIndex={colIndex}
+                    cell={cellData}
+                    onChange={handleCellChange}
+                  />
+                </tr>
+              </tbody>
+            </table>
+          </div>
         )
       }
 
-      rows.push(
-        <div
-          key={`row-${rowIndex}`}
-          className="flex"
-          style={{
-            position: "absolute",
-            top: rowIndex * CELL_HEIGHT + COLUMN_HEADER_HEIGHT,
-            left: 0,
-            height: CELL_HEIGHT,
-          }}
-        >
-          {cells}
-        </div>
-      )
+      rows.push(...cells)
     }
 
     return rows
@@ -165,7 +159,7 @@ const VirtualizedGrid: React.FC<VirtualizedGridProps> = ({
     headers.push(
       <div
         key="corner"
-        className="sticky left-0 z-20 bg-gray-100 dark:bg-neutral-800 border-r border-b border-gray-300 dark:border-neutral-600"
+        className="absolute top-0 left-0 z-20 bg-gray-100 dark:bg-neutral-800 border-r border-b border-gray-300 dark:border-neutral-600"
         style={{
           width: ROW_HEADER_WIDTH,
           height: COLUMN_HEADER_HEIGHT,
@@ -179,11 +173,13 @@ const VirtualizedGrid: React.FC<VirtualizedGridProps> = ({
       headers.push(
         <div
           key={`col-header-${colIndex}`}
-          className="flex items-center justify-center bg-gray-100 dark:bg-neutral-800 border-r border-b border-gray-300 dark:border-neutral-600 text-xs font-medium text-gray-600 dark:text-gray-300"
+          className="absolute top-0 flex items-center justify-center bg-gray-100 dark:bg-neutral-800 border-r border-b border-gray-300 dark:border-neutral-600 text-xs font-medium text-gray-600 dark:text-gray-300"
           style={{
+            left: ROW_HEADER_WIDTH + colIndex * CELL_WIDTH,
             width: CELL_WIDTH,
             height: COLUMN_HEADER_HEIGHT,
             minWidth: CELL_WIDTH,
+            maxWidth: CELL_WIDTH,
           }}
         >
           {getColumnLetter(colIndex)}
@@ -191,33 +187,37 @@ const VirtualizedGrid: React.FC<VirtualizedGridProps> = ({
       )
     }
 
-    return (
-      <div
-        className="sticky top-0 z-10 flex"
-        style={{ height: COLUMN_HEADER_HEIGHT }}
-      >
-        {headers}
-      </div>
-    )
+    return headers
   }, [visibleRange, getColumnLetter])
 
   return (
-    <div className={`relative overflow-auto ${className}`} ref={containerRef} onScroll={handleScroll}>
-      {/* Virtual scroll area */}
-      <div
-        style={{
-          width: MAX_COLS * CELL_WIDTH + ROW_HEADER_WIDTH,
-          height: MAX_ROWS * CELL_HEIGHT + COLUMN_HEADER_HEIGHT,
-          position: "relative",
-        }}
-      >
-        {/* Column headers */}
-        {renderColumnHeaders}
+    <>
+      <style>
+        {`
+          .virtual-cell-wrapper td {
+            min-width: unset !important;
+            width: ${CELL_WIDTH - 4}px !important;
+            max-width: ${CELL_WIDTH - 4}px !important;
+          }
+        `}
+      </style>
+      <div className={`relative overflow-auto ${className}`} ref={containerRef} onScroll={handleScroll}>
+        {/* Virtual scroll area */}
+        <div
+          style={{
+            width: MAX_COLS * CELL_WIDTH + ROW_HEADER_WIDTH,
+            height: MAX_ROWS * CELL_HEIGHT + COLUMN_HEADER_HEIGHT,
+            position: "relative",
+          }}
+        >
+          {/* Column headers */}
+          {renderColumnHeaders}
 
-        {/* Data rows */}
-        {renderRows}
+          {/* Data rows */}
+          {renderRows}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 
