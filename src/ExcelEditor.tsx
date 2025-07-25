@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react"
-import ExcelCell from "./ExcelCell"
 import ExcelHeader from "./ExcelHeader"
+import VirtualizedGrid from "./VirtualizedGrid"
 import { useFullScreen } from "./hooks/useFullScreen"
 import { writeFile } from "xlsx"
 import type { WorkBook, CellObject } from "xlsx"
@@ -124,10 +124,8 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       if (hasData) break
       lastRowIdx--
     }
-    return lastRowIdx
+    return Math.max(lastRowIdx, 100) // Ensure minimum visible rows
   }
-
-  const rowCount = getLastNonEmptyRow()
 
   const getLastNonEmptyCol = (): number => {
     let lastColIdx = activeSheet.data.reduce(
@@ -142,10 +140,8 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       if (hasData) break
       lastColIdx--
     }
-    return lastColIdx
+    return Math.max(lastColIdx, 26) // Ensure minimum visible columns (A-Z)
   }
-
-  const colCount = getLastNonEmptyCol()
 
   const updateCell = useCallback(
     (r: number, c: number, cell: Partial<CellObject>) => {
@@ -153,13 +149,26 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         const copy = [...prev]
         const sheet = { ...copy[activeSheetIndex] }
         const data = [...sheet.data]
+
+        // Ensure the data array is large enough
+        while (data.length <= r) {
+          data.push([])
+        }
+
         const row = [...(data[r] || [])]
+
+        // Ensure the row array is large enough
+        while (row.length <= c) {
+          row.push({})
+        }
+
         undoStack.current.push({
           sheetIndex: activeSheetIndex,
           r,
           c,
           prev: row[c] ?? {},
         })
+
         row[c] = cell
         data[r] = row
         sheet.data = recalculateSheet(data)
@@ -178,14 +187,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     dataToSheet(sheets[activeSheetIndex].data, workbook.Sheets[sheetName])
     onWorkbookChange?.(workbook)
   }, [sheets, activeSheetIndex, workbook, onWorkbookChange])
-
-  const rows = Array.from({ length: rowCount }).map((_, rIdx) => {
-    const rowData = activeSheet.data[rIdx] || []
-    const cells = Array.from({ length: colCount }).map((_, cIdx) => {
-      return rowData[cIdx]
-    })
-    return { cells }
-  })
 
   const handleDownload = () => {
     sheets.forEach((sd, idx) => {
@@ -211,25 +212,11 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         hasChanges={hasChanges}
         onDownload={handleDownload}
       />
-      <div className="flex-1 overflow-auto">
-        <table className="min-w-max border-collapse text-sm">
-          <tbody>
-            {rows.map((row, rIdx) => (
-              <tr key={rIdx}>
-                {row.cells.map((cellData, cIdx) => (
-                  <ExcelCell
-                    key={cIdx}
-                    rowIndex={rIdx}
-                    colIndex={cIdx}
-                    cell={cellData}
-                    onChange={updateCell}
-                  />
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <VirtualizedGrid
+        data={activeSheet.data}
+        onCellChange={updateCell}
+        className="flex-1"
+      />
     </div>
   )
 }
