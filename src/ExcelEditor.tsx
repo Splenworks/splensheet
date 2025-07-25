@@ -79,6 +79,16 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     setHasChanges(initialHasChanges)
   }, [initialHasChanges])
 
+  const focusCell = useCallback((row: number, col: number) => {
+    setTimeout(() => {
+      const table = document.querySelector('table')
+      const targetCell = table?.rows[row]?.cells[col]
+      if (targetCell) {
+        targetCell.click()
+      }
+    }, 0)
+  }, [])
+
   const handleUndo = useCallback(() => {
     const last = undoStack.current.pop()
     if (!last) return
@@ -104,7 +114,8 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     })
     setHasChanges(true)
     onHasChangesChange?.(true)
-  }, [onHasChangesChange])
+    focusCell(last.r, last.c)
+  }, [onHasChangesChange, focusCell])
 
   const handleRedo = useCallback(() => {
     const last = redoStack.current.pop()
@@ -131,7 +142,8 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     })
     setHasChanges(true)
     onHasChangesChange?.(true)
-  }, [onHasChangesChange])
+    focusCell(last.r, last.c)
+  }, [onHasChangesChange, focusCell])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
