@@ -160,21 +160,22 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
         handleInputChange(inputValue + suggestion)
         setTimeout(() => {
           if (inputRef.current) {
-            inputRef.current.setSelectionRange(inputValue.length + suggestion.length, inputValue.length + suggestion.length)
+            inputRef.current.setSelectionRange(
+              inputValue.length + suggestion.length,
+              inputValue.length + suggestion.length,
+            )
             inputRef.current.scrollLeft = inputRef.current.scrollWidth || 0
           }
         }, 0)
       } else {
         commit()
         stopEdit()
-        const td = inputRef.current?.closest("td") as HTMLTableCellElement | null
-        if (!td) return
-        let next: HTMLTableCellElement | null = td.nextElementSibling as
-          | HTMLTableCellElement
-          | null
+        const cell = inputRef.current?.closest("[data-cell]") as HTMLDivElement | null
+        if (!cell) return
+        let next: HTMLDivElement | null = cell.nextElementSibling as HTMLDivElement | null
         if (!next) {
-          const nextRow = td.parentElement?.nextElementSibling as HTMLTableRowElement | null
-          next = nextRow?.querySelector("td") || null
+          const nextRow = cell.parentElement?.nextElementSibling as HTMLDivElement | null
+          next = nextRow?.querySelector("[data-cell]") || null
         }
         next?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
       }
@@ -187,7 +188,10 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     !editing && !showImagePreview && isHttpUrl(displayValue)
 
   return (
-    <td
+    <div
+      data-cell
+      data-row-index={rowIndex}
+      data-col-index={colIndex}
       className={twMerge(
         "min-w-12 px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600 relative cursor-default",
         rowIndex === 0 && "border-t-0",
@@ -221,7 +225,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       ) : (
         displayValue
       )}
-    </td>
+    </div>
   )
 }
 

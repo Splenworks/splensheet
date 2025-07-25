@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react"
+import { useVirtualizer } from "@tanstack/react-virtual"
 import ExcelCell from "./ExcelCell"
 import ExcelHeader from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
@@ -43,6 +44,57 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   const [hasChanges, setHasChanges] = useState(initialHasChanges)
   const activeSheet = sheets[activeSheetIndex]
   const activeDataRef = useRef(activeSheet.data)
+  const getLastNonEmptyRow = useCallback((): number => {
+    let lastRowIdx = activeSheet.data.length
+    while (lastRowIdx > 0) {
+      const row = activeSheet.data[lastRowIdx - 1] || []
+      const hasData = row.some((c) => c && (c.f || (c.v !== undefined && c.v !== "")))
+      if (hasData) break
+      lastRowIdx--
+    }
+    return lastRowIdx
+  }, [activeSheet])
+
+  const getLastNonEmptyCol = useCallback((): number => {
+    let lastColIdx = activeSheet.data.reduce((max, row) => Math.max(max, row.length), 0)
+    while (lastColIdx > 0) {
+      const hasData = activeSheet.data.some((row) => {
+        const c = row[lastColIdx - 1]
+        return c && (c.f || (c.v !== null && c.v !== undefined && c.v !== ""))
+      })
+      if (hasData) break
+      lastColIdx--
+    }
+    return lastColIdx
+  }, [activeSheet])
+
+  const [rowCount, setRowCount] = useState(() => Math.max(getLastNonEmptyRow(), 100))
+  const [colCount, setColCount] = useState(() => Math.max(getLastNonEmptyCol(), 26))
+  const containerRef = useRef<HTMLDivElement>(null)
+  const rowVirtualizer = useVirtualizer({
+    count: rowCount,
+    getScrollElement: () => containerRef.current,
+    estimateSize: () => 28,
+    overscan: 5,
+  })
+  const colVirtualizer = useVirtualizer({
+    horizontal: true,
+    count: colCount,
+    getScrollElement: () => containerRef.current,
+    estimateSize: () => 80,
+    overscan: 5,
+  })
+
+  const handleScroll = () => {
+    const el = containerRef.current
+    if (!el) return
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < 200) {
+      setRowCount((c) => c + 50)
+    }
+    if (el.scrollWidth - el.scrollLeft - el.clientWidth < 200) {
+      setColCount((c) => c + 20)
+    }
+  }
   const undoStack = useRef<
     Array<{
       sheetIndex: number
@@ -65,7 +117,9 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         data: sheetToData(workbook.Sheets[name]),
       })),
     )
-  }, [workbook])
+    setRowCount(Math.max(getLastNonEmptyRow(), 100))
+    setColCount(Math.max(getLastNonEmptyCol(), 26))
+  }, [workbook, getLastNonEmptyRow, getLastNonEmptyCol])
 
   useEffect(() => {
     setHasChanges(initialHasChanges)
@@ -114,38 +168,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     }
   }, [isFullScreen, toggleFullScreen, onClose, handleUndo])
 
-  const getLastNonEmptyRow = (): number => {
-    let lastRowIdx = activeSheet.data.length
-    while (lastRowIdx > 0) {
-      const row = activeSheet.data[lastRowIdx - 1] || []
-      const hasData = row.some((c) =>
-        c && (c.f || (c.v !== undefined && c.v !== "")),
-      )
-      if (hasData) break
-      lastRowIdx--
-    }
-    return lastRowIdx
-  }
-
-  const rowCount = getLastNonEmptyRow()
-
-  const getLastNonEmptyCol = (): number => {
-    let lastColIdx = activeSheet.data.reduce(
-      (max, row) => Math.max(max, row.length),
-      0,
-    )
-    while (lastColIdx > 0) {
-      const hasData = activeSheet.data.some((row) => {
-        const c = row[lastColIdx - 1]
-        return c && (c.f || (c.v !== null && c.v !== undefined && c.v !== ""))
-      })
-      if (hasData) break
-      lastColIdx--
-    }
-    return lastColIdx
-  }
-
-  const colCount = getLastNonEmptyCol()
 
   const updateCell = useCallback(
     (r: number, c: number, cell: Partial<CellObject>) => {
@@ -179,13 +201,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     onWorkbookChange?.(workbook)
   }, [sheets, activeSheetIndex, workbook, onWorkbookChange])
 
-  const rows = Array.from({ length: rowCount }).map((_, rIdx) => {
-    const rowData = activeSheet.data[rIdx] || []
-    const cells = Array.from({ length: colCount }).map((_, cIdx) => {
-      return rowData[cIdx]
-    })
-    return { cells }
-  })
 
   const handleDownload = () => {
     sheets.forEach((sd, idx) => {
@@ -211,24 +226,39 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         hasChanges={hasChanges}
         onDownload={handleDownload}
       />
-      <div className="flex-1 overflow-auto">
-        <table className="min-w-max border-collapse text-sm">
-          <tbody>
-            {rows.map((row, rIdx) => (
-              <tr key={rIdx}>
-                {row.cells.map((cellData, cIdx) => (
+      <div ref={containerRef} onScroll={handleScroll} className="flex-1 overflow-auto">
+        <div
+          style={{
+            height: rowVirtualizer.getTotalSize(),
+            width: colVirtualizer.getTotalSize(),
+            position: "relative",
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map((row) =>
+            colVirtualizer.getVirtualItems().map((column) => {
+              const cellData = activeSheet.data[row.index]?.[column.index]
+              return (
+                <div
+                  key={`${row.index}-${column.index}`}
+                  style={{
+                    position: "absolute",
+                    top: row.start,
+                    left: column.start,
+                    width: column.size,
+                    height: row.size,
+                  }}
+                >
                   <ExcelCell
-                    key={cIdx}
-                    rowIndex={rIdx}
-                    colIndex={cIdx}
+                    rowIndex={row.index}
+                    colIndex={column.index}
                     cell={cellData}
                     onChange={updateCell}
                   />
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </div>
+              )
+            }),
+          )}
+        </div>
       </div>
     </div>
   )
