@@ -1,0 +1,23 @@
+{
+  "header": {
+    "goBack": "返回"
+  },
+  "dragDropArea": {
+    "dropHere": "拖放到此处",
+    "mainMessage": "将 <u>电子表格</u> 文件（.xlsx、.xls 或 .csv）拖放到这里！",
+    "subMessage": "你甚至可以编辑公式并保存文件。",
+    "noImageFilesFound": "未找到电子表格文件。",
+    "neverStoreYourData": "我们绝不会将你的文件存储在服务器上。"
+  },
+  "footer": {
+    "checkOutProduct": "查看我们的其他产品 <link />"
+  },
+  "others": {
+    "close": "关闭",
+    "exit": "退出",
+    "fullscreen": "全屏",
+    "exitFullscreen": "退出全屏",
+    "toggleDarkMode": "切换深色模式",
+    "download": "下载"
+  }
+}

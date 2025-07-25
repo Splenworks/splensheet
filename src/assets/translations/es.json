@@ -1,0 +1,23 @@
+{
+  "header": {
+    "goBack": "Volver"
+  },
+  "dragDropArea": {
+    "dropHere": "Suelta aquí",
+    "mainMessage": "¡Arrastra y suelta un archivo de <u>hoja de cálculo</u> (.xlsx, .xls o .csv) aquí!",
+    "subMessage": "Incluso puedes editar fórmulas y guardar tu archivo.",
+    "noImageFilesFound": "No se encontraron archivos de hoja de cálculo.",
+    "neverStoreYourData": "Nunca almacenamos tus archivos en nuestro servidor."
+  },
+  "footer": {
+    "checkOutProduct": "Consulta nuestro otro producto <link />"
+  },
+  "others": {
+    "close": "Cerrar",
+    "exit": "Salir",
+    "fullscreen": "Pantalla completa",
+    "exitFullscreen": "Salir de pantalla completa",
+    "toggleDarkMode": "Cambiar modo oscuro",
+    "download": "Descargar"
+  }
+}

@@ -8,6 +8,8 @@ import { DarkmodeProvider } from "./providers/DarkmodeProvider"
 import enTranslation from "./assets/translations/en.json"
 import jaTranslation from "./assets/translations/ja.json"
 import koTranslation from "./assets/translations/ko.json"
+import cnTranslation from "./assets/translations/cn.json"
+import esTranslation from "./assets/translations/es.json"
 import "./index.css"
 
 i18n
@@ -23,6 +25,12 @@ i18n
       },
       ja: {
         translation: jaTranslation,
+      },
+      cn: {
+        translation: cnTranslation,
+      },
+      es: {
+        translation: esTranslation,
       },
     },
     fallbackLng: "en",
