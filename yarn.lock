@@ -1378,7 +1378,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@heroicons/react@npm:^2.1.1":
+"@heroicons/react@npm:^2.2.0":
   version: 2.2.0
   resolution: "@heroicons/react@npm:2.2.0"
   peerDependencies:
@@ -6142,7 +6142,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "splensheet@workspace:."
   dependencies:
-    "@heroicons/react": "npm:^2.1.1"
+    "@heroicons/react": "npm:^2.2.0"
     "@tailwindcss/forms": "npm:^0.5.7"
     "@tailwindcss/vite": "npm:^4.0.3"
     "@types/node": "npm:^20.11.25"

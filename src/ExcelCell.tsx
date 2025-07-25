@@ -5,7 +5,6 @@ import LinkPreview from "./LinkPreview"
 import type { CellObject } from "xlsx"
 import { HyperFormula } from "hyperformula"
 import { formatDate } from "./utils/date"
-import { RectangleGroupIcon } from "@heroicons/react/16/solid"
 
 const FUNCTION_NAMES = HyperFormula.getRegisteredFunctionNames("enGB").sort()
 
