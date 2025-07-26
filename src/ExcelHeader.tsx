@@ -62,7 +62,7 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
   return (
     <header className="flex h-11 items-center justify-between px-2 bg-gray-200 dark:bg-neutral-800 border-b border-gray-300 dark:border-neutral-600">
       {!isCsv && (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center">
           <select
             className="h-7 rounded border max-w-55 border-gray-300 bg-white px-1 text-xs dark:border-neutral-600 dark:bg-neutral-700 dark:text-white focus:outline-pink-900 dark:focus:outline-pink-700"
             value={activeSheetIndex}
