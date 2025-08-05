@@ -1,5 +1,6 @@
 import type { CellObject, WorkSheet } from "xlsx"
 import { utils } from "xlsx"
+import { PartialCellObj } from "../types"
 
 export const getCellType = (value: unknown): "n" | "s" | "b" | "d" => {
   if (typeof value === "number") return "n"
@@ -9,15 +10,12 @@ export const getCellType = (value: unknown): "n" | "s" | "b" | "d" => {
   return "s"
 }
 
-export const sheetToData = (
-  ws: WorkSheet,
-): Array<Array<Partial<CellObject>>> => {
+export const sheetToData = (ws: WorkSheet): PartialCellObj[][] => {
   const range = utils.decode_range(ws["!ref"] || "A1")
   const rowCount = range.e.r + 1
   const colCount = range.e.c + 1
-  const data: Array<Array<Partial<CellObject>>> = Array.from(
-    { length: rowCount },
-    () => Array.from({ length: colCount }, () => ({})),
+  const data: PartialCellObj[][] = Array.from({ length: rowCount }, () =>
+    Array.from({ length: colCount }, () => ({})),
   )
   for (let R = range.s.r; R <= range.e.r; R++) {
     for (let C = range.s.c; C <= range.e.c; C++) {
@@ -32,10 +30,7 @@ export const sheetToData = (
   return data
 }
 
-export const dataToSheet = (
-  data: Array<Array<Partial<CellObject>>>,
-  ws: WorkSheet,
-) => {
+export const dataToSheet = (data: PartialCellObj[][], ws: WorkSheet) => {
   for (let r = 0; r < data.length; r++) {
     for (let c = 0; c < data[r].length; c++) {
       const cell = data[r][c]

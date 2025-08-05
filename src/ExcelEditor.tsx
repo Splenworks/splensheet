@@ -7,6 +7,7 @@ import type { WorkBook, CellObject } from "xlsx"
 import { recalculateSheet } from "./utils/recalculateSheet"
 import { sheetToData, dataToSheet } from "./utils/xlsx"
 import { isMac } from "./utils/isMac"
+import { PartialCellObj, SheetData } from "./types"
 
 interface ExcelEditorProps {
   workbook: WorkBook
@@ -25,12 +26,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   initialHasChanges = false,
   onHasChangesChange,
 }) => {
-  type SheetData = {
-    id: number
-    name: string
-    data: Array<Array<Partial<CellObject>>>
-  }
-
   const { isFullScreen, toggleFullScreen } = useFullScreen()
   const [activeSheetIndex, setActiveSheetIndex] = useState(0)
   const [sheets, setSheets] = useState<SheetData[]>(
@@ -48,7 +43,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       sheetIndex: number
       r: number
       c: number
-      prev: Partial<CellObject>
+      prev: PartialCellObj
     }>
   >([])
   const redoStack = useRef<
@@ -56,7 +51,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       sheetIndex: number
       r: number
       c: number
-      prev: Partial<CellObject>
+      prev: PartialCellObj
     }>
   >([])
 
@@ -212,7 +207,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   const colCount = getLastNonEmptyCol()
 
   const updateCell = useCallback(
-    (r: number, c: number, cell: Partial<CellObject>) => {
+    (r: number, c: number, cell: PartialCellObj) => {
       setSheets((prev) => {
         const copy = [...prev]
         const sheet = { ...copy[activeSheetIndex] }

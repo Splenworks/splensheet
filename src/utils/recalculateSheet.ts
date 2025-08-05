@@ -1,12 +1,12 @@
 import { DetailedCellError, HyperFormula } from "hyperformula"
-import type { CellObject } from "xlsx"
+import { PartialCellObj } from "../types"
 import { getCellType } from "./xlsx"
 
 const LICENSE = { licenseKey: "gpl-v3" }
 
 export const recalculateSheet = (
-  data: Array<Array<Partial<CellObject>>>,
-): Array<Array<Partial<CellObject>>> => {
+  data: PartialCellObj[][],
+): PartialCellObj[][] => {
   const arrayData = data.map((r) => r.map((c) => (c?.f ? `=${c.f}` : c?.v)))
   const hf = HyperFormula.buildFromArray(arrayData, LICENSE)
   const values = hf.getSheetValues(0)
@@ -24,4 +24,3 @@ export const recalculateSheet = (
     }),
   )
 }
-

@@ -5,6 +5,7 @@ import LinkPreview from "./LinkPreview"
 import type { CellObject } from "xlsx"
 import { HyperFormula } from "hyperformula"
 import { formatDate } from "./utils/date"
+import { PartialCellObj } from "./types"
 
 const FUNCTION_NAMES = HyperFormula.getRegisteredFunctionNames("enGB").sort()
 
@@ -31,8 +32,8 @@ const isHttpUrl = (val: string): boolean => {
 interface ExcelCellProps {
   rowIndex: number
   colIndex: number
-  cell: Partial<CellObject> | undefined
-  onChange: (r: number, c: number, cell: Partial<CellObject>) => void
+  cell: PartialCellObj | undefined
+  onChange: (r: number, c: number, cell: PartialCellObj) => void
 }
 
 const ExcelCell: React.FC<ExcelCellProps> = ({
@@ -46,7 +47,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   const [suggestion, setSuggestion] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const getDisplayValue = (c: Partial<CellObject> | undefined) => {
+  const getDisplayValue = (c: PartialCellObj | undefined) => {
     if (!c || c.v === undefined) return "\u00A0"
     if (c.t === "b") return c.v ? "TRUE" : "FALSE"
     if (c.t === "d" && c.v instanceof Date) {
@@ -56,7 +57,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     return String(c.v)
   }
 
-  const getEditableValue = (c: Partial<CellObject> | undefined) => {
+  const getEditableValue = (c: PartialCellObj | undefined) => {
     if (!c) return ""
     if (c.f) return `=${c.f}`
     if (c.v === undefined) return ""
