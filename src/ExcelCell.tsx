@@ -5,28 +5,9 @@ import LinkPreview from "./LinkPreview"
 import { HyperFormula } from "hyperformula"
 import { formatDate } from "./utils/date"
 import { PartialCellObj } from "./types"
+import { isHttpUrl, isImageUrl } from "./utils/url"
 
 const FUNCTION_NAMES = HyperFormula.getRegisteredFunctionNames("enGB").sort()
-
-const IMAGE_EXT_RE = /\.(png|jpe?g|gif|webp|svg)$/i
-
-const isImageUrl = (val: string): boolean => {
-  try {
-    const u = new URL(val)
-    return IMAGE_EXT_RE.test(u.pathname)
-  } catch {
-    return false
-  }
-}
-
-const isHttpUrl = (val: string): boolean => {
-  try {
-    const u = new URL(val)
-    return u.protocol === "http:" || u.protocol === "https:"
-  } catch {
-    return false
-  }
-}
 
 interface ExcelCellProps {
   rowIndex: number
