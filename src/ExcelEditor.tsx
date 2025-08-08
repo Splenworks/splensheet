@@ -293,7 +293,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         <div
           ref={gridRef}
           className="min-w-max text-sm grid"
-          style={{ gridTemplateColumns: `repeat(${colCount}, minmax(3rem, 1fr))` }}
+          style={{ gridTemplateColumns: `repeat(${colCount}, minmax(3rem, max-content))` }}
         >
           {rows.map((row, rIdx) =>
             row.cells.map((cellData, cIdx) => (
