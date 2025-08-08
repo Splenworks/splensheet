@@ -12,6 +12,7 @@ interface DragDropAreaProps {
   setFileName: (name: string) => void
   onOpenEditor: () => void
   setHasChanges: (changes: boolean) => void
+  loading?: boolean
 }
 
 const DragDropArea: React.FC<DragDropAreaProps> = ({
@@ -19,11 +20,14 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
   setFileName,
   onOpenEditor,
   setHasChanges,
+  loading: externalLoading = false,
 }) => {
   const [dragging, setDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [loading, setLoading] = useState(false)
+  const [internalLoading, setInternalLoading] = useState(false)
   const smallScreen = useMediaQuery("(max-width: 640px), (max-height: 640px)")
+
+  const loading = externalLoading || internalLoading
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -43,7 +47,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
     e.preventDefault()
     setDragging(false)
     if (loading) return
-    setLoading(true)
+    setInternalLoading(true)
     const items = e.dataTransfer.items
     try {
       if (items.length === 0) {
@@ -73,7 +77,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
       alert(error instanceof Error ? error.message : error)
       console.error(error)
     } finally {
-      setLoading(false)
+      setInternalLoading(false)
     }
   }
 
@@ -85,7 +89,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
   const handleFileInputChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    setLoading(true)
+    setInternalLoading(true)
     try {
       const files = Array.from(e.target.files || [])
       const file = files[0]
@@ -110,7 +114,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
       alert(error instanceof Error ? error.message : error)
       console.error(error)
     } finally {
-      setLoading(false)
+      setInternalLoading(false)
     }
   }
 
