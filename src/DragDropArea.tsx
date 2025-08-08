@@ -139,7 +139,7 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
           onChange={handleFileInputChange}
         />
         {loading ? (
-          <Spinner />
+          <Spinner className="border-white border-r-transparent" />
         ) : (
           <div
             className={twMerge(
