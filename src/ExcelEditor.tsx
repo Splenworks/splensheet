@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react"
-import { useVirtualizer } from "@tanstack/react-virtual"
+import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual"
 import ExcelCell from "./ExcelCell"
 import ExcelHeader from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
@@ -59,6 +59,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   const gridRef = useRef<HTMLDivElement>(null)
   const rowCountRef = useRef(0)
   const colCountRef = useRef(0)
+  const measuredColsRef = useRef(new Set<number>())
 
   useEffect(() => {
     activeDataRef.current = sheets[activeSheetIndex].data
@@ -98,6 +99,21 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     estimateSize: () => 48,
     overscan: 5,
   })
+
+  const measureRef = useCallback(
+    (col: VirtualItem) => (el: HTMLDivElement | null) => {
+      if (!el) return
+      const naturalWidth = el.scrollWidth
+      const measured = measuredColsRef.current.has(col.index)
+      if (!measured || naturalWidth > col.size) {
+        el.style.width = `${naturalWidth}px`
+        el.dataset.index = String(col.index)
+        columnVirtualizer.measureElement(el)
+        measuredColsRef.current.add(col.index)
+      }
+    },
+    [columnVirtualizer],
+  )
 
   const focusCell = useCallback((row: number, col: number) => {
     setTimeout(() => {
@@ -283,6 +299,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
             columnVirtualizer.getVirtualItems().map((col) => (
               <ExcelCell
                 key={`${row.index}-${col.index}`}
+                ref={measureRef(col)}
                 rowIndex={row.index}
                 colIndex={col.index}
                 cell={activeSheet.data[row.index]?.[col.index]}
@@ -292,8 +309,10 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
                   position: "absolute",
                   top: row.start,
                   left: col.start,
-                  width: col.size,
                   height: row.size,
+                  width: measuredColsRef.current.has(col.index)
+                    ? col.size
+                    : undefined,
                 }}
               />
             )),

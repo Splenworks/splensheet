@@ -17,15 +17,8 @@ interface ExcelCellProps {
   focusCell: (r: number, c: number) => void
   style?: React.CSSProperties
 }
-
-const ExcelCell: React.FC<ExcelCellProps> = ({
-  rowIndex,
-  colIndex,
-  cell,
-  onChange,
-  focusCell,
-  style,
-}) => {
+const ExcelCell = React.forwardRef<HTMLDivElement, ExcelCellProps>(
+  ({ rowIndex, colIndex, cell, onChange, focusCell, style }, ref) => {
   const [editing, setEditing] = useState(false)
   const [inputValue, setInputValue] = useState("")
   const [suggestion, setSuggestion] = useState("")
@@ -195,13 +188,14 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   const showLinkPreview =
     !editing && !showImagePreview && isHttpUrl(displayValue)
 
-  return (
-    <div
-      data-row={rowIndex}
-      data-col={colIndex}
-      style={style}
-      className={twMerge(
-        "w-full h-full min-w-12 px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600 relative cursor-default",
+    return (
+      <div
+        data-row={rowIndex}
+        data-col={colIndex}
+        ref={ref}
+        style={style}
+        className={twMerge(
+          "w-full h-full min-w-12 px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600 relative cursor-default",
         rowIndex === 0 && "border-t-0",
         rowIndex > 0 && "-mt-px",
         colIndex > 0 && "-ml-px",
@@ -236,8 +230,9 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
         displayValue
       )}
     </div>
-  )
-}
+    )
+  },
+)
 
 export default React.memo(
   ExcelCell,
