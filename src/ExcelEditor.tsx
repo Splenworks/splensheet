@@ -54,6 +54,9 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       prev: PartialCellObj
     }>
   >([])
+  const gridRef = useRef<HTMLDivElement>(null)
+  const rowCountRef = useRef(0)
+  const colCountRef = useRef(0)
 
   useEffect(() => {
     activeDataRef.current = sheets[activeSheetIndex].data
@@ -74,13 +77,61 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     setHasChanges(initialHasChanges)
   }, [initialHasChanges])
 
+
+  const getLastNonEmptyRow = (): number => {
+    let lastRowIdx = activeSheet.data.length
+    while (lastRowIdx > 0) {
+      const row = activeSheet.data[lastRowIdx - 1] || []
+      const hasData = row.some((c) =>
+        c && (c.f || (c.v !== undefined && c.v !== "")),
+      )
+      if (hasData) break
+      lastRowIdx--
+    }
+    return lastRowIdx
+  }
+
+  const rowCount = getLastNonEmptyRow()
+
+  const getLastNonEmptyCol = (): number => {
+    let lastColIdx = activeSheet.data.reduce(
+      (max, row) => Math.max(max, row.length),
+      0,
+    )
+    while (lastColIdx > 0) {
+      const hasData = activeSheet.data.some((row) => {
+        const c = row[lastColIdx - 1]
+        return c && (c.f || (c.v !== null && c.v !== undefined && c.v !== ""))
+      })
+      if (hasData) break
+      lastColIdx--
+    }
+    return lastColIdx
+  }
+
+  const colCount = getLastNonEmptyCol()
+
+  rowCountRef.current = rowCount
+  colCountRef.current = colCount
+
   const focusCell = useCallback((row: number, col: number) => {
     setTimeout(() => {
-      const table = document.querySelector('table')
-      const targetCell = table?.rows[row]?.cells[col]
-      if (targetCell) {
-        targetCell.click()
+      let r = row
+      let c = col
+      const maxRow = rowCountRef.current
+      const maxCol = colCountRef.current
+      if (c >= maxCol) {
+        c = 0
+        r += 1
+      } else if (c < 0) {
+        c = maxCol - 1
+        r -= 1
       }
+      if (r < 0 || r >= maxRow) return
+      const target = gridRef.current?.querySelector<HTMLDivElement>(
+        `[data-row='${r}'][data-col='${c}']`,
+      )
+      target?.click()
     }, 0)
   }, [])
 
@@ -173,39 +224,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     }
   }, [isFullScreen, toggleFullScreen, onClose, handleUndo, handleRedo])
 
-  const getLastNonEmptyRow = (): number => {
-    let lastRowIdx = activeSheet.data.length
-    while (lastRowIdx > 0) {
-      const row = activeSheet.data[lastRowIdx - 1] || []
-      const hasData = row.some((c) =>
-        c && (c.f || (c.v !== undefined && c.v !== "")),
-      )
-      if (hasData) break
-      lastRowIdx--
-    }
-    return lastRowIdx
-  }
-
-  const rowCount = getLastNonEmptyRow()
-
-  const getLastNonEmptyCol = (): number => {
-    let lastColIdx = activeSheet.data.reduce(
-      (max, row) => Math.max(max, row.length),
-      0,
-    )
-    while (lastColIdx > 0) {
-      const hasData = activeSheet.data.some((row) => {
-        const c = row[lastColIdx - 1]
-        return c && (c.f || (c.v !== null && c.v !== undefined && c.v !== ""))
-      })
-      if (hasData) break
-      lastColIdx--
-    }
-    return lastColIdx
-  }
-
-  const colCount = getLastNonEmptyCol()
-
   const updateCell = useCallback(
     (r: number, c: number, cell: PartialCellObj) => {
       setSheets((prev) => {
@@ -272,23 +290,24 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         onDownload={handleDownload}
       />
       <div className="flex-1 overflow-auto">
-        <table className="min-w-max border-collapse text-sm">
-          <tbody>
-            {rows.map((row, rIdx) => (
-              <tr key={rIdx}>
-                {row.cells.map((cellData, cIdx) => (
-                  <ExcelCell
-                    key={cIdx}
-                    rowIndex={rIdx}
-                    colIndex={cIdx}
-                    cell={cellData}
-                    onChange={updateCell}
-                  />
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div
+          ref={gridRef}
+          className="min-w-max text-sm grid"
+          style={{ gridTemplateColumns: `repeat(${colCount}, minmax(3rem, max-content))` }}
+        >
+          {rows.map((row, rIdx) =>
+            row.cells.map((cellData, cIdx) => (
+              <ExcelCell
+                key={`${rIdx}-${cIdx}`}
+                rowIndex={rIdx}
+                colIndex={cIdx}
+                cell={cellData}
+                onChange={updateCell}
+                focusCell={focusCell}
+              />
+            ))
+          )}
+        </div>
       </div>
     </div>
   )

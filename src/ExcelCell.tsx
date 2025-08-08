@@ -14,6 +14,7 @@ interface ExcelCellProps {
   colIndex: number
   cell: PartialCellObj | undefined
   onChange: (r: number, c: number, cell: PartialCellObj) => void
+  focusCell: (r: number, c: number) => void
 }
 
 const ExcelCell: React.FC<ExcelCellProps> = ({
@@ -21,6 +22,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   colIndex,
   cell,
   onChange,
+  focusCell,
 }) => {
   const [editing, setEditing] = useState(false)
   const [inputValue, setInputValue] = useState("")
@@ -148,16 +150,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       } else {
         commit()
         stopEdit()
-        const td = inputRef.current?.closest("td") as HTMLTableCellElement | null
-        if (!td) return
-        let next: HTMLTableCellElement | null = td.nextElementSibling as
-          | HTMLTableCellElement
-          | null
-        if (!next) {
-          const nextRow = td.parentElement?.nextElementSibling as HTMLTableRowElement | null
-          next = nextRow?.querySelector("td") || null
-        }
-        next?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+        focusCell(rowIndex, colIndex + 1)
       }
     } else if (e.key === "ArrowRight" || e.key === "ArrowLeft" || e.key === "ArrowDown" || e.key === "ArrowUp") {
       const input = inputRef.current
@@ -173,44 +166,25 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
         return
       }
 
-      const td = inputRef.current?.closest("td") as HTMLTableCellElement | null
-      if (!td) return
-
-      let next: HTMLTableCellElement | null = null
+      let targetRow = rowIndex
+      let targetCol = colIndex
 
       if (e.key === "ArrowRight") {
-        next = td.nextElementSibling as HTMLTableCellElement | null
-        if (!next) {
-          const nextRow = td.parentElement?.nextElementSibling as HTMLTableRowElement | null
-          next = nextRow?.querySelector("td") || null
-        }
+        if (!cursorAtEnd) return
+        targetCol = colIndex + 1
       } else if (e.key === "ArrowLeft") {
-        next = td.previousElementSibling as HTMLTableCellElement | null
-        if (!next) {
-          const prevRow = td.parentElement?.previousElementSibling as HTMLTableRowElement | null
-          if (prevRow) {
-            const cells = prevRow.querySelectorAll("td")
-            next = cells[cells.length - 1] || null
-          }
-        }
+        if (!cursorAtStart) return
+        targetCol = colIndex - 1
       } else if (e.key === "ArrowDown") {
-        const currentRowIndex = Array.from(td.parentElement?.parentElement?.children || []).indexOf(td.parentElement!)
-        const currentCellIndex = Array.from(td.parentElement?.children || []).indexOf(td)
-        const nextRow = td.parentElement?.parentElement?.children[currentRowIndex + 1] as HTMLTableRowElement | null
-        next = nextRow?.children[currentCellIndex] as HTMLTableCellElement | null
+        targetRow = rowIndex + 1
       } else if (e.key === "ArrowUp") {
-        const currentRowIndex = Array.from(td.parentElement?.parentElement?.children || []).indexOf(td.parentElement!)
-        const currentCellIndex = Array.from(td.parentElement?.children || []).indexOf(td)
-        const prevRow = td.parentElement?.parentElement?.children[currentRowIndex - 1] as HTMLTableRowElement | null
-        next = prevRow?.children[currentCellIndex] as HTMLTableCellElement | null
+        targetRow = rowIndex - 1
       }
 
-      if (next) {
-        e.preventDefault()
-        commit()
-        stopEdit()
-        next.dispatchEvent(new MouseEvent("click", { bubbles: true }))
-      }
+      e.preventDefault()
+      commit()
+      stopEdit()
+      focusCell(targetRow, targetCol)
     }
   }
 
@@ -220,10 +194,14 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     !editing && !showImagePreview && isHttpUrl(displayValue)
 
   return (
-    <td
+    <div
+      data-row={rowIndex}
+      data-col={colIndex}
       className={twMerge(
         "min-w-12 px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600 relative cursor-default",
         rowIndex === 0 && "border-t-0",
+        rowIndex > 0 && "-mt-px",
+        colIndex > 0 && "-ml-px",
         cell?.t === "n" && !editing && "text-right"
       )}
       onClick={startEdit}
@@ -254,11 +232,12 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       ) : (
         displayValue
       )}
-    </td>
+    </div>
   )
 }
 
 export default React.memo(
   ExcelCell,
-  (prev, next) => prev.cell === next.cell,
+  (prev, next) =>
+    prev.cell === next.cell && prev.focusCell === next.focusCell,
 )
