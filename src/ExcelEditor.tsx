@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react"
+import { useVirtualizer } from "@tanstack/react-virtual"
 import ExcelCell from "./ExcelCell"
 import ExcelHeader from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
@@ -54,6 +55,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       prev: PartialCellObj
     }>
   >([])
+  const parentRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
   const rowCountRef = useRef(0)
   const colCountRef = useRef(0)
@@ -77,42 +79,25 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     setHasChanges(initialHasChanges)
   }, [initialHasChanges])
 
+  const MAX_ROWS = 1_000_000
+  const MAX_COLS = 18278
+  rowCountRef.current = MAX_ROWS
+  colCountRef.current = MAX_COLS
 
-  const getLastNonEmptyRow = (): number => {
-    let lastRowIdx = activeSheet.data.length
-    while (lastRowIdx > 0) {
-      const row = activeSheet.data[lastRowIdx - 1] || []
-      const hasData = row.some((c) =>
-        c && (c.f || (c.v !== undefined && c.v !== "")),
-      )
-      if (hasData) break
-      lastRowIdx--
-    }
-    return lastRowIdx
-  }
+  const rowVirtualizer = useVirtualizer({
+    count: MAX_ROWS,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 28,
+    overscan: 5,
+  })
 
-  const rowCount = getLastNonEmptyRow()
-
-  const getLastNonEmptyCol = (): number => {
-    let lastColIdx = activeSheet.data.reduce(
-      (max, row) => Math.max(max, row.length),
-      0,
-    )
-    while (lastColIdx > 0) {
-      const hasData = activeSheet.data.some((row) => {
-        const c = row[lastColIdx - 1]
-        return c && (c.f || (c.v !== null && c.v !== undefined && c.v !== ""))
-      })
-      if (hasData) break
-      lastColIdx--
-    }
-    return lastColIdx
-  }
-
-  const colCount = getLastNonEmptyCol()
-
-  rowCountRef.current = rowCount
-  colCountRef.current = colCount
+  const columnVirtualizer = useVirtualizer({
+    horizontal: true,
+    count: MAX_COLS,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 48,
+    overscan: 5,
+  })
 
   const focusCell = useCallback((row: number, col: number) => {
     setTimeout(() => {
@@ -128,12 +113,16 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         r -= 1
       }
       if (r < 0 || r >= maxRow) return
-      const target = gridRef.current?.querySelector<HTMLDivElement>(
-        `[data-row='${r}'][data-col='${c}']`,
-      )
-      target?.click()
+      rowVirtualizer.scrollToIndex(r)
+      columnVirtualizer.scrollToIndex(c)
+      requestAnimationFrame(() => {
+        const target = gridRef.current?.querySelector<HTMLDivElement>(
+          `[data-row='${r}'][data-col='${c}']`,
+        )
+        target?.click()
+      })
     }, 0)
-  }, [])
+  }, [rowVirtualizer, columnVirtualizer])
 
   const handleUndo = useCallback(() => {
     const last = undoStack.current.pop()
@@ -257,14 +246,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     onWorkbookChange?.(workbook)
   }, [sheets, activeSheetIndex, workbook, onWorkbookChange])
 
-  const rows = Array.from({ length: rowCount }).map((_, rIdx) => {
-    const rowData = activeSheet.data[rIdx] || []
-    const cells = Array.from({ length: colCount }).map((_, cIdx) => {
-      return rowData[cIdx]
-    })
-    return { cells }
-  })
-
   const handleDownload = () => {
     sheets.forEach((sd, idx) => {
       const sheetName = workbook.SheetNames[idx]
@@ -289,23 +270,33 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         hasChanges={hasChanges}
         onDownload={handleDownload}
       />
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-scroll" ref={parentRef}>
         <div
           ref={gridRef}
-          className="min-w-max text-sm grid"
-          style={{ gridTemplateColumns: `repeat(${colCount}, minmax(3rem, max-content))` }}
+          className="relative text-sm"
+          style={{
+            width: columnVirtualizer.getTotalSize(),
+            height: rowVirtualizer.getTotalSize(),
+          }}
         >
-          {rows.map((row, rIdx) =>
-            row.cells.map((cellData, cIdx) => (
+          {rowVirtualizer.getVirtualItems().map((row) =>
+            columnVirtualizer.getVirtualItems().map((col) => (
               <ExcelCell
-                key={`${rIdx}-${cIdx}`}
-                rowIndex={rIdx}
-                colIndex={cIdx}
-                cell={cellData}
+                key={`${row.index}-${col.index}`}
+                rowIndex={row.index}
+                colIndex={col.index}
+                cell={activeSheet.data[row.index]?.[col.index]}
                 onChange={updateCell}
                 focusCell={focusCell}
+                style={{
+                  position: "absolute",
+                  top: row.start,
+                  left: col.start,
+                  width: col.size,
+                  height: row.size,
+                }}
               />
-            ))
+            )),
           )}
         </div>
       </div>

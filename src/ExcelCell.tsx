@@ -15,6 +15,7 @@ interface ExcelCellProps {
   cell: PartialCellObj | undefined
   onChange: (r: number, c: number, cell: PartialCellObj) => void
   focusCell: (r: number, c: number) => void
+  style?: React.CSSProperties
 }
 
 const ExcelCell: React.FC<ExcelCellProps> = ({
@@ -23,6 +24,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   cell,
   onChange,
   focusCell,
+  style,
 }) => {
   const [editing, setEditing] = useState(false)
   const [inputValue, setInputValue] = useState("")
@@ -197,8 +199,9 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     <div
       data-row={rowIndex}
       data-col={colIndex}
+      style={style}
       className={twMerge(
-        "min-w-12 px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600 relative cursor-default",
+        "w-full h-full min-w-12 px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600 relative cursor-default",
         rowIndex === 0 && "border-t-0",
         rowIndex > 0 && "-mt-px",
         colIndex > 0 && "-ml-px",
@@ -239,5 +242,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
 export default React.memo(
   ExcelCell,
   (prev, next) =>
-    prev.cell === next.cell && prev.focusCell === next.focusCell,
+    prev.cell === next.cell &&
+    prev.focusCell === next.focusCell &&
+    prev.style === next.style,
 )
