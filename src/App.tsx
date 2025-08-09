@@ -14,6 +14,7 @@ function App() {
   const [fileName, setFileName] = useState<string | null>(null)
   const [editorOpen, setEditorOpen] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
+  const [isLoadingFromEditor, setIsLoadingFromEditor] = useState(false)
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -59,17 +60,26 @@ function App() {
     )
   }
 
+  const handleGoBack = () => {
+    setIsLoadingFromEditor(true)
+    setTimeout(() => {
+      setEditorOpen(true)
+      setIsLoadingFromEditor(false)
+    }, 100)
+  }
+
   return (
     <>
       <Header
         showGoBack={!!workbook && !editorOpen}
-        onGoBack={() => setEditorOpen(true)}
+        onGoBack={handleGoBack}
       />
       <DragDropArea
         setWorkbook={setWorkbook}
         setFileName={setFileName}
         onOpenEditor={() => setEditorOpen(true)}
         setHasChanges={setHasChanges}
+        loading={isLoadingFromEditor}
       />
       <Footer />
     </>
