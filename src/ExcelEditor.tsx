@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from "react"
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import ExcelCell from "./ExcelCell"
 import ExcelHeader from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
@@ -7,6 +7,7 @@ import type { WorkBook } from "xlsx"
 import { recalculateSheet } from "./utils/recalculateSheet"
 import { sheetToData, dataToSheet } from "./utils/xlsx"
 import { isMac } from "./utils/isMac"
+import { getLastNonEmptyRow, getLastNonEmptyCol } from "./utils/sheetStats"
 import { PartialCellObj, SheetData } from "./types"
 
 interface ExcelEditorProps {
@@ -78,41 +79,20 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   }, [initialHasChanges])
 
 
-  const getLastNonEmptyRow = (): number => {
-    let lastRowIdx = activeSheet.data.length
-    while (lastRowIdx > 0) {
-      const row = activeSheet.data[lastRowIdx - 1] || []
-      const hasData = row.some((c) =>
-        c && (c.f || (c.v !== undefined && c.v !== "")),
-      )
-      if (hasData) break
-      lastRowIdx--
-    }
-    return lastRowIdx
-  }
+  const rowCount = useMemo(
+    () => getLastNonEmptyRow(activeSheet.data),
+    [activeSheet.data],
+  )
 
-  const rowCount = getLastNonEmptyRow()
+  const colCount = useMemo(
+    () => getLastNonEmptyCol(activeSheet.data),
+    [activeSheet.data],
+  )
 
-  const getLastNonEmptyCol = (): number => {
-    let lastColIdx = activeSheet.data.reduce(
-      (max, row) => Math.max(max, row.length),
-      0,
-    )
-    while (lastColIdx > 0) {
-      const hasData = activeSheet.data.some((row) => {
-        const c = row[lastColIdx - 1]
-        return c && (c.f || (c.v !== null && c.v !== undefined && c.v !== ""))
-      })
-      if (hasData) break
-      lastColIdx--
-    }
-    return lastColIdx
-  }
-
-  const colCount = getLastNonEmptyCol()
-
-  rowCountRef.current = rowCount
-  colCountRef.current = colCount
+  useEffect(() => {
+    rowCountRef.current = rowCount
+    colCountRef.current = colCount
+  }, [rowCount, colCount])
 
   const focusCell = useCallback((row: number, col: number) => {
     setTimeout(() => {
@@ -257,13 +237,15 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     onWorkbookChange?.(workbook)
   }, [sheets, activeSheetIndex, workbook, onWorkbookChange])
 
-  const rows = Array.from({ length: rowCount }).map((_, rIdx) => {
-    const rowData = activeSheet.data[rIdx] || []
-    const cells = Array.from({ length: colCount }).map((_, cIdx) => {
-      return rowData[cIdx]
+  const rows = useMemo(() => {
+    return Array.from({ length: rowCount }).map((_, rIdx) => {
+      const rowData = activeSheet.data[rIdx] || []
+      const cells = Array.from({ length: colCount }).map((_, cIdx) => {
+        return rowData[cIdx]
+      })
+      return { cells }
     })
-    return { cells }
-  })
+  }, [activeSheet.data, rowCount, colCount])
 
   const handleDownload = () => {
     sheets.forEach((sd, idx) => {
