@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { twJoin } from "tailwind-merge"
 
 interface ImagePreviewProps {
@@ -11,11 +11,20 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ url, delay = 300, children 
   const [show, setShow] = useState(false)
   const [showAbove, setShowAbove] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
-  const timerRef = useRef<number | null>(null)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const containerRef = useRef<HTMLSpanElement>(null)
 
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+        timerRef.current = null
+      }
+    }
+  }, [delay])
+
   const handleMouseEnter = () => {
-    timerRef.current = window.setTimeout(() => {
+    timerRef.current = setTimeout(() => {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect()
         setShowAbove(rect.top > window.innerHeight / 2)
