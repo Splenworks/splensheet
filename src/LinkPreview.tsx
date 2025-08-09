@@ -35,7 +35,7 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url, delay = 300, children })
   const [showAbove, setShowAbove] = useState(false)
   const [metadata, setMetadata] = useState<Metadata | null>(null)
   const [loading, setLoading] = useState(false)
-  const timerRef = useRef<number | null>(null)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const containerRef = useRef<HTMLSpanElement>(null)
 
   const loadMetadata = useCallback(async () => {
@@ -60,8 +60,17 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url, delay = 300, children })
     }
   }, [show, metadata, loading, loadMetadata])
 
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+        timerRef.current = null
+      }
+    }
+  }, [delay])
+
   const handleMouseEnter = () => {
-    timerRef.current = window.setTimeout(() => {
+    timerRef.current = setTimeout(() => {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect()
         setShowAbove(rect.top > window.innerHeight / 2)
