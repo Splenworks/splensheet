@@ -3,8 +3,8 @@ import { Trans } from "react-i18next"
 import { twJoin, twMerge } from "tailwind-merge"
 import { useMediaQuery } from "usehooks-ts"
 import Spinner from "./Spinner"
-import { parseCsv } from "./utils/parseCsv"
-import { read, type WorkBook } from "xlsx"
+import { loadWorkbook } from "./utils/loadWorkbook"
+import type { WorkBook } from "xlsx"
 import SheetIcon from "./SheetIcon"
 
 interface DragDropAreaProps {
@@ -51,31 +51,20 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
     const items = e.dataTransfer.items
     try {
       if (items.length === 0) {
-        throw new Error("No files dropped.")
+        alert("No files dropped.")
+        return
       }
       const file = items[0].getAsFile()
       if (!file) {
-        throw new Error("No valid file found in the drop.")
+        alert("No valid file found in the drop.")
+        return
       }
-      const fileName = file.name.toLowerCase()
-      if (!fileName.endsWith(".xlsx") && !fileName.endsWith(".xls") && !fileName.endsWith(".csv")) {
-        throw new Error("Please upload a valid Excel (.xlsx, .xls) or CSV file.")
-      }
-      let workbook: WorkBook
-      if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
-        const arrayBuffer = await file.arrayBuffer()
-        workbook = read(arrayBuffer, { type: "array", cellDates: true })
-      } else {
-        const csvData = await file.text()
-        workbook = parseCsv(csvData)
-      }
+      const workbook = await loadWorkbook(file)
+      if (!workbook) return
       setWorkbook(workbook)
       setFileName(file.name)
       setHasChanges(false)
       onOpenEditor()
-    } catch (error) {
-      alert(error instanceof Error ? error.message : error)
-      console.error(error)
     } finally {
       setInternalLoading(false)
     }
@@ -91,28 +80,14 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
   ) => {
     setInternalLoading(true)
     try {
-      const files = Array.from(e.target.files || [])
-      const file = files[0]
+      const file = e.target.files?.[0]
       if (!file) return
-      const fileName = file.name.toLowerCase()
-      if (!fileName.endsWith(".xlsx") && !fileName.endsWith(".xls") && !fileName.endsWith(".csv")) {
-        throw new Error("Please upload a valid Excel (.xlsx, .xls) or CSV file.")
-      }
-      let workbook: WorkBook
-      if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
-        const arrayBuffer = await file.arrayBuffer()
-        workbook = read(arrayBuffer, { type: "array", cellDates: true })
-      } else {
-        const csvData = await file.text()
-        workbook = parseCsv(csvData)
-      }
+      const workbook = await loadWorkbook(file)
+      if (!workbook) return
       setWorkbook(workbook)
       setFileName(file.name)
       setHasChanges(false)
       onOpenEditor()
-    } catch (error) {
-      alert(error instanceof Error ? error.message : error)
-      console.error(error)
     } finally {
       setInternalLoading(false)
     }
