@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react"
+import { useVirtualizer } from "@tanstack/react-virtual"
 import ExcelCell from "./ExcelCell"
 import ExcelHeader from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
@@ -56,6 +57,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     }>
   >([])
   const gridRef = useRef<HTMLDivElement>(null)
+  const parentRef = useRef<HTMLDivElement>(null)
   const rowCountRef = useRef(0)
   const colCountRef = useRef(0)
 
@@ -94,26 +96,44 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     colCountRef.current = colCount
   }, [rowCount, colCount])
 
-  const focusCell = useCallback((row: number, col: number) => {
-    setTimeout(() => {
-      let r = row
-      let c = col
-      const maxRow = rowCountRef.current
-      const maxCol = colCountRef.current
-      if (c >= maxCol) {
-        c = 0
-        r += 1
-      } else if (c < 0) {
-        c = maxCol - 1
-        r -= 1
-      }
-      if (r < 0 || r >= maxRow) return
-      const target = gridRef.current?.querySelector<HTMLDivElement>(
-        `[data-row='${r}'][data-col='${c}']`,
-      )
-      target?.click()
-    }, 0)
-  }, [])
+  const rowVirtualizer = useVirtualizer({
+    count: rowCount,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 32,
+  })
+
+  const focusCell = useCallback(
+    (row: number, col: number) => {
+      setTimeout(() => {
+        let r = row
+        let c = col
+        const maxRow = rowCountRef.current
+        const maxCol = colCountRef.current
+        if (c >= maxCol) {
+          c = 0
+          r += 1
+        } else if (c < 0) {
+          c = maxCol - 1
+          r -= 1
+        }
+        if (r < 0 || r >= maxRow) return
+        rowVirtualizer.scrollToIndex(r)
+        const parent = parentRef.current
+        if (parent) {
+          const cellWidth = 48
+          const left = c * cellWidth
+          if (left < parent.scrollLeft) parent.scrollLeft = left
+          else if (left + cellWidth > parent.scrollLeft + parent.clientWidth)
+            parent.scrollLeft = left + cellWidth - parent.clientWidth
+        }
+        const target = gridRef.current?.querySelector<HTMLDivElement>(
+          `[data-row='${r}'][data-col='${c}']`,
+        )
+        target?.click()
+      }, 0)
+    },
+    [rowVirtualizer],
+  )
 
   const handleUndo = useCallback(() => {
     const last = undoStack.current.pop()
@@ -237,15 +257,13 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     onWorkbookChange?.(workbook)
   }, [sheets, activeSheetIndex, workbook, onWorkbookChange])
 
-  const rows = useMemo(() => {
-    return Array.from({ length: rowCount }).map((_, rIdx) => {
-      const rowData = activeSheet.data[rIdx] || []
-      const cells = Array.from({ length: colCount }).map((_, cIdx) => {
-        return rowData[cIdx]
-      })
-      return { cells }
-    })
-  }, [activeSheet.data, rowCount, colCount])
+  const virtualRows = rowVirtualizer.getVirtualItems()
+  const paddingTop = virtualRows.length > 0 ? virtualRows[0].start : 0
+  const paddingBottom =
+    virtualRows.length > 0
+      ? rowVirtualizer.getTotalSize() -
+        virtualRows[virtualRows.length - 1].end
+      : 0
 
   const handleDownload = () => {
     sheets.forEach((sd, idx) => {
@@ -271,24 +289,35 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         hasChanges={hasChanges}
         onDownload={handleDownload}
       />
-      <div className="flex-1 overflow-auto">
+      <div ref={parentRef} className="flex-1 overflow-auto">
         <div
           ref={gridRef}
           className="min-w-max text-sm grid"
-          style={{ gridTemplateColumns: `repeat(${colCount}, minmax(3rem, max-content))` }}
+          style={{
+            gridTemplateColumns: `repeat(${colCount}, minmax(3rem, max-content))`,
+            height: rowVirtualizer.getTotalSize(),
+          }}
         >
-          {rows.map((row, rIdx) =>
-            row.cells.map((cellData, cIdx) => (
+          <div
+            style={{ height: paddingTop, gridColumn: `1 / span ${colCount}` }}
+          />
+          {virtualRows.map((virtualRow) => {
+            const rIdx = virtualRow.index
+            const rowData = activeSheet.data[rIdx] || []
+            return Array.from({ length: colCount }).map((_, cIdx) => (
               <ExcelCell
                 key={`${rIdx}-${cIdx}`}
                 rowIndex={rIdx}
                 colIndex={cIdx}
-                cell={cellData}
+                cell={rowData[cIdx]}
                 onChange={updateCell}
                 focusCell={focusCell}
               />
             ))
-          )}
+          })}
+          <div
+            style={{ height: paddingBottom, gridColumn: `1 / span ${colCount}` }}
+          />
         </div>
       </div>
     </div>
