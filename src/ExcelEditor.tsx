@@ -38,6 +38,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     })),
   )
   const [hasChanges, setHasChanges] = useState(initialHasChanges)
+  const [focusedCell, setFocusedCell] = useState<{ row: number; col: number } | null>(null)
   const activeSheet = sheets[activeSheetIndex]
   const activeDataRef = useRef(activeSheet.data)
   const undoStack = useRef<
@@ -96,6 +97,18 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     colCountRef.current = colCount
   }, [rowCount, colCount])
 
+  // Set initial focused cell or reset when changing sheets
+  useEffect(() => {
+    if (rowCount > 0 && colCount > 0 && !focusedCell) {
+      setFocusedCell({ row: 0, col: 0 })
+    }
+  }, [rowCount, colCount, activeSheetIndex, focusedCell])
+
+  // Reset focused cell when changing sheets
+  useEffect(() => {
+    setFocusedCell(null)
+  }, [activeSheetIndex])
+
   const rowVirtualizer = useVirtualizer({
     count: rowCount,
     getScrollElement: () => parentRef.current,
@@ -104,33 +117,34 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
 
   const focusCell = useCallback(
     (row: number, col: number) => {
-      setTimeout(() => {
-        let r = row
-        let c = col
-        const maxRow = rowCountRef.current
-        const maxCol = colCountRef.current
-        if (c >= maxCol) {
-          c = 0
-          r += 1
-        } else if (c < 0) {
-          c = maxCol - 1
-          r -= 1
-        }
-        if (r < 0 || r >= maxRow) return
-        rowVirtualizer.scrollToIndex(r)
-        const parent = parentRef.current
-        if (parent) {
-          const cellWidth = 48
-          const left = c * cellWidth
-          if (left < parent.scrollLeft) parent.scrollLeft = left
-          else if (left + cellWidth > parent.scrollLeft + parent.clientWidth)
-            parent.scrollLeft = left + cellWidth - parent.clientWidth
-        }
-        const target = gridRef.current?.querySelector<HTMLDivElement>(
-          `[data-row='${r}'][data-col='${c}']`,
-        )
-        target?.click()
-      }, 0)
+      let r = row
+      let c = col
+      const maxRow = rowCountRef.current
+      const maxCol = colCountRef.current
+      if (c >= maxCol) {
+        c = 0
+        r += 1
+      } else if (c < 0) {
+        c = maxCol - 1
+        r -= 1
+      }
+      if (r < 0 || r >= maxRow) return
+
+      // Update focused cell state
+      setFocusedCell({ row: r, col: c })
+
+      // Scroll to the target row
+      rowVirtualizer.scrollToIndex(r)
+
+      // Handle horizontal scrolling
+      const parent = parentRef.current
+      if (parent) {
+        const cellWidth = 48
+        const left = c * cellWidth
+        if (left < parent.scrollLeft) parent.scrollLeft = left
+        else if (left + cellWidth > parent.scrollLeft + parent.clientWidth)
+          parent.scrollLeft = left + cellWidth - parent.clientWidth
+      }
     },
     [rowVirtualizer],
   )
@@ -194,6 +208,11 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const key = event.key.toLowerCase()
+
+      // Check if any input is currently focused (to avoid interfering with cell editing)
+      const activeElement = document.activeElement
+      const isInputFocused = activeElement?.tagName === 'INPUT' || activeElement?.tagName === 'TEXTAREA'
+
       if (
         (isMac && event.metaKey && key === "z") ||
         (!isMac && event.ctrlKey && key === "z")
@@ -216,13 +235,38 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         } else {
           onClose()
         }
+        return
+      }
+
+      // Handle arrow key navigation when not editing a cell
+      if (!isInputFocused && focusedCell) {
+        if (key === "arrowright") {
+          event.preventDefault()
+          focusCell(focusedCell.row, focusedCell.col + 1)
+        } else if (key === "arrowleft") {
+          event.preventDefault()
+          focusCell(focusedCell.row, focusedCell.col - 1)
+        } else if (key === "arrowdown") {
+          event.preventDefault()
+          focusCell(focusedCell.row + 1, focusedCell.col)
+        } else if (key === "arrowup") {
+          event.preventDefault()
+          focusCell(focusedCell.row - 1, focusedCell.col)
+        } else if (key === "enter") {
+          // Start editing the focused cell
+          event.preventDefault()
+          const target = gridRef.current?.querySelector<HTMLDivElement>(
+            `[data-row='${focusedCell.row}'][data-col='${focusedCell.col}']`,
+          )
+          target?.click()
+        }
       }
     }
     window.addEventListener("keydown", handleKeyDown)
     return () => {
       window.removeEventListener("keydown", handleKeyDown)
     }
-  }, [isFullScreen, toggleFullScreen, onClose, handleUndo, handleRedo])
+  }, [isFullScreen, toggleFullScreen, onClose, handleUndo, handleRedo, focusedCell, focusCell])
 
   const updateCell = useCallback(
     (r: number, c: number, cell: PartialCellObj) => {
@@ -262,7 +306,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   const paddingBottom =
     virtualRows.length > 0
       ? rowVirtualizer.getTotalSize() -
-        virtualRows[virtualRows.length - 1].end
+      virtualRows[virtualRows.length - 1].end
       : 0
 
   const handleDownload = () => {
@@ -310,6 +354,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
                 rowIndex={rIdx}
                 colIndex={cIdx}
                 cell={rowData[cIdx]}
+                isFocused={focusedCell?.row === rIdx && focusedCell?.col === cIdx}
                 onChange={updateCell}
                 focusCell={focusCell}
               />
