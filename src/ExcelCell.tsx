@@ -207,7 +207,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
         rowIndex > 0 && "-mt-px",
         colIndex > 0 && "-ml-px",
         cell?.t === "n" && !editing && "text-right",
-        isFocused && !editing && "outline-2 outline-pink-900 outline-offset-[-3px] z-30"
+        isFocused && !editing && "outline-2 outline-pink-900 outline-offset-[-3px]"
       )}
       onClick={startEdit}
     >

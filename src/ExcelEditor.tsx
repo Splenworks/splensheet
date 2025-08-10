@@ -342,9 +342,11 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
             height: rowVirtualizer.getTotalSize(),
           }}
         >
-          <div
-            style={{ height: paddingTop, gridColumn: `1 / span ${colCount}` }}
-          />
+          {paddingTop > 0 && (
+            <div
+              style={{ height: paddingTop, gridColumn: `1 / span ${colCount}` }}
+            />
+          )}
           {virtualRows.map((virtualRow) => {
             const rIdx = virtualRow.index
             const rowData = activeSheet.data[rIdx] || []
@@ -360,9 +362,11 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
               />
             ))
           })}
-          <div
-            style={{ height: paddingBottom, gridColumn: `1 / span ${colCount}` }}
-          />
+          {paddingBottom > 0 && (
+            <div
+              style={{ height: paddingBottom, gridColumn: `1 / span ${colCount}` }}
+            />
+          )}
         </div>
       </div>
     </div>
