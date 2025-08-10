@@ -38,7 +38,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     })),
   )
   const [hasChanges, setHasChanges] = useState(initialHasChanges)
-  const [focusedCell, setFocusedCell] = useState<{ row: number; col: number } | null>(null)
+  const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null)
   const activeSheet = sheets[activeSheetIndex]
   const activeDataRef = useRef(activeSheet.data)
   const undoStack = useRef<
@@ -97,16 +97,8 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     colCountRef.current = colCount
   }, [rowCount, colCount])
 
-  // Set initial focused cell or reset when changing sheets
   useEffect(() => {
-    if (rowCount > 0 && colCount > 0 && !focusedCell) {
-      setFocusedCell({ row: 0, col: 0 })
-    }
-  }, [rowCount, colCount, activeSheetIndex, focusedCell])
-
-  // Reset focused cell when changing sheets
-  useEffect(() => {
-    setFocusedCell(null)
+    setSelectedCell(null)
   }, [activeSheetIndex])
 
   const rowVirtualizer = useVirtualizer({
@@ -115,7 +107,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     estimateSize: () => 32,
   })
 
-  const focusCell = useCallback(
+  const selectCell = useCallback(
     (row: number, col: number) => {
       let r = row
       let c = col
@@ -130,8 +122,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       }
       if (r < 0 || r >= maxRow) return
 
-      // Update focused cell state
-      setFocusedCell({ row: r, col: c })
+      setSelectedCell({ row: r, col: c })
 
       // Scroll to the target row
       rowVirtualizer.scrollToIndex(r)
@@ -174,8 +165,8 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     })
     setHasChanges(true)
     onHasChangesChange?.(true)
-    focusCell(last.r, last.c)
-  }, [onHasChangesChange, focusCell])
+    selectCell(last.r, last.c)
+  }, [onHasChangesChange, selectCell])
 
   const handleRedo = useCallback(() => {
     const last = redoStack.current.pop()
@@ -202,8 +193,8 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     })
     setHasChanges(true)
     onHasChangesChange?.(true)
-    focusCell(last.r, last.c)
-  }, [onHasChangesChange, focusCell])
+    selectCell(last.r, last.c)
+  }, [onHasChangesChange, selectCell])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -239,24 +230,23 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       }
 
       // Handle arrow key navigation when not editing a cell
-      if (!isInputFocused && focusedCell) {
+      if (!isInputFocused && selectedCell) {
         if (key === "arrowright") {
           event.preventDefault()
-          focusCell(focusedCell.row, focusedCell.col + 1)
+          selectCell(selectedCell.row, selectedCell.col + 1)
         } else if (key === "arrowleft") {
           event.preventDefault()
-          focusCell(focusedCell.row, focusedCell.col - 1)
+          selectCell(selectedCell.row, selectedCell.col - 1)
         } else if (key === "arrowdown") {
           event.preventDefault()
-          focusCell(focusedCell.row + 1, focusedCell.col)
+          selectCell(selectedCell.row + 1, selectedCell.col)
         } else if (key === "arrowup") {
           event.preventDefault()
-          focusCell(focusedCell.row - 1, focusedCell.col)
+          selectCell(selectedCell.row - 1, selectedCell.col)
         } else if (key === "enter") {
-          // Start editing the focused cell
           event.preventDefault()
           const target = gridRef.current?.querySelector<HTMLDivElement>(
-            `[data-row='${focusedCell.row}'][data-col='${focusedCell.col}']`,
+            `[data-row='${selectedCell.row}'][data-col='${selectedCell.col}']`,
           )
           target?.click()
         }
@@ -266,7 +256,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     return () => {
       window.removeEventListener("keydown", handleKeyDown)
     }
-  }, [isFullScreen, toggleFullScreen, onClose, handleUndo, handleRedo, focusedCell, focusCell])
+  }, [isFullScreen, toggleFullScreen, onClose, handleUndo, handleRedo, selectedCell, selectCell])
 
   const updateCell = useCallback(
     (r: number, c: number, cell: PartialCellObj) => {
@@ -356,9 +346,9 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
                 rowIndex={rIdx}
                 colIndex={cIdx}
                 cell={rowData[cIdx]}
-                isFocused={focusedCell?.row === rIdx && focusedCell?.col === cIdx}
+                isSelected={selectedCell?.row === rIdx && selectedCell?.col === cIdx}
                 onChange={updateCell}
-                focusCell={focusCell}
+                selectCell={selectCell}
               />
             ))
           })}

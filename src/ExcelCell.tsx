@@ -13,18 +13,18 @@ interface ExcelCellProps {
   rowIndex: number
   colIndex: number
   cell: PartialCellObj | undefined
-  isFocused: boolean
+  isSelected: boolean
   onChange: (r: number, c: number, cell: PartialCellObj) => void
-  focusCell: (r: number, c: number) => void
+  selectCell: (r: number, c: number) => void
 }
 
 const ExcelCell: React.FC<ExcelCellProps> = ({
   rowIndex,
   colIndex,
   cell,
-  isFocused,
+  isSelected,
   onChange,
-  focusCell,
+  selectCell,
 }) => {
   const [editing, setEditing] = useState(false)
   const [inputValue, setInputValue] = useState("")
@@ -61,8 +61,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
 
   const startEdit = () => {
     if (editing) return
-    // Set focus on this cell
-    focusCell(rowIndex, colIndex)
+    selectCell(rowIndex, colIndex)
     const value = getEditableValue(cell)
     setInputValue(value)
     updateSuggestion(value)
@@ -154,7 +153,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       } else {
         commit()
         stopEdit()
-        focusCell(rowIndex, colIndex + 1)
+        selectCell(rowIndex, colIndex + 1)
       }
     } else if (e.key === "ArrowRight" || e.key === "ArrowLeft" || e.key === "ArrowDown" || e.key === "ArrowUp") {
       const input = inputRef.current
@@ -186,9 +185,10 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       }
 
       e.preventDefault()
+      e.stopPropagation()
       commit()
       stopEdit()
-      focusCell(targetRow, targetCol)
+      selectCell(targetRow, targetCol)
     }
   }
 
@@ -207,7 +207,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
         rowIndex > 0 && "-mt-px",
         colIndex > 0 && "-ml-px",
         cell?.t === "n" && !editing && "text-right",
-        isFocused && !editing && "outline-2 outline-pink-900 outline-offset-[-3px]"
+        isSelected && !editing && "outline-2 outline-pink-900 outline-offset-[-3px]"
       )}
       onClick={startEdit}
     >
@@ -245,6 +245,6 @@ export default React.memo(
   ExcelCell,
   (prev, next) =>
     prev.cell === next.cell &&
-    prev.isFocused === next.isFocused &&
-    prev.focusCell === next.focusCell,
+    prev.isSelected === next.isSelected &&
+    prev.selectCell === next.selectCell,
 )
