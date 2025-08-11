@@ -16,6 +16,7 @@ interface ExcelCellProps {
   isSelected: boolean
   onChange: (r: number, c: number, cell: PartialCellObj) => void
   selectCell: (r: number, c: number) => void
+  style?: React.CSSProperties
 }
 
 const ExcelCell: React.FC<ExcelCellProps> = ({
@@ -25,6 +26,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   isSelected,
   onChange,
   selectCell,
+  style,
 }) => {
   const [editing, setEditing] = useState(false)
   const [inputValue, setInputValue] = useState("")
@@ -206,6 +208,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
     <div
       data-row={rowIndex}
       data-col={colIndex}
+      style={style}
       className={twMerge(
         "relative min-w-12 px-2 py-1 border-gray-300 dark:border-neutral-600",
         "font-normal text-base text-black dark:text-white border cursor-default",
