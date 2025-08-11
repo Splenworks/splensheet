@@ -11,7 +11,6 @@ interface DragDropAreaProps {
   setWorkbook: (workbook: WorkBook) => void
   setFileName: (name: string) => void
   onOpenEditor: () => void
-  setHasChanges: (changes: boolean) => void
   loading?: boolean
 }
 
@@ -19,7 +18,6 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
   setWorkbook,
   setFileName,
   onOpenEditor,
-  setHasChanges,
   loading: externalLoading = false,
 }) => {
   const [dragging, setDragging] = useState(false)
@@ -63,7 +61,6 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
       if (!workbook) return
       setWorkbook(workbook)
       setFileName(file.name)
-      setHasChanges(false)
       onOpenEditor()
     } finally {
       setInternalLoading(false)
@@ -86,7 +83,6 @@ const DragDropArea: React.FC<DragDropAreaProps> = ({
       if (!workbook) return
       setWorkbook(workbook)
       setFileName(file.name)
-      setHasChanges(false)
       onOpenEditor()
     } finally {
       setInternalLoading(false)

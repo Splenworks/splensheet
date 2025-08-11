@@ -75,10 +75,12 @@ function App() {
         onGoBack={handleGoBack}
       />
       <DragDropArea
-        setWorkbook={setWorkbook}
+        setWorkbook={(workbook) => {
+          setWorkbook(workbook)
+          setHasChanges(false)
+        }}
         setFileName={setFileName}
         onOpenEditor={() => setEditorOpen(true)}
-        setHasChanges={setHasChanges}
         loading={isLoadingFromEditor}
       />
       <Footer />
