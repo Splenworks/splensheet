@@ -130,11 +130,20 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       // Handle horizontal scrolling
       const parent = parentRef.current
       if (parent) {
-        const cellWidth = 48
-        const left = c * cellWidth
-        if (left < parent.scrollLeft) parent.scrollLeft = left
-        else if (left + cellWidth > parent.scrollLeft + parent.clientWidth)
-          parent.scrollLeft = left + cellWidth - parent.clientWidth
+        let targetCell: HTMLElement | null = null
+        targetCell = parent.querySelector(`[data-col="${c}"]`)
+        if (targetCell) {
+          const cellRect = targetCell.getBoundingClientRect()
+          const parentWidth = parent.clientWidth
+          if (cellRect.left < 0 || cellRect.right > parentWidth) {
+            const left = cellRect.left - parent.getBoundingClientRect().left + parent.scrollLeft
+            if (left < parent.scrollLeft) {
+              parent.scrollLeft = left
+            } else if (left + cellRect.width > parent.scrollLeft + parentWidth) {
+              parent.scrollLeft = left + cellRect.width - parentWidth
+            }
+          }
+        }
       }
     },
     [rowVirtualizer],
