@@ -202,20 +202,21 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       data-row={rowIndex}
       data-col={colIndex}
       className={twMerge(
-        "min-w-12 px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600 relative cursor-default",
+        "relative min-w-12 px-2 py-1 border-gray-300 dark:border-neutral-600",
+        "font-normal text-base text-black dark:text-white border cursor-default",
         rowIndex === 0 && "border-t-0",
         rowIndex > 0 && "-mt-px",
         colIndex > 0 && "-ml-px",
         cell?.t === "n" && !editing && "text-right",
-        isSelected && !editing && "outline-2 outline-pink-900 dark:outline-pink-700 outline-offset-[-3px]"
+        isSelected && "outline-2 outline-pink-900 dark:outline-pink-700 outline-offset-[-3px] z-20"
       )}
       onClick={startEdit}
     >
       {editing && (
-        <div className="absolute left-0 top-0 right-0 bottom-0 box-border">
+        <div className="absolute inset-0.5">
           <input
             ref={inputRef}
-            className="w-full h-full px-2 py-1 box-border border-none bg-white dark:bg-neutral-900 focus:outline-pink-900 focus:outline-2 focus:[outline-offset:-2px] dark:focus:outline-pink-700"
+            className="w-full h-full px-1.5 font-normal text-base border-none bg-white dark:bg-neutral-900 outline-none focus:outline-none"
             value={inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
             onBlur={handleBlur}
