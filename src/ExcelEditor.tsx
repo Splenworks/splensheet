@@ -223,6 +223,8 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       if (key === "escape") {
         if (isFullScreen) {
           toggleFullScreen()
+        } else if (selectedCell) {
+          setSelectedCell(null)
         } else {
           onClose()
         }
