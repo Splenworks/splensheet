@@ -204,11 +204,10 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       className={twMerge(
         "relative min-w-12 px-2 py-1 border-gray-300 dark:border-neutral-600",
         "font-normal text-base text-black dark:text-white border cursor-default",
-        rowIndex === 0 && "border-t-0",
         rowIndex > 0 && "-mt-px",
         colIndex > 0 && "-ml-px",
         cell?.t === "n" && !editing && "text-right",
-        isSelected && "outline-2 outline-pink-900 dark:outline-pink-700 outline-offset-[-3px] z-20"
+        isSelected && "outline-2 outline-pink-900 dark:outline-pink-700 outline-offset-[-3px] z-20",
       )}
       onClick={startEdit}
     >
