@@ -60,7 +60,7 @@ const ExcelHeader: React.FC<ExcelHeaderProps> = ({
   }
 
   return (
-    <header className="flex h-11 items-center justify-between px-2 bg-gray-200 dark:bg-neutral-800 border-b border-gray-300 dark:border-neutral-600">
+    <header className="flex h-11 items-center justify-between px-2 bg-gray-200 dark:bg-neutral-800">
       {!isCsv && (
         <div className="flex items-center">
           <select

@@ -13,16 +13,18 @@ interface ExcelCellProps {
   rowIndex: number
   colIndex: number
   cell: PartialCellObj | undefined
+  isSelected: boolean
   onChange: (r: number, c: number, cell: PartialCellObj) => void
-  focusCell: (r: number, c: number) => void
+  selectCell: (r: number, c: number) => void
 }
 
 const ExcelCell: React.FC<ExcelCellProps> = ({
   rowIndex,
   colIndex,
   cell,
+  isSelected,
   onChange,
-  focusCell,
+  selectCell,
 }) => {
   const [editing, setEditing] = useState(false)
   const [inputValue, setInputValue] = useState("")
@@ -59,6 +61,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
 
   const startEdit = () => {
     if (editing) return
+    selectCell(rowIndex, colIndex)
     const value = getEditableValue(cell)
     setInputValue(value)
     updateSuggestion(value)
@@ -150,7 +153,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       } else {
         commit()
         stopEdit()
-        focusCell(rowIndex, colIndex + 1)
+        selectCell(rowIndex, colIndex + 1)
       }
     } else if (e.key === "ArrowRight" || e.key === "ArrowLeft" || e.key === "ArrowDown" || e.key === "ArrowUp") {
       const input = inputRef.current
@@ -182,9 +185,10 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       }
 
       e.preventDefault()
+      e.stopPropagation()
       commit()
       stopEdit()
-      focusCell(targetRow, targetCol)
+      selectCell(targetRow, targetCol)
     }
   }
 
@@ -198,19 +202,20 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       data-row={rowIndex}
       data-col={colIndex}
       className={twMerge(
-        "min-w-12 px-2 py-1 text-black dark:text-white border border-gray-300 dark:border-neutral-600 relative cursor-default",
-        rowIndex === 0 && "border-t-0",
+        "relative min-w-12 px-2 py-1 border-gray-300 dark:border-neutral-600",
+        "font-normal text-base text-black dark:text-white border cursor-default",
         rowIndex > 0 && "-mt-px",
         colIndex > 0 && "-ml-px",
-        cell?.t === "n" && !editing && "text-right"
+        cell?.t === "n" && !editing && "text-right",
+        isSelected && "outline-2 outline-pink-900 dark:outline-pink-700 outline-offset-[-3px] z-20",
       )}
       onClick={startEdit}
     >
       {editing && (
-        <div className="absolute left-0 top-0 right-0 bottom-0 box-border">
+        <div className="absolute inset-0.5">
           <input
             ref={inputRef}
-            className="w-full h-full px-2 py-1 box-border border-none bg-white dark:bg-neutral-900 focus:outline-pink-900 focus:outline-2 focus:[outline-offset:-2px] dark:focus:outline-pink-700"
+            className="w-full h-full px-1.5 font-normal text-base border-none bg-white dark:bg-neutral-900 outline-none focus:outline-none"
             value={inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
             onBlur={handleBlur}
@@ -239,5 +244,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
 export default React.memo(
   ExcelCell,
   (prev, next) =>
-    prev.cell === next.cell && prev.focusCell === next.focusCell,
+    prev.cell === next.cell &&
+    prev.isSelected === next.isSelected &&
+    prev.selectCell === next.selectCell,
 )

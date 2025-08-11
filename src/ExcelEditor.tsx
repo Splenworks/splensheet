@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react"
+import { useVirtualizer } from "@tanstack/react-virtual"
 import ExcelCell from "./ExcelCell"
 import ExcelHeader from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
@@ -37,6 +38,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     })),
   )
   const [hasChanges, setHasChanges] = useState(initialHasChanges)
+  const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null)
   const activeSheet = sheets[activeSheetIndex]
   const activeDataRef = useRef(activeSheet.data)
   const undoStack = useRef<
@@ -56,6 +58,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     }>
   >([])
   const gridRef = useRef<HTMLDivElement>(null)
+  const parentRef = useRef<HTMLDivElement>(null)
   const rowCountRef = useRef(0)
   const colCountRef = useRef(0)
 
@@ -94,8 +97,18 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     colCountRef.current = colCount
   }, [rowCount, colCount])
 
-  const focusCell = useCallback((row: number, col: number) => {
-    setTimeout(() => {
+  useEffect(() => {
+    setSelectedCell(null)
+  }, [activeSheetIndex])
+
+  const rowVirtualizer = useVirtualizer({
+    count: rowCount,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 32,
+  })
+
+  const selectCell = useCallback(
+    (row: number, col: number) => {
       let r = row
       let c = col
       const maxRow = rowCountRef.current
@@ -108,12 +121,33 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         r -= 1
       }
       if (r < 0 || r >= maxRow) return
-      const target = gridRef.current?.querySelector<HTMLDivElement>(
-        `[data-row='${r}'][data-col='${c}']`,
-      )
-      target?.click()
-    }, 0)
-  }, [])
+
+      setSelectedCell({ row: r, col: c })
+
+      // Scroll to the target row
+      rowVirtualizer.scrollToIndex(r)
+
+      // Handle horizontal scrolling
+      const parent = parentRef.current
+      if (parent) {
+        let targetCell: HTMLElement | null = null
+        targetCell = parent.querySelector(`[data-col="${c}"]`)
+        if (targetCell) {
+          const cellRect = targetCell.getBoundingClientRect()
+          const parentWidth = parent.clientWidth
+          if (cellRect.left < 0 || cellRect.right > parentWidth) {
+            const left = cellRect.left - parent.getBoundingClientRect().left + parent.scrollLeft
+            if (left < parent.scrollLeft) {
+              parent.scrollLeft = left
+            } else if (left + cellRect.width > parent.scrollLeft + parentWidth) {
+              parent.scrollLeft = left + cellRect.width - parentWidth
+            }
+          }
+        }
+      }
+    },
+    [rowVirtualizer],
+  )
 
   const handleUndo = useCallback(() => {
     const last = undoStack.current.pop()
@@ -140,8 +174,8 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     })
     setHasChanges(true)
     onHasChangesChange?.(true)
-    focusCell(last.r, last.c)
-  }, [onHasChangesChange, focusCell])
+    selectCell(last.r, last.c)
+  }, [onHasChangesChange, selectCell])
 
   const handleRedo = useCallback(() => {
     const last = redoStack.current.pop()
@@ -168,12 +202,17 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     })
     setHasChanges(true)
     onHasChangesChange?.(true)
-    focusCell(last.r, last.c)
-  }, [onHasChangesChange, focusCell])
+    selectCell(last.r, last.c)
+  }, [onHasChangesChange, selectCell])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const key = event.key.toLowerCase()
+
+      // Check if any input is currently focused (to avoid interfering with cell editing)
+      const activeElement = document.activeElement
+      const isInputFocused = activeElement?.tagName === 'INPUT' || activeElement?.tagName === 'TEXTAREA'
+
       if (
         (isMac && event.metaKey && key === "z") ||
         (!isMac && event.ctrlKey && key === "z")
@@ -193,8 +232,34 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       if (key === "escape") {
         if (isFullScreen) {
           toggleFullScreen()
+        } else if (selectedCell) {
+          setSelectedCell(null)
         } else {
           onClose()
+        }
+        return
+      }
+
+      // Handle arrow key navigation when not editing a cell
+      if (!isInputFocused && selectedCell) {
+        if (key === "arrowright") {
+          event.preventDefault()
+          selectCell(selectedCell.row, selectedCell.col + 1)
+        } else if (key === "arrowleft") {
+          event.preventDefault()
+          selectCell(selectedCell.row, selectedCell.col - 1)
+        } else if (key === "arrowdown") {
+          event.preventDefault()
+          selectCell(selectedCell.row + 1, selectedCell.col)
+        } else if (key === "arrowup") {
+          event.preventDefault()
+          selectCell(selectedCell.row - 1, selectedCell.col)
+        } else if (key === "enter") {
+          event.preventDefault()
+          const target = gridRef.current?.querySelector<HTMLDivElement>(
+            `[data-row='${selectedCell.row}'][data-col='${selectedCell.col}']`,
+          )
+          target?.click()
         }
       }
     }
@@ -202,7 +267,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     return () => {
       window.removeEventListener("keydown", handleKeyDown)
     }
-  }, [isFullScreen, toggleFullScreen, onClose, handleUndo, handleRedo])
+  }, [isFullScreen, toggleFullScreen, onClose, handleUndo, handleRedo, selectedCell, selectCell])
 
   const updateCell = useCallback(
     (r: number, c: number, cell: PartialCellObj) => {
@@ -237,15 +302,13 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     onWorkbookChange?.(workbook)
   }, [sheets, activeSheetIndex, workbook, onWorkbookChange])
 
-  const rows = useMemo(() => {
-    return Array.from({ length: rowCount }).map((_, rIdx) => {
-      const rowData = activeSheet.data[rIdx] || []
-      const cells = Array.from({ length: colCount }).map((_, cIdx) => {
-        return rowData[cIdx]
-      })
-      return { cells }
-    })
-  }, [activeSheet.data, rowCount, colCount])
+  const virtualRows = rowVirtualizer.getVirtualItems()
+  const paddingTop = virtualRows.length > 0 ? virtualRows[0].start : 0
+  const paddingBottom =
+    virtualRows.length > 0
+      ? rowVirtualizer.getTotalSize() -
+      virtualRows[virtualRows.length - 1].end
+      : 0
 
   const handleDownload = () => {
     sheets.forEach((sd, idx) => {
@@ -271,23 +334,39 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         hasChanges={hasChanges}
         onDownload={handleDownload}
       />
-      <div className="flex-1 overflow-auto">
+      <div ref={parentRef} className="flex-1 overflow-auto">
         <div
           ref={gridRef}
           className="min-w-max text-sm grid"
-          style={{ gridTemplateColumns: `repeat(${colCount}, minmax(3rem, max-content))` }}
+          style={{
+            gridTemplateColumns: `repeat(${colCount}, minmax(3rem, max-content))`,
+            height: rowVirtualizer.getTotalSize(),
+          }}
         >
-          {rows.map((row, rIdx) =>
-            row.cells.map((cellData, cIdx) => (
+          {paddingTop > 0 && (
+            <div
+              style={{ height: paddingTop, gridColumn: `1 / span ${colCount}` }}
+            />
+          )}
+          {virtualRows.map((virtualRow) => {
+            const rIdx = virtualRow.index
+            const rowData = activeSheet.data[rIdx] || []
+            return Array.from({ length: colCount }).map((_, cIdx) => (
               <ExcelCell
                 key={`${rIdx}-${cIdx}`}
                 rowIndex={rIdx}
                 colIndex={cIdx}
-                cell={cellData}
+                cell={rowData[cIdx]}
+                isSelected={selectedCell?.row === rIdx && selectedCell?.col === cIdx}
                 onChange={updateCell}
-                focusCell={focusCell}
+                selectCell={selectCell}
               />
             ))
+          })}
+          {paddingBottom > 0 && (
+            <div
+              style={{ height: paddingBottom, gridColumn: `1 / span ${colCount}` }}
+            />
           )}
         </div>
       </div>
