@@ -95,6 +95,11 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
 
   const commit = () => {
     const val = inputValue
+    const originalValue = getEditableValue(cell)
+    if (val === originalValue) {
+      stopEdit()
+      return
+    }
     if (val.startsWith("=")) {
       const formula = val.slice(1)
       onChange(rowIndex, colIndex, { f: formula })
