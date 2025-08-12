@@ -1,4 +1,5 @@
 import { forwardRef, useImperativeHandle, useRef } from "react"
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline"
 import Tooltip from "./Tooltip"
 import { twJoin } from "tailwind-merge"
 
@@ -33,31 +34,36 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
 
   return (
     <div className="flex items-center space-x-1 text-black dark:text-white">
-      <input
-        ref={inputRef}
-        autoFocus
-        className={twJoin(
-          "h-7 w-32 rounded border border-gray-300 px-1 py-0.5 text-xs text-black outline-none dark:border-neutral-600 dark:text-white focus:outline-pink-900 dark:focus:outline-pink-700",
-          "focus:bg-white dark:focus:bg-neutral-700",
-          query ? "bg-white dark:bg-neutral-700" : "bg-transparent"
-        )}
-        placeholder="Find..."
-        value={query}
-        onChange={(e) => onQueryChange(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault()
-            if (e.shiftKey) {
-              onPrev()
-            } else {
-              onNext()
+      <div className="relative">
+        <div className="absolute left-1 top-1/2 transform -translate-y-1/2 pointer-events-none">
+          <MagnifyingGlassIcon className="w-3 h-3 text-gray-400 dark:text-gray-500" />
+        </div>
+        <input
+          ref={inputRef}
+          autoFocus
+          className={twJoin(
+            "h-7 w-32 rounded border border-gray-300 pl-4.5 pr-1 py-0.5 text-xs text-black outline-none dark:border-neutral-600 dark:text-white focus:outline-pink-900 dark:focus:outline-pink-700",
+            "focus:bg-white dark:focus:bg-neutral-700",
+            query ? "bg-white dark:bg-neutral-700" : "bg-transparent"
+          )}
+          placeholder="Find..."
+          value={query}
+          onChange={(e) => onQueryChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault()
+              if (e.shiftKey) {
+                onPrev()
+              } else {
+                onNext()
+              }
+            } else if (e.key === "Escape") {
+              onQueryChange("")
+              inputRef.current?.blur()
             }
-          } else if (e.key === "Escape") {
-            onQueryChange("")
-            inputRef.current?.blur()
-          }
-        }}
-      />
+          }}
+        />
+      </div>
       {query && (
         <>
           <span className="text-xs text-gray-600 dark:text-gray-300 min-w-max">
