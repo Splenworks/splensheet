@@ -115,7 +115,6 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
               onPrev={onFindPrev || (() => { })}
               matchIndex={findMatchIndex}
               matchCount={findMatchCount}
-              showCloseButton={false}
             />
           )}
         </div>

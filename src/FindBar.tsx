@@ -8,7 +8,6 @@ interface FindBarProps {
   onPrev: () => void
   matchIndex: number
   matchCount: number
-  showCloseButton?: boolean
 }
 
 export interface FindBarRef {
@@ -23,7 +22,6 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
   onPrev,
   matchIndex,
   matchCount,
-  showCloseButton = true,
 }, ref) => {
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -72,14 +70,6 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
       >
         ↓
       </button>
-      {showCloseButton && (
-        <button
-          className="px-1 text-sm text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white"
-          onClick={onClose}
-        >
-          ×
-        </button>
-      )}
     </div>
   )
 })
