@@ -1,4 +1,5 @@
-import React, { forwardRef, useImperativeHandle, useRef } from "react"
+import { forwardRef, useImperativeHandle, useRef } from "react"
+import Tooltip from "./Tooltip"
 
 interface FindBarProps {
   query: string
@@ -55,20 +56,23 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
       <span className="text-xs text-gray-600 dark:text-gray-300 min-w-max">
         {matchCount > 0 ? `${matchIndex + 1}/${matchCount}` : "0/0"}
       </span>
-      <button
-        className="px-1 text-sm text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white"
-        onClick={onPrev}
-        title="Previous match (Shift+Enter)"
-      >
-        ↑
-      </button>
-      <button
-        className="px-1 text-sm text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white"
-        onClick={onNext}
-        title="Next match (Enter)"
-      >
-        ↓
-      </button>
+      <Tooltip text="Previous" place="bottom" className="rounded-full">
+        <button
+          className="text-sm text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white"
+          onClick={onPrev}
+        >
+          ↑
+        </button>
+      </Tooltip>
+      <Tooltip text="Next" place="bottom" className="rounded-full">
+        <button
+          className="px-1 text-sm text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white"
+          onClick={onNext}
+          title="Next match (Enter)"
+        >
+          ↓
+        </button>
+      </Tooltip>
     </div>
   )
 })
