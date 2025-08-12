@@ -42,9 +42,11 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
           ref={inputRef}
           autoFocus
           className={twJoin(
-            "h-7 w-32 rounded border border-gray-300 pl-4.5 pr-1 py-0.5 text-xs text-black outline-none dark:border-neutral-600 dark:text-white focus:outline-pink-900 dark:focus:outline-pink-700",
+            "h-7 w-32 rounded border border-gray-300 pl-4.5 pr-1 py-0.5 text-xs text-black dark:border-neutral-600 dark:text-white",
+            "focus:outline-2 focus:outline-pink-900 dark:focus:outline-pink-700",
+            query ? "bg-white dark:bg-neutral-700" : "bg-transparent",
             "focus:bg-white dark:focus:bg-neutral-700",
-            query ? "bg-white dark:bg-neutral-700" : "bg-transparent"
+            "placeholder:text-gray-500 dark:placeholder:text-gray-400"
           )}
           placeholder="Find..."
           value={query}
