@@ -32,11 +32,11 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
   }), [])
 
   return (
-    <div className="flex items-center space-x-1 rounded border border-gray-300 bg-white px-2 py-1 text-black shadow-sm dark:border-neutral-600 dark:bg-neutral-700 dark:text-white">
+    <div className="flex items-center space-x-1 text-black dark:text-white">
       <input
         ref={inputRef}
         autoFocus
-        className="w-32 rounded border border-gray-300 bg-transparent px-1 py-0.5 text-xs text-black outline-none dark:border-neutral-600 dark:text-white focus:outline-pink-900 dark:focus:outline-pink-700"
+        className="h-7 w-32 rounded border border-gray-300 bg-transparent px-1 py-0.5 text-xs text-black outline-none dark:border-neutral-600 dark:text-white focus:outline-pink-900 dark:focus:outline-pink-700"
         placeholder="Find..."
         value={query}
         onChange={(e) => onQueryChange(e.target.value)}
