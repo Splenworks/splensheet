@@ -3,7 +3,6 @@ import React, { forwardRef, useImperativeHandle, useRef } from "react"
 interface FindBarProps {
   query: string
   onQueryChange: (val: string) => void
-  onClose: () => void
   onNext: () => void
   onPrev: () => void
   matchIndex: number
@@ -17,7 +16,6 @@ export interface FindBarRef {
 const FindBar = forwardRef<FindBarRef, FindBarProps>(({
   query,
   onQueryChange,
-  onClose,
   onNext,
   onPrev,
   matchIndex,
@@ -49,7 +47,8 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
               onNext()
             }
           } else if (e.key === "Escape") {
-            onClose()
+            onQueryChange("")
+            inputRef.current?.blur()
           }
         }}
       />

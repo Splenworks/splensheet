@@ -24,13 +24,10 @@ interface ExcelHeaderProps {
   setActiveSheetIndex: (index: number) => void
   hasChanges?: boolean
   onDownload?: () => void
-  // Find functionality props
-  showFindBar?: boolean
   findQuery?: string
   onFindQueryChange?: (val: string) => void
   onFindNext?: () => void
   onFindPrev?: () => void
-  onFindClose?: () => void
   findMatchIndex?: number
   findMatchCount?: number
 }
@@ -49,12 +46,10 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
   setActiveSheetIndex,
   hasChanges,
   onDownload,
-  showFindBar = false,
   findQuery = "",
   onFindQueryChange,
   onFindNext,
   onFindPrev,
-  onFindClose,
   findMatchIndex = 0,
   findMatchCount = 0,
 }, ref) => {
@@ -105,18 +100,15 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
               ))}
             </select>
           )}
-          {showFindBar && (
-            <FindBar
-              ref={findBarRef}
-              query={findQuery}
-              onQueryChange={onFindQueryChange || (() => { })}
-              onClose={onFindClose || (() => { })}
-              onNext={onFindNext || (() => { })}
-              onPrev={onFindPrev || (() => { })}
-              matchIndex={findMatchIndex}
-              matchCount={findMatchCount}
-            />
-          )}
+          <FindBar
+            ref={findBarRef}
+            query={findQuery}
+            onQueryChange={onFindQueryChange || (() => { })}
+            onNext={onFindNext || (() => { })}
+            onPrev={onFindPrev || (() => { })}
+            matchIndex={findMatchIndex}
+            matchCount={findMatchCount}
+          />
         </div>
         <div className="hidden md:block flex-1 overflow-hidden text-center text-base font-medium text-black dark:text-white">
           {fileName}

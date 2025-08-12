@@ -3,7 +3,6 @@ import { useVirtualizer } from "@tanstack/react-virtual"
 import ExcelCell from "./ExcelCell"
 import ExcelHeader, { ExcelHeaderRef } from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
-import FindBar from "./FindBar"
 import { writeFile } from "xlsx"
 import type { WorkBook } from "xlsx"
 import { recalculateSheet } from "./utils/recalculateSheet"
@@ -40,7 +39,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   )
   const [hasChanges, setHasChanges] = useState(initialHasChanges)
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null)
-  const [findOpen, setFindOpen] = useState(false)
   const [findQuery, setFindQuery] = useState("")
   const [findIndex, setFindIndex] = useState(0)
   const headerRef = useRef<ExcelHeaderRef>(null)
@@ -206,10 +204,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     gotoMatch(prev)
   }, [findMatches, findIndex, gotoMatch])
 
-  const closeFind = useCallback(() => {
-    setFindOpen(false)
-  }, [])
-
   useEffect(() => {
     setFindIndex(0)
   }, [findQuery, activeSheetIndex])
@@ -283,14 +277,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         (!isMac && event.ctrlKey && key === "f")
       ) {
         event.preventDefault()
-        if (findOpen) {
-          // If find bar is already open, just focus it
-          headerRef.current?.focusFind()
-        } else {
-          // Open find bar and focus it
-          setFindOpen(true)
-          setTimeout(() => headerRef.current?.focusFind(), 0)
-        }
+        headerRef.current?.focusFind()
         return
       }
 
@@ -370,7 +357,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     handleFindPrev,
     selectedCell,
     selectCell,
-    findOpen,
   ])
 
   const updateCell = useCallback(
@@ -438,12 +424,10 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         setActiveSheetIndex={setActiveSheetIndex}
         hasChanges={hasChanges}
         onDownload={handleDownload}
-        showFindBar={findOpen}
         findQuery={findQuery}
         onFindQueryChange={setFindQuery}
         onFindNext={handleFindNext}
         onFindPrev={handleFindPrev}
-        onFindClose={closeFind}
         findMatchIndex={findIndex}
         findMatchCount={findMatches.length}
       />
