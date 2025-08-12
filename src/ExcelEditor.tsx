@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { useVirtualizer } from "@tanstack/react-virtual"
 import ExcelCell from "./ExcelCell"
-import ExcelHeader from "./ExcelHeader"
+import ExcelHeader, { ExcelHeaderRef } from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
 import FindBar from "./FindBar"
 import { writeFile } from "xlsx"
@@ -43,6 +43,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   const [findOpen, setFindOpen] = useState(false)
   const [findQuery, setFindQuery] = useState("")
   const [findIndex, setFindIndex] = useState(0)
+  const headerRef = useRef<ExcelHeaderRef>(null)
   const activeSheet = sheets[activeSheetIndex]
   const activeDataRef = useRef(activeSheet.data)
   const undoStack = useRef<
@@ -282,7 +283,14 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         (!isMac && event.ctrlKey && key === "f")
       ) {
         event.preventDefault()
-        setFindOpen(true)
+        if (findOpen) {
+          // If find bar is already open, just focus it
+          headerRef.current?.focusFind()
+        } else {
+          // Open find bar and focus it
+          setFindOpen(true)
+          setTimeout(() => headerRef.current?.focusFind(), 0)
+        }
         return
       }
 
@@ -362,6 +370,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     handleFindPrev,
     selectedCell,
     selectCell,
+    findOpen,
   ])
 
   const updateCell = useCallback(
@@ -419,6 +428,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   return (
     <div className="fixed inset-0 flex flex-col bg-white dark:bg-neutral-900">
       <ExcelHeader
+        ref={headerRef}
         isFullScreen={isFullScreen}
         toggleFullScreen={toggleFullScreen}
         fileName={fileName}
@@ -428,18 +438,15 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         setActiveSheetIndex={setActiveSheetIndex}
         hasChanges={hasChanges}
         onDownload={handleDownload}
+        showFindBar={findOpen}
+        findQuery={findQuery}
+        onFindQueryChange={setFindQuery}
+        onFindNext={handleFindNext}
+        onFindPrev={handleFindPrev}
+        onFindClose={closeFind}
+        findMatchIndex={findIndex}
+        findMatchCount={findMatches.length}
       />
-      {findOpen && (
-        <FindBar
-          query={findQuery}
-          onQueryChange={setFindQuery}
-          onClose={closeFind}
-          onNext={handleFindNext}
-          onPrev={handleFindPrev}
-          matchIndex={findIndex}
-          matchCount={findMatches.length}
-        />
-      )}
       <div ref={parentRef} className="flex-1 overflow-auto">
         <div
           ref={gridRef}

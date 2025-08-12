@@ -1,4 +1,4 @@
-import React from "react"
+import React, { forwardRef, useImperativeHandle, useRef } from "react"
 
 interface FindBarProps {
   query: string
@@ -8,9 +8,14 @@ interface FindBarProps {
   onPrev: () => void
   matchIndex: number
   matchCount: number
+  showCloseButton?: boolean
 }
 
-const FindBar: React.FC<FindBarProps> = ({
+export interface FindBarRef {
+  focus: () => void
+}
+
+const FindBar = forwardRef<FindBarRef, FindBarProps>(({
   query,
   onQueryChange,
   onClose,
@@ -18,12 +23,23 @@ const FindBar: React.FC<FindBarProps> = ({
   onPrev,
   matchIndex,
   matchCount,
-}) => {
+  showCloseButton = true,
+}, ref) => {
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      inputRef.current?.focus()
+    }
+  }), [])
+
   return (
-    <div className="absolute top-12 right-4 z-50 flex items-center space-x-2 rounded border border-gray-300 bg-white p-2 text-black shadow dark:border-neutral-600 dark:bg-neutral-800 dark:text-white">
+    <div className="flex items-center space-x-1 rounded border border-gray-300 bg-white px-2 py-1 text-black shadow-sm dark:border-neutral-600 dark:bg-neutral-700 dark:text-white">
       <input
+        ref={inputRef}
         autoFocus
-        className="w-48 rounded border border-gray-300 bg-transparent px-1 py-0.5 text-sm text-black outline-none dark:border-neutral-600 dark:text-white"
+        className="w-32 rounded border border-gray-300 bg-transparent px-1 py-0.5 text-xs text-black outline-none dark:border-neutral-600 dark:text-white focus:outline-pink-900 dark:focus:outline-pink-700"
+        placeholder="Find..."
         value={query}
         onChange={(e) => onQueryChange(e.target.value)}
         onKeyDown={(e) => {
@@ -39,30 +55,36 @@ const FindBar: React.FC<FindBarProps> = ({
           }
         }}
       />
-      <span className="text-xs text-gray-600 dark:text-gray-300">
+      <span className="text-xs text-gray-600 dark:text-gray-300 min-w-max">
         {matchCount > 0 ? `${matchIndex + 1}/${matchCount}` : "0/0"}
       </span>
       <button
         className="px-1 text-sm text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white"
         onClick={onPrev}
+        title="Previous match (Shift+Enter)"
       >
         ↑
       </button>
       <button
         className="px-1 text-sm text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white"
         onClick={onNext}
+        title="Next match (Enter)"
       >
         ↓
       </button>
-      <button
-        className="px-1 text-sm text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white"
-        onClick={onClose}
-      >
-        ×
-      </button>
+      {showCloseButton && (
+        <button
+          className="px-1 text-sm text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white"
+          onClick={onClose}
+        >
+          ×
+        </button>
+      )}
     </div>
   )
-}
+})
+
+FindBar.displayName = 'FindBar'
 
 export default FindBar
 
