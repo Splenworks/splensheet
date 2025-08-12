@@ -20,7 +20,7 @@ const Tooltip: React.FC<PropsWithChildren<TooltipProps>> = ({
   }
 
   return (
-    <div className="relative cursor-pointer z-10">
+    <div className="relative cursor-pointer z-50">
       <div className={twMerge("peer", className)}>{children}</div>
       <div
         className={twJoin(
