@@ -1,5 +1,6 @@
 import { forwardRef, useImperativeHandle, useRef } from "react"
 import Tooltip from "./Tooltip"
+import { twJoin } from "tailwind-merge"
 
 interface FindBarProps {
   query: string
@@ -35,7 +36,11 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
       <input
         ref={inputRef}
         autoFocus
-        className="h-7 w-32 rounded border border-gray-300 bg-transparent px-1 py-0.5 text-xs text-black outline-none dark:border-neutral-600 dark:text-white focus:outline-pink-900 dark:focus:outline-pink-700"
+        className={twJoin(
+          "h-7 w-32 rounded border border-gray-300 px-1 py-0.5 text-xs text-black outline-none dark:border-neutral-600 dark:text-white focus:outline-pink-900 dark:focus:outline-pink-700",
+          "focus:bg-white dark:focus:bg-neutral-700",
+          query ? "bg-white dark:bg-neutral-700" : "bg-transparent"
+        )}
         placeholder="Find..."
         value={query}
         onChange={(e) => onQueryChange(e.target.value)}
@@ -53,26 +58,30 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
           }
         }}
       />
-      <span className="text-xs text-gray-600 dark:text-gray-300 min-w-max">
-        {matchCount > 0 ? `${matchIndex + 1}/${matchCount}` : "0/0"}
-      </span>
-      <Tooltip text="Previous" place="bottom" className="rounded-full">
-        <button
-          className="text-sm text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white"
-          onClick={onPrev}
-        >
-          ↑
-        </button>
-      </Tooltip>
-      <Tooltip text="Next" place="bottom" className="rounded-full">
-        <button
-          className="px-1 text-sm text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white"
-          onClick={onNext}
-          title="Next match (Enter)"
-        >
-          ↓
-        </button>
-      </Tooltip>
+      {query && (
+        <>
+          <span className="text-xs text-gray-600 dark:text-gray-300 min-w-max">
+            {matchCount > 0 ? `${matchIndex + 1}/${matchCount}` : "0/0"}
+          </span>
+          <Tooltip text="Previous" place="bottom" className="rounded-full">
+            <button
+              className="text-sm text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white"
+              onClick={onPrev}
+            >
+              ↑
+            </button>
+          </Tooltip>
+          <Tooltip text="Next" place="bottom" className="rounded-full">
+            <button
+              className="text-sm text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white"
+              onClick={onNext}
+              title="Next match (Enter)"
+            >
+              ↓
+            </button>
+          </Tooltip>
+        </>
+      )}
     </div>
   )
 })
