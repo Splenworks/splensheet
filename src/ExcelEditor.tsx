@@ -314,8 +314,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
           toggleFullScreen()
         } else if (selectedCell) {
           setSelectedCell(null)
-        } else {
-          onClose()
         }
         return
       }
