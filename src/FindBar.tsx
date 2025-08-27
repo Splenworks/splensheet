@@ -2,6 +2,7 @@ import { forwardRef, useImperativeHandle, useRef } from "react"
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline"
 import Tooltip from "./Tooltip"
 import { twJoin } from "tailwind-merge"
+import IconButton from "./IconButton"
 
 interface FindBarProps {
   query: string
@@ -33,7 +34,7 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
   }), [])
 
   return (
-    <div className="flex items-center space-x-1 text-black dark:text-white">
+    <div className="flex items-center space-x-2 text-black dark:text-white">
       <div className="relative">
         <div className="absolute left-1 top-1/2 transform -translate-y-1/2 pointer-events-none">
           <MagnifyingGlassIcon className="w-3 h-3 text-gray-400 dark:text-gray-500" />
@@ -66,28 +67,30 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
         />
       </div>
       {query && (
-        <>
+        <div className="flex items-center">
           <span className="text-xs text-gray-600 dark:text-gray-300 min-w-max">
             {matchCount > 0 ? `${matchIndex + 1}/${matchCount}` : "0/0"}
           </span>
-          <Tooltip text="Previous" place="bottom" className="rounded-full">
-            <button
-              className="text-sm text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white"
-              onClick={onPrev}
-            >
-              ↑
-            </button>
-          </Tooltip>
-          <Tooltip text="Next" place="bottom" className="rounded-full">
-            <button
-              className="text-sm text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white"
-              onClick={onNext}
-              title="Next match (Enter)"
-            >
-              ↓
-            </button>
-          </Tooltip>
-        </>
+          {matchCount > 0 && (<>
+            <Tooltip text="Previous" place="bottom" className="rounded-full">
+              <button
+                className="text-sm text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white size-5 rounded-full transition-colors duration-300 ease-in-out hover:bg-zinc-400 dark:hover:bg-zinc-600 cursor-pointer"
+                onClick={onPrev}
+              >
+                ↑
+              </button>
+            </Tooltip>
+            <Tooltip text="Next" place="bottom" className="rounded-full">
+              <button
+                className="text-sm text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white size-5 rounded-full transition-colors duration-300 ease-in-out hover:bg-zinc-400 dark:hover:bg-zinc-600 cursor-pointer"
+                onClick={onNext}
+              >
+                ↓
+              </button>
+            </Tooltip>
+          </>
+          )}
+        </div>
       )}
     </div>
   )
