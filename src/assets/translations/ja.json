@@ -12,6 +12,11 @@
   "footer": {
     "checkOutProduct": "弊社の他のプロダクト<link />もご確認ください"
   },
+  "find":{
+    "placeholder": "検索...",
+    "next": "次へ",
+    "previous": "前へ"
+  },
   "others": {
     "close": "閉じる",
     "exit": "終了",

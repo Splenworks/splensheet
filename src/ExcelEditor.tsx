@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { useVirtualizer } from "@tanstack/react-virtual"
 import ExcelCell from "./ExcelCell"
-import ExcelHeader from "./ExcelHeader"
+import ExcelHeader, { ExcelHeaderRef } from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
 import { writeFile } from "xlsx"
 import type { WorkBook } from "xlsx"
@@ -39,6 +39,9 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   )
   const [hasChanges, setHasChanges] = useState(initialHasChanges)
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null)
+  const [findQuery, setFindQuery] = useState("")
+  const [findIndex, setFindIndex] = useState(-1)
+  const headerRef = useRef<ExcelHeaderRef>(null)
   const activeSheet = sheets[activeSheetIndex]
   const activeDataRef = useRef(activeSheet.data)
   const undoStack = useRef<
@@ -101,6 +104,29 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     setSelectedCell(null)
   }, [activeSheetIndex])
 
+  const getCellValue = useCallback((c: PartialCellObj | undefined) => {
+    if (!c || c.v === undefined) return ""
+    if (c.t === "b") return c.v ? "TRUE" : "FALSE"
+    if (c.t === "d" && c.v instanceof Date) {
+      const d = new Date(c.v)
+      if (!isNaN(d.getTime())) return d.toLocaleDateString()
+    }
+    return String(c.v)
+  }, [])
+
+  const findMatches = useMemo(() => {
+    if (!findQuery) return []
+    const q = findQuery.toLowerCase()
+    const results: Array<{ row: number; col: number }> = []
+    activeSheet.data.forEach((row, r) => {
+      row?.forEach((cell, c) => {
+        const val = getCellValue(cell).toLowerCase()
+        if (val.includes(q)) results.push({ row: r, col: c })
+      })
+    })
+    return results
+  }, [findQuery, activeSheet.data, getCellValue])
+
   const rowVirtualizer = useVirtualizer({
     count: rowCount,
     getScrollElement: () => parentRef.current,
@@ -148,6 +174,39 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     },
     [rowVirtualizer],
   )
+
+  const gotoMatch = useCallback(
+    (idx: number) => {
+      const match = findMatches[idx]
+      if (!match) return
+      rowVirtualizer.scrollToIndex(match.row)
+      selectCell(match.row, match.col)
+      setTimeout(() => {
+        gridRef.current
+          ?.querySelector<HTMLDivElement>(`[data-row='${match.row}'][data-col='${match.col}']`)
+          ?.scrollIntoView({ block: "nearest", inline: "center" })
+      }, 0)
+    },
+    [findMatches, rowVirtualizer, selectCell],
+  )
+
+  const handleFindNext = useCallback(() => {
+    if (findMatches.length === 0) return
+    const next = (findIndex + 1) % findMatches.length
+    setFindIndex(next)
+    gotoMatch(next)
+  }, [findMatches, findIndex, gotoMatch])
+
+  const handleFindPrev = useCallback(() => {
+    if (findMatches.length === 0) return
+    const prev = (findIndex - 1 + findMatches.length) % findMatches.length
+    setFindIndex(prev)
+    gotoMatch(prev)
+  }, [findMatches, findIndex, gotoMatch])
+
+  useEffect(() => {
+    setFindIndex(-1)
+  }, [findQuery, activeSheetIndex])
 
   const handleUndo = useCallback(() => {
     const last = undoStack.current.pop()
@@ -214,6 +273,15 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       const isInputFocused = activeElement?.tagName === 'INPUT' || activeElement?.tagName === 'TEXTAREA'
 
       if (
+        (isMac && event.metaKey && key === "f") ||
+        (!isMac && event.ctrlKey && key === "f")
+      ) {
+        event.preventDefault()
+        headerRef.current?.focusFind()
+        return
+      }
+
+      if (
         (isMac && event.metaKey && key === "z") ||
         (!isMac && event.ctrlKey && key === "z")
       ) {
@@ -229,13 +297,23 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         handleRedo()
         return
       }
+      if (
+        (isMac && event.metaKey && key === "g") ||
+        (!isMac && event.ctrlKey && key === "g")
+      ) {
+        event.preventDefault()
+        if (event.shiftKey) {
+          handleFindPrev()
+        } else {
+          handleFindNext()
+        }
+        return
+      }
       if (key === "escape") {
         if (isFullScreen) {
           toggleFullScreen()
         } else if (selectedCell) {
           setSelectedCell(null)
-        } else {
-          onClose()
         }
         return
       }
@@ -267,7 +345,17 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     return () => {
       window.removeEventListener("keydown", handleKeyDown)
     }
-  }, [isFullScreen, toggleFullScreen, onClose, handleUndo, handleRedo, selectedCell, selectCell])
+  }, [
+    isFullScreen,
+    toggleFullScreen,
+    onClose,
+    handleUndo,
+    handleRedo,
+    handleFindNext,
+    handleFindPrev,
+    selectedCell,
+    selectCell,
+  ])
 
   const updateCell = useCallback(
     (r: number, c: number, cell: PartialCellObj) => {
@@ -324,6 +412,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   return (
     <div className="fixed inset-0 flex flex-col bg-white dark:bg-neutral-900">
       <ExcelHeader
+        ref={headerRef}
         isFullScreen={isFullScreen}
         toggleFullScreen={toggleFullScreen}
         fileName={fileName}
@@ -333,6 +422,12 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         setActiveSheetIndex={setActiveSheetIndex}
         hasChanges={hasChanges}
         onDownload={handleDownload}
+        findQuery={findQuery}
+        onFindQueryChange={setFindQuery}
+        onFindNext={handleFindNext}
+        onFindPrev={handleFindPrev}
+        findMatchIndex={findIndex}
+        findMatchCount={findMatches.length}
       />
       <div ref={parentRef} className="flex-1 overflow-auto">
         <div
