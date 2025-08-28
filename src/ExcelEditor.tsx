@@ -131,7 +131,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     count: rowCount,
     getScrollElement: () => parentRef.current,
     estimateSize: () => 32,
-    overscan: 20,
+    overscan: 100,
   })
 
   const selectCell = useCallback(
