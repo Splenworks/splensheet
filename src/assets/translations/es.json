@@ -12,6 +12,11 @@
   "footer": {
     "checkOutProduct": "Consulta nuestro otro producto <link />"
   },
+  "find":{
+    "placeholder": "Buscar...",
+    "next": "Siguiente",
+    "previous": "Anterior"
+  },
   "others": {
     "close": "Cerrar",
     "exit": "Salir",

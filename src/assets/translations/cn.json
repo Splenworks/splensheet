@@ -12,6 +12,11 @@
   "footer": {
     "checkOutProduct": "查看我们的其他产品 <link />"
   },
+  "find":{
+    "placeholder": "查找...",
+    "next": "下一条",
+    "previous": "上一条"
+  },
   "others": {
     "close": "关闭",
     "exit": "退出",

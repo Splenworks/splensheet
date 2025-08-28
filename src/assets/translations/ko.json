@@ -12,6 +12,11 @@
   "footer": {
     "checkOutProduct": "우리의 다른 제품 <link />도 확인해보세요"
   },
+  "find":{
+    "placeholder": "검색...",
+    "next": "다음",
+    "previous": "이전"
+  },
   "others": {
     "close": "닫기",
     "exit": "나가기",

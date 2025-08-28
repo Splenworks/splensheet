@@ -2,6 +2,7 @@ import { forwardRef, useImperativeHandle, useRef } from "react"
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline"
 import Tooltip from "./Tooltip"
 import { twJoin } from "tailwind-merge"
+import { useTranslation } from "react-i18next"
 
 interface FindBarProps {
   query: string
@@ -25,6 +26,7 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
   matchCount,
 }, ref) => {
   const inputRef = useRef<HTMLInputElement>(null)
+  const { t } = useTranslation()
 
   useImperativeHandle(ref, () => ({
     focus: () => {
@@ -47,7 +49,7 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
             "focus:bg-white dark:focus:bg-neutral-700",
             "placeholder:text-gray-500 dark:placeholder:text-gray-400"
           )}
-          placeholder="Find..."
+          placeholder={t('find.placeholder')}
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
           onKeyDown={(e) => {
@@ -71,7 +73,7 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
             {matchCount > 0 ? `${matchIndex + 1}/${matchCount}` : "0/0"}
           </span>
           {matchCount > 0 && (<>
-            <Tooltip text="Previous" place="bottom" className="rounded-full">
+            <Tooltip text={t('find.previous')} place="bottom" className="rounded-full">
               <button
                 className="text-sm text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white size-5 rounded-full transition-colors duration-300 ease-in-out hover:bg-zinc-400 dark:hover:bg-zinc-600 cursor-pointer focus:outline-pink-900 dark:focus:outline-pink-700"
                 onClick={onPrev}
@@ -79,7 +81,7 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
                 ↑
               </button>
             </Tooltip>
-            <Tooltip text="Next" place="bottom" className="rounded-full -m-1">
+            <Tooltip text={t('find.next')} place="bottom" className="rounded-full -m-1">
               <button
                 className="text-sm text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white size-5 rounded-full transition-colors duration-300 ease-in-out hover:bg-zinc-400 dark:hover:bg-zinc-600 cursor-pointer focus:outline-pink-900 dark:focus:outline-pink-700"
                 onClick={onNext}
