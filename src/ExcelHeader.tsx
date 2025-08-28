@@ -85,7 +85,7 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
 
   return (
     <>
-      <header className="flex h-11 items-center justify-between px-2 bg-gray-200 dark:bg-neutral-800">
+      <header className="flex h-11 items-center justify-between px-2 bg-gray-200 dark:bg-neutral-800 relative">
         <div className="flex items-center space-x-2">
           {!isCsv && (
             <select
@@ -110,7 +110,7 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
             matchCount={findMatchCount}
           />
         </div>
-        <div className="hidden md:block flex-1 overflow-hidden text-center text-base font-medium text-black dark:text-white">
+        <div className="hidden md:block absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-hidden text-center text-base font-medium text-black dark:text-white pointer-events-none">
           {fileName}
         </div>
         <div className="flex items-center space-x-2">
