@@ -1,8 +1,4 @@
 import type { PartialCellObj } from "../types"
-import { getMaxColumnIndex } from "./columnUtils"
-
-const EXTRA_ROWS = 20
-const EXTRA_COLS = 20
 
 export const getLastNonEmptyRow = (data: PartialCellObj[][]): number => {
   let lastRowIdx = data.length
@@ -14,7 +10,7 @@ export const getLastNonEmptyRow = (data: PartialCellObj[][]): number => {
     if (hasData) break
     lastRowIdx--
   }
-  return lastRowIdx + EXTRA_ROWS
+  return lastRowIdx
 }
 
 export const getLastNonEmptyCol = (data: PartialCellObj[][]): number => {
@@ -27,6 +23,11 @@ export const getLastNonEmptyCol = (data: PartialCellObj[][]): number => {
     if (hasData) break
     lastColIdx--
   }
-  const maxColumnIndex = getMaxColumnIndex()
-  return Math.min(lastColIdx + EXTRA_COLS, maxColumnIndex + 1)
+  return lastColIdx
 }
+
+// export const getLastNonEmptyCol = (data: PartialCellObj[][]): number => {
+//   const lastColIdx = getLastNonEmptyColIndex(data)
+//   const maxColumnIndex = getMaxColumnIndex()
+//   return Math.min(lastColIdx + EXTRA_COLS, maxColumnIndex + 1)
+// }
