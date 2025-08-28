@@ -2,7 +2,6 @@ import { forwardRef, useImperativeHandle, useRef } from "react"
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline"
 import Tooltip from "./Tooltip"
 import { twJoin } from "tailwind-merge"
-import IconButton from "./IconButton"
 
 interface FindBarProps {
   query: string
