@@ -430,7 +430,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         findMatchIndex={findIndex}
         findMatchCount={findMatches.length}
       />
-      <div ref={parentRef} className="flex-1 overflow-auto">
+      <div ref={parentRef} className="flex-1 overflow-x-scroll overflow-y-scroll">
         <div
           ref={gridRef}
           className="min-w-max text-sm grid"
