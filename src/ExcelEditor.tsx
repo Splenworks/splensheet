@@ -40,7 +40,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   const [hasChanges, setHasChanges] = useState(initialHasChanges)
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null)
   const [findQuery, setFindQuery] = useState("")
-  const [findIndex, setFindIndex] = useState(0)
+  const [findIndex, setFindIndex] = useState(-1)
   const headerRef = useRef<ExcelHeaderRef>(null)
   const activeSheet = sheets[activeSheetIndex]
   const activeDataRef = useRef(activeSheet.data)
@@ -205,7 +205,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   }, [findMatches, findIndex, gotoMatch])
 
   useEffect(() => {
-    setFindIndex(0)
+    setFindIndex(-1)
   }, [findQuery, activeSheetIndex])
 
   const handleUndo = useCallback(() => {
