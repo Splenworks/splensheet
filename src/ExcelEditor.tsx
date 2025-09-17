@@ -10,6 +10,11 @@ import { sheetToData, dataToSheet } from "./utils/xlsx"
 import { isMac } from "./utils/isMac"
 import { getLastNonEmptyRow, getLastNonEmptyCol } from "./utils/sheetStats"
 import { PartialCellObj, SheetData } from "./types"
+import { getMaxColumnIndex } from "./utils/columnUtils"
+
+const EXTRA_ROWS = 20
+const EXTRA_COLS = 20
+const MAX_COLS = getMaxColumnIndex()
 
 interface ExcelEditorProps {
   workbook: WorkBook
@@ -86,13 +91,18 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
 
 
   const rowCount = useMemo(
-    () => getLastNonEmptyRow(activeSheet.data),
+    () => getLastNonEmptyRow(activeSheet.data) + EXTRA_ROWS,
+    [activeSheet.data],
+  )
+
+  const lastNonEmptyColIndex = useMemo(
+    () => getLastNonEmptyCol(activeSheet.data),
     [activeSheet.data],
   )
 
   const colCount = useMemo(
-    () => getLastNonEmptyCol(activeSheet.data),
-    [activeSheet.data],
+    () => Math.min(lastNonEmptyColIndex + EXTRA_COLS, MAX_COLS + 1),
+    [lastNonEmptyColIndex],
   )
 
   useEffect(() => {
@@ -364,7 +374,13 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         const copy = [...prev]
         const sheet = { ...copy[activeSheetIndex] }
         const data = [...sheet.data]
+
+        while (data.length <= r) {
+          data.push([])
+        }
+
         const row = [...(data[r] || [])]
+
         undoStack.current.push({
           sheetIndex: activeSheetIndex,
           r,
@@ -430,7 +446,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         findMatchIndex={findIndex}
         findMatchCount={findMatches.length}
       />
-      <div ref={parentRef} className="flex-1 overflow-auto">
+      <div ref={parentRef} className="flex-1 overflow-x-scroll overflow-y-scroll">
         <div
           ref={gridRef}
           className="min-w-max text-sm grid"
@@ -456,6 +472,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
                 isSelected={selectedCell?.row === rIdx && selectedCell?.col === cIdx}
                 onChange={updateCell}
                 selectCell={selectCell}
+                isExtraColumn={cIdx >= lastNonEmptyColIndex}
               />
             ))
           })}
