@@ -434,8 +434,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     onHasChangesChange?.(false)
   }
 
-  const HEADER_HEIGHT = 32 // px, matches virtualizer estimateSize
-
   return (
     <div className="fixed inset-0 flex flex-col bg-white dark:bg-neutral-900">
       <ExcelHeader
@@ -462,7 +460,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
           className="min-w-max text-sm grid"
           style={{
             gridTemplateColumns: `minmax(3rem, max-content) repeat(${colCount}, minmax(3rem, max-content))`,
-            height: useVirtual ? rowVirtualizer.getTotalSize() + HEADER_HEIGHT : undefined,
+            height: useVirtual ? rowVirtualizer.getTotalSize() + 32 : undefined,
           }}
         >
           {/* Corner cell (top-left) */}
