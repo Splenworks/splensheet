@@ -10,7 +10,7 @@ import { sheetToData, dataToSheet } from "./utils/xlsx"
 import { isMac } from "./utils/isMac"
 import { getLastNonEmptyRow, getLastNonEmptyCol } from "./utils/sheetStats"
 import { PartialCellObj, SheetData } from "./types"
-import { getMaxColumnIndex } from "./utils/columnUtils"
+import { getMaxColumnIndex, indexToColumnName } from "./utils/columnUtils"
 
 const EXTRA_ROWS = 20
 const EXTRA_COLS = 20
@@ -426,6 +426,8 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     onHasChangesChange?.(false)
   }
 
+  const HEADER_HEIGHT = 32 // px, matches virtualizer estimateSize
+
   return (
     <div className="fixed inset-0 flex flex-col bg-white dark:bg-neutral-900">
       <ExcelHeader
@@ -452,9 +454,23 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
           className="min-w-max text-sm grid"
           style={{
             gridTemplateColumns: `repeat(${colCount}, minmax(3rem, max-content))`,
-            height: rowVirtualizer.getTotalSize(),
+            height: rowVirtualizer.getTotalSize() + HEADER_HEIGHT,
           }}
         >
+          {/* Sticky Column Header Row */}
+          {Array.from({ length: colCount }).map((_, cIdx) => (
+            <div
+              key={`header-${cIdx}`}
+              className={
+                "sticky top-0 z-10 bg-gray-100 dark:bg-neutral-800 " +
+                "px-2 h-8 flex items-center justify-start " +
+                "border border-gray-300 dark:border-neutral-600 text-black dark:text-white " +
+                (cIdx > 0 ? "-ml-px" : "")
+              }
+            >
+              {indexToColumnName(cIdx)}
+            </div>
+          ))}
           {paddingTop > 0 && (
             <div
               style={{ height: paddingTop, gridColumn: `1 / span ${colCount}` }}
