@@ -494,6 +494,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
                 className={
                   "sticky left-0 z-10 bg-gray-100 dark:bg-neutral-800 " +
                   "px-2 h-8 flex items-center justify-start -mr-px " +
+                  (rIdx > 0 ? "-mt-px " : "") +
                   "border border-gray-300 dark:border-neutral-600 text-black dark:text-white"
                 }
               >
