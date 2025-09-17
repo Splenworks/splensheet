@@ -462,7 +462,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
             key={`corner`}
             className={
               "sticky top-0 left-0 z-20 bg-gray-100 dark:bg-neutral-800 " +
-              "px-2 h-8 flex items-center justify-center -mr-px -mb-px " +
+              "px-2 h-8 flex items-center justify-center " +
               "border border-gray-300 dark:border-neutral-600 text-black dark:text-white"
             }
           />
@@ -472,7 +472,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
               key={`header-${cIdx}`}
               className={
                 "sticky top-0 z-10 bg-gray-100 dark:bg-neutral-800 " +
-                "px-2 h-8 flex items-center justify-start -ml-px -mb-px " +
+                "px-2 h-8 flex items-center justify-start -ml-px " +
                 "border border-gray-300 dark:border-neutral-600 text-black dark:text-white"
               }
             >
@@ -493,8 +493,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
                 key={`rowheader-${rIdx}`}
                 className={
                   "sticky left-0 z-10 bg-gray-100 dark:bg-neutral-800 " +
-                  "px-2 h-8 flex items-center justify-start -mr-px " +
-                  (rIdx > 0 ? "-mt-px " : "") +
+                  "px-2 flex items-center justify-start -mt-px " +
                   "border border-gray-300 dark:border-neutral-600 text-black dark:text-white"
                 }
               >
