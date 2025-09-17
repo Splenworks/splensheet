@@ -25,9 +25,3 @@ export const getLastNonEmptyCol = (data: PartialCellObj[][]): number => {
   }
   return lastColIdx
 }
-
-// export const getLastNonEmptyCol = (data: PartialCellObj[][]): number => {
-//   const lastColIdx = getLastNonEmptyColIndex(data)
-//   const maxColumnIndex = getMaxColumnIndex()
-//   return Math.min(lastColIdx + EXTRA_COLS, maxColumnIndex + 1)
-// }
