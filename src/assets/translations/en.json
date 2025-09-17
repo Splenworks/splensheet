@@ -1,6 +1,7 @@
 {
   "header": {
-    "goBack": "Go Back"
+    "goBack": "Go Back",
+    "createNew": "Create New"
   },
   "dragDropArea": {
     "dropHere": "Drop here",

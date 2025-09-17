@@ -1,6 +1,7 @@
 {
   "header": {
-    "goBack": "戻る"
+    "goBack": "戻る",
+    "createNew": "新規作成"
   },
   "dragDropArea": {
     "dropHere": "ここにドロップしてください",
