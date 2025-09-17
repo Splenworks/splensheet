@@ -453,19 +453,27 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
           ref={gridRef}
           className="min-w-max text-sm grid"
           style={{
-            gridTemplateColumns: `repeat(${colCount}, minmax(3rem, max-content))`,
+            gridTemplateColumns: `minmax(3rem, max-content) repeat(${colCount}, minmax(3rem, max-content))`,
             height: rowVirtualizer.getTotalSize() + HEADER_HEIGHT,
           }}
         >
+          {/* Corner cell (top-left) */}
+          <div
+            key={`corner`}
+            className={
+              "sticky top-0 left-0 z-20 bg-gray-100 dark:bg-neutral-800 " +
+              "px-2 h-8 flex items-center justify-center -mr-px -mb-px " +
+              "border border-gray-300 dark:border-neutral-600 text-black dark:text-white"
+            }
+          />
           {/* Sticky Column Header Row */}
           {Array.from({ length: colCount }).map((_, cIdx) => (
             <div
               key={`header-${cIdx}`}
               className={
                 "sticky top-0 z-10 bg-gray-100 dark:bg-neutral-800 " +
-                "px-2 h-8 flex items-center justify-start " +
-                "border border-gray-300 dark:border-neutral-600 text-black dark:text-white " +
-                (cIdx > 0 ? "-ml-px" : "")
+                "px-2 h-8 flex items-center justify-start -ml-px -mb-px " +
+                "border border-gray-300 dark:border-neutral-600 text-black dark:text-white"
               }
             >
               {indexToColumnName(cIdx)}
@@ -473,28 +481,42 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
           ))}
           {paddingTop > 0 && (
             <div
-              style={{ height: paddingTop, gridColumn: `1 / span ${colCount}` }}
+              style={{ height: paddingTop, gridColumn: `1 / span ${colCount + 1}` }}
             />
           )}
           {virtualRows.map((virtualRow) => {
             const rIdx = virtualRow.index
             const rowData = activeSheet.data[rIdx] || []
-            return Array.from({ length: colCount }).map((_, cIdx) => (
-              <ExcelCell
-                key={`${rIdx}-${cIdx}`}
-                rowIndex={rIdx}
-                colIndex={cIdx}
-                cell={rowData[cIdx]}
-                isSelected={selectedCell?.row === rIdx && selectedCell?.col === cIdx}
-                onChange={updateCell}
-                selectCell={selectCell}
-                isExtraColumn={cIdx >= lastNonEmptyColIndex}
-              />
-            ))
+            return [
+              // Row header cell
+              <div
+                key={`rowheader-${rIdx}`}
+                className={
+                  "sticky left-0 z-10 bg-gray-100 dark:bg-neutral-800 " +
+                  "px-2 h-8 flex items-center justify-start -mr-px " +
+                  "border border-gray-300 dark:border-neutral-600 text-black dark:text-white"
+                }
+              >
+                {rIdx + 1}
+              </div>,
+              // Data cells for this row
+              ...Array.from({ length: colCount }).map((_, cIdx) => (
+                <ExcelCell
+                  key={`${rIdx}-${cIdx}`}
+                  rowIndex={rIdx}
+                  colIndex={cIdx}
+                  cell={rowData[cIdx]}
+                  isSelected={selectedCell?.row === rIdx && selectedCell?.col === cIdx}
+                  onChange={updateCell}
+                  selectCell={selectCell}
+                  isExtraColumn={cIdx >= lastNonEmptyColIndex}
+                />
+              )),
+            ]
           })}
           {paddingBottom > 0 && (
             <div
-              style={{ height: paddingBottom, gridColumn: `1 / span ${colCount}` }}
+              style={{ height: paddingBottom, gridColumn: `1 / span ${colCount + 1}` }}
             />
           )}
         </div>
