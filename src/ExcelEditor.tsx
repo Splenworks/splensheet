@@ -374,7 +374,13 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         const copy = [...prev]
         const sheet = { ...copy[activeSheetIndex] }
         const data = [...sheet.data]
+
+        while (data.length <= r) {
+          data.push([])
+        }
+
         const row = [...(data[r] || [])]
+
         undoStack.current.push({
           sheetIndex: activeSheetIndex,
           r,
