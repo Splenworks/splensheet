@@ -105,6 +105,8 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     [lastNonEmptyColIndex],
   )
 
+  const useVirtual = rowCount > 300
+
   useEffect(() => {
     rowCountRef.current = rowCount
     colCountRef.current = colCount
@@ -162,7 +164,15 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       setSelectedCell({ row: r, col: c })
 
       // Scroll to the target row
-      rowVirtualizer.scrollToIndex(r)
+      if (useVirtual) {
+        rowVirtualizer.scrollToIndex(r)
+      } else {
+        setTimeout(() => {
+          gridRef.current
+            ?.querySelector<HTMLDivElement>(`[data-row='${r}'][data-col='${c}']`)
+            ?.scrollIntoView({ block: "nearest", inline: "nearest" })
+        }, 0)
+      }
 
       // Handle horizontal scrolling
       const parent = parentRef.current
@@ -183,14 +193,14 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         }
       }
     },
-    [rowVirtualizer],
+    [rowVirtualizer, useVirtual],
   )
 
   const gotoMatch = useCallback(
     (idx: number) => {
       const match = findMatches[idx]
       if (!match) return
-      rowVirtualizer.scrollToIndex(match.row)
+      if (useVirtual) rowVirtualizer.scrollToIndex(match.row)
       selectCell(match.row, match.col)
       setTimeout(() => {
         gridRef.current
@@ -198,7 +208,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
           ?.scrollIntoView({ block: "nearest", inline: "center" })
       }, 0)
     },
-    [findMatches, rowVirtualizer, selectCell],
+    [findMatches, rowVirtualizer, selectCell, useVirtual],
   )
 
   const handleFindNext = useCallback(() => {
@@ -407,13 +417,11 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     onWorkbookChange?.(workbook)
   }, [sheets, activeSheetIndex, workbook, onWorkbookChange])
 
-  const virtualRows = rowVirtualizer.getVirtualItems()
-  const paddingTop = virtualRows.length > 0 ? virtualRows[0].start : 0
-  const paddingBottom =
-    virtualRows.length > 0
-      ? rowVirtualizer.getTotalSize() -
-      virtualRows[virtualRows.length - 1].end
-      : 0
+  const virtualRows = useVirtual ? rowVirtualizer.getVirtualItems() : []
+  const paddingTop = useVirtual && virtualRows.length > 0 ? virtualRows[0].start : 0
+  const paddingBottom = useVirtual && virtualRows.length > 0
+    ? rowVirtualizer.getTotalSize() - virtualRows[virtualRows.length - 1].end
+    : 0
 
   const handleDownload = () => {
     sheets.forEach((sd, idx) => {
@@ -454,7 +462,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
           className="min-w-max text-sm grid"
           style={{
             gridTemplateColumns: `minmax(3rem, max-content) repeat(${colCount}, minmax(3rem, max-content))`,
-            height: rowVirtualizer.getTotalSize() + HEADER_HEIGHT,
+            height: useVirtual ? rowVirtualizer.getTotalSize() + HEADER_HEIGHT : undefined,
           }}
         >
           {/* Corner cell (top-left) */}
@@ -479,16 +487,14 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
               {indexToColumnName(cIdx)}
             </div>
           ))}
-          {paddingTop > 0 && (
+          {useVirtual && paddingTop > 0 && (
             <div
               style={{ height: paddingTop, gridColumn: `1 / span ${colCount + 1}` }}
             />
           )}
-          {virtualRows.map((virtualRow) => {
-            const rIdx = virtualRow.index
+          {(useVirtual ? virtualRows.map(v => v.index) : Array.from({ length: rowCount }, (_, i) => i)).map((rIdx) => {
             const rowData = activeSheet.data[rIdx] || []
             return [
-              // Row header cell
               <div
                 key={`rowheader-${rIdx}`}
                 className={
@@ -499,7 +505,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
               >
                 {rIdx + 1}
               </div>,
-              // Data cells for this row
               ...Array.from({ length: colCount }).map((_, cIdx) => (
                 <ExcelCell
                   key={`${rIdx}-${cIdx}`}
@@ -514,7 +519,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
               )),
             ]
           })}
-          {paddingBottom > 0 && (
+          {useVirtual && paddingBottom > 0 && (
             <div
               style={{ height: paddingBottom, gridColumn: `1 / span ${colCount + 1}` }}
             />
