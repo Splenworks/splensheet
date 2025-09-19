@@ -1,20 +1,21 @@
 import React from "react"
-import { ArrowUturnLeftIcon } from "@heroicons/react/16/solid"
+import { ArrowUturnLeftIcon, PlusIcon } from "@heroicons/react/16/solid"
 import { useTranslation } from "react-i18next"
 import DarkModeSwitch from "./DarkModeSwitch"
 
 interface HeaderProps {
   showGoBack?: boolean
   onGoBack?: () => void
+  onCreateNew?: () => void
 }
 
-const Header: React.FC<HeaderProps> = ({ showGoBack = false, onGoBack }) => {
+const Header: React.FC<HeaderProps> = ({ showGoBack = false, onGoBack, onCreateNew }) => {
   const { t } = useTranslation()
   return (
     <header className="absolute left-0 right-0 top-0 bg-white dark:bg-neutral-900">
       <div className="mx-8 flex h-16 items-center justify-center md:mx-16">
         <div className="flex flex-1">
-          {showGoBack && (
+          {showGoBack ? (
             <div
               className="flex cursor-pointer items-center gap-2"
               onClick={onGoBack}
@@ -22,6 +23,16 @@ const Header: React.FC<HeaderProps> = ({ showGoBack = false, onGoBack }) => {
               <ArrowUturnLeftIcon className="h-5 w-5 text-black dark:text-white" />
               <span className="text-md font-semibold text-black dark:text-white">
                 {t("header.goBack")}
+              </span>
+            </div>
+          ) : (
+            <div
+              className="flex cursor-pointer items-center gap-2"
+              onClick={onCreateNew}
+            >
+              <PlusIcon className="h-5 w-5 text-black dark:text-white" />
+              <span className="text-md font-semibold text-black dark:text-white">
+                {t("header.createNew")}
               </span>
             </div>
           )}

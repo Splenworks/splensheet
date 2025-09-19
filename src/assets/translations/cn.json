@@ -1,6 +1,9 @@
 {
   "header": {
-    "goBack": "返回"
+    "goBack": "返回",
+    "createNew": "新建",
+    "newFileName": "未命名.xlsx",
+    "newSheetName": "工作表1"
   },
   "dragDropArea": {
     "dropHere": "拖放到此处",
