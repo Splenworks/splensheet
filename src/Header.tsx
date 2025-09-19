@@ -6,9 +6,10 @@ import DarkModeSwitch from "./DarkModeSwitch"
 interface HeaderProps {
   showGoBack?: boolean
   onGoBack?: () => void
+  onCreateNew?: () => void
 }
 
-const Header: React.FC<HeaderProps> = ({ showGoBack = false, onGoBack }) => {
+const Header: React.FC<HeaderProps> = ({ showGoBack = false, onGoBack, onCreateNew }) => {
   const { t } = useTranslation()
   return (
     <header className="absolute left-0 right-0 top-0 bg-white dark:bg-neutral-900">
@@ -27,6 +28,7 @@ const Header: React.FC<HeaderProps> = ({ showGoBack = false, onGoBack }) => {
           ) : (
             <div
               className="flex cursor-pointer items-center gap-2"
+              onClick={onCreateNew}
             >
               <PlusIcon className="h-5 w-5 text-black dark:text-white" />
               <span className="text-md font-semibold text-black dark:text-white">

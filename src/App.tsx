@@ -7,9 +7,12 @@ import { FullScreenProvider } from "./providers/FullScreenProvider"
 import { isMac } from "./utils/isMac"
 import ExcelEditor from "./ExcelEditor"
 import type { WorkBook } from "xlsx"
+import { utils } from "xlsx"
+import { useTranslation } from "react-i18next"
 
 function App() {
   const { toggleFullScreen } = useFullScreen()
+  const { t } = useTranslation()
   const [workbook, setWorkbook] = useState<WorkBook | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
   const [editorOpen, setEditorOpen] = useState(false)
@@ -68,11 +71,28 @@ function App() {
     }, 100)
   }
 
+  const handleCreateNew = () => {
+    // Create a blank workbook with a localized default sheet name
+    const wb = utils.book_new()
+    const sheetName = t("header.newSheetName", { defaultValue: "Sheet1" })
+    const ws = utils.aoa_to_sheet([[]])
+    utils.book_append_sheet(wb, ws, sheetName)
+
+    // Localized default file name
+    const defaultFileName = t("header.newFileName", { defaultValue: "Untitled.xlsx" })
+
+    setWorkbook(wb)
+    setFileName(defaultFileName)
+    setHasChanges(false)
+    setEditorOpen(true)
+  }
+
   return (
     <>
       <Header
         showGoBack={!!workbook && !editorOpen}
         onGoBack={handleGoBack}
+        onCreateNew={handleCreateNew}
       />
       <DragDropArea
         setWorkbook={(workbook) => {
