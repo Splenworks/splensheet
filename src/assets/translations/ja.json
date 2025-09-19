@@ -1,7 +1,9 @@
 {
   "header": {
     "goBack": "戻る",
-    "createNew": "新規作成"
+    "createNew": "新規作成",
+    "newFileName": "無題.xlsx",
+    "newSheetName": "シート1"
   },
   "dragDropArea": {
     "dropHere": "ここにドロップしてください",

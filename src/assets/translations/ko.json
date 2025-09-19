@@ -1,7 +1,9 @@
 {
   "header": {
     "goBack": "돌아가기",
-    "createNew": "새로 만들기"
+    "createNew": "새로 만들기",
+    "newFileName": "제목 없음.xlsx",
+    "newSheetName": "시트1"
   },
   "dragDropArea": {
     "dropHere": "여기에 드롭하세요",

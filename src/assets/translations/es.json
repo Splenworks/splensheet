@@ -1,7 +1,9 @@
 {
   "header": {
     "goBack": "Volver",
-    "createNew": "Crear nuevo"
+    "createNew": "Crear nuevo",
+    "newFileName": "Sin título.xlsx",
+    "newSheetName": "Hoja1"
   },
   "dragDropArea": {
     "dropHere": "Suelta aquí",
