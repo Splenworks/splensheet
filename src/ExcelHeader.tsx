@@ -131,6 +131,7 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
                   {ws.name}
                 </option>
               ))}
+              <option disabled>──────────</option>
               <option>
                 {t("excelHeader.addSheet")}
               </option>
