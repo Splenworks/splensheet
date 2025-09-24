@@ -27,5 +27,10 @@
     "exitFullscreen": "Exit Fullscreen",
     "toggleDarkMode": "Toggle Dark Mode",
     "download": "Download"
+  },
+  "excelHeader": {
+    "addSheet": "Add a new sheet",
+    "renameSheet": "Rename {{sheetName}}",
+    "deleteSheet": "Delete {{sheetName}}"
   }
 }

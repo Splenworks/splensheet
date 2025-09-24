@@ -27,5 +27,10 @@
     "exitFullscreen": "フルスクリーンを終了",
     "toggleDarkMode": "ダークモード切替",
     "download": "ダウンロード"
+  },
+  "excelHeader": {
+    "addSheet": "新しいシートを追加",
+    "renameSheet": "{{sheetName}} の名前を変更",
+    "deleteSheet": "{{sheetName}} を削除"
   }
 }

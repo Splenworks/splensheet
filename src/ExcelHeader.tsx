@@ -59,6 +59,7 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
   const { darkMode, toggleDarkMode } = useDarkmode()
   const isCsv = fileName.toLowerCase().endsWith('.csv')
   const findBarRef = useRef<FindBarRef>(null)
+  const activeSheetName = worksheets[activeSheetIndex]?.name ?? ""
 
   const [showBounce, setShowBounce] = useState(false)
   const [isEditingName, setIsEditingName] = useState(false)
@@ -130,6 +131,17 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
                   {ws.name}
                 </option>
               ))}
+              <option>
+                {t("excelHeader.addSheet")}
+              </option>
+              <option>
+                {t("excelHeader.renameSheet", { sheetName: activeSheetName })}
+              </option>
+              {worksheets.length > 1 && (
+                <option>
+                  {t("excelHeader.deleteSheet", { sheetName: activeSheetName })}
+                </option>
+              )}
             </select>
           )}
           <FindBar
