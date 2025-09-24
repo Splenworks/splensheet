@@ -52,6 +52,7 @@ function App() {
         <ExcelEditor
           workbook={workbook}
           fileName={fileName ?? ""}
+          onFileNameChange={setFileName}
           onClose={() => {
             setEditorOpen(false)
           }}

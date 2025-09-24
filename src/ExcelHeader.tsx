@@ -16,6 +16,7 @@ interface ExcelHeaderProps {
   toggleFullScreen: () => void
   onClose: () => void
   fileName: string
+  onFileNameChange?: (val: string) => void
   worksheets: Array<{
     id: number
     name: string
@@ -41,6 +42,7 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
   toggleFullScreen,
   onClose,
   fileName,
+  onFileNameChange,
   worksheets,
   activeSheetIndex,
   setActiveSheetIndex,
@@ -59,6 +61,9 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
   const findBarRef = useRef<FindBarRef>(null)
 
   const [showBounce, setShowBounce] = useState(false)
+  const [isEditingName, setIsEditingName] = useState(false)
+  const [nameInput, setNameInput] = useState("")
+  const nameInputRef = useRef<HTMLInputElement>(null)
 
   useImperativeHandle(ref, () => ({
     focusFind: () => {
@@ -73,6 +78,33 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
       return () => clearTimeout(timer)
     }
   }, [hasChanges])
+
+  // Keep local input in sync with incoming fileName
+  useEffect(() => {
+    const dot = fileName.lastIndexOf('.')
+    const base = dot > 0 ? fileName.slice(0, dot) : fileName
+    setNameInput(base)
+  }, [fileName])
+
+  // Autofocus the input when starting to edit
+  useEffect(() => {
+    if (isEditingName) {
+      setTimeout(() => nameInputRef.current?.focus(), 0)
+    }
+  }, [isEditingName])
+
+  const finishEditing = () => {
+    setIsEditingName(false)
+    const extDot = fileName.lastIndexOf('.')
+    const ext = extDot >= 0 ? fileName.slice(extDot) : ''
+    const baseRaw = nameInput.trim()
+    if (!baseRaw) {
+      setNameInput(fileName.replace(ext, ''))
+      return
+    }
+    const nextName = `${baseRaw}${ext}`
+    if (nextName !== fileName) onFileNameChange?.(nextName)
+  }
 
   const DarkModeToggleIcon: React.FC<{ className?: string }> = ({ className }) => {
     return (
@@ -110,8 +142,33 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
             matchCount={findMatchCount}
           />
         </div>
-        <div className="hidden md:block absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-hidden text-center text-base font-medium text-black dark:text-white pointer-events-none">
-          {fileName}
+        <div className="hidden md:block absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-hidden text-center text-base font-medium text-black dark:text-white">
+          {isEditingName ? (
+            <input
+              ref={nameInputRef}
+              className="px-2 py-0.5 rounded bg-white text-black dark:bg-neutral-700 dark:text-white focus:outline-none border-0 focus:border-2 border-pink-900 dark:border-pink-700 text-center"
+              value={nameInput}
+              onChange={(e) => setNameInput(e.target.value)}
+              onBlur={() => finishEditing()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') finishEditing()
+                else if (e.key === 'Escape') {
+                  setIsEditingName(false)
+                  const dot = fileName.lastIndexOf('.')
+                  const base = dot > 0 ? fileName.slice(0, dot) : fileName
+                  setNameInput(base)
+                }
+              }}
+            />
+          ) : (
+            <button
+              type="button"
+              className="px-2 py-0.5 rounded hover:bg-gray-300/70 dark:hover:bg-neutral-700/70 cursor-text"
+              onClick={() => setIsEditingName(true)}
+            >
+              {fileName}
+            </button>
+          )}
         </div>
         <div className="flex items-center space-x-2">
           {hasChanges && (

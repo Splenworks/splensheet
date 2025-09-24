@@ -23,6 +23,7 @@ interface ExcelEditorProps {
   onWorkbookChange?: (workbook: WorkBook) => void
   initialHasChanges?: boolean
   onHasChangesChange?: (hasChanges: boolean) => void
+  onFileNameChange?: (val: string) => void
 }
 
 const ExcelEditor: React.FC<ExcelEditorProps> = ({
@@ -32,6 +33,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   onWorkbookChange,
   initialHasChanges = false,
   onHasChangesChange,
+  onFileNameChange,
 }) => {
   const { isFullScreen, toggleFullScreen } = useFullScreen()
   const [activeSheetIndex, setActiveSheetIndex] = useState(0)
@@ -441,6 +443,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         isFullScreen={isFullScreen}
         toggleFullScreen={toggleFullScreen}
         fileName={fileName}
+        onFileNameChange={onFileNameChange}
         onClose={onClose}
         worksheets={sheets.map((ws) => ({ id: ws.id, name: ws.name }))}
         activeSheetIndex={activeSheetIndex}
