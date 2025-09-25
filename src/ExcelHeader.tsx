@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react"
+import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import ExpandIcon from "./assets/icons/expand.svg?react"
 import CompressIcon from "./assets/icons/compress.svg?react"
@@ -145,6 +145,21 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
     )
   }
 
+  const dividerLabel = useMemo(() => {
+    const labels = [
+      ...worksheets.map(({ name }) => name),
+      t("excelHeader.addSheet"),
+      t("excelHeader.renameSheet", { sheetName: activeSheetName }),
+    ]
+
+    if (worksheets.length > 1) {
+      labels.push(t("excelHeader.deleteSheet", { sheetName: activeSheetName }))
+    }
+
+    // extra few chars so it doesn’t look short next to longest label
+    return "─".repeat(Math.max(...labels.map(label => label.length), 0) / 2 + 2)
+  }, [worksheets, activeSheetName, t])
+
   return (
     <>
       <header className="flex h-11 items-center justify-between px-2 bg-gray-200 dark:bg-neutral-800 relative">
@@ -160,7 +175,7 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
                   {ws.name}
                 </option>
               ))}
-              <option disabled>──────────</option>
+              <option disabled>{dividerLabel}</option>
               <option value="__add__">
                 {t("excelHeader.addSheet")}
               </option>
