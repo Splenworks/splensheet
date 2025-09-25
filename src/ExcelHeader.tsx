@@ -23,6 +23,7 @@ interface ExcelHeaderProps {
   }>
   activeSheetIndex: number
   setActiveSheetIndex: (index: number) => void
+  onAddSheet?: () => void
   hasChanges?: boolean
   onDownload?: () => void
   findQuery?: string
@@ -37,7 +38,7 @@ export interface ExcelHeaderRef {
   focusFind: () => void
 }
 
-const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
+const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({ 
   isFullScreen,
   toggleFullScreen,
   onClose,
@@ -46,6 +47,7 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
   worksheets,
   activeSheetIndex,
   setActiveSheetIndex,
+  onAddSheet,
   hasChanges,
   onDownload,
   findQuery = "",
@@ -65,6 +67,21 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
   const [isEditingName, setIsEditingName] = useState(false)
   const [nameInput, setNameInput] = useState("")
   const nameInputRef = useRef<HTMLInputElement>(null)
+
+  const handleSheetChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value
+    if (value === "__add__") {
+      onAddSheet?.()
+      return
+    }
+    if (value === "__rename__" || value === "__delete__") {
+      return
+    }
+    const newIndex = Number(value)
+    if (!Number.isNaN(newIndex)) {
+      setActiveSheetIndex(newIndex)
+    }
+  }
 
   useImperativeHandle(ref, () => ({
     focusFind: () => {
@@ -124,7 +141,7 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
             <select
               className="h-7 rounded border max-w-55 border-gray-300 bg-white px-1 text-xs dark:border-neutral-600 dark:bg-neutral-700 dark:text-white focus:outline-pink-900 dark:focus:outline-pink-700"
               value={activeSheetIndex}
-              onChange={(e) => setActiveSheetIndex(Number(e.target.value))}
+              onChange={handleSheetChange}
             >
               {worksheets.map((ws, idx) => (
                 <option key={ws.id} value={idx}>
@@ -132,14 +149,14 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
                 </option>
               ))}
               <option disabled>──────────</option>
-              <option>
+              <option value="__add__">
                 {t("excelHeader.addSheet")}
               </option>
-              <option>
+              <option value="__rename__">
                 {t("excelHeader.renameSheet", { sheetName: activeSheetName })}
               </option>
               {worksheets.length > 1 && (
-                <option>
+                <option value="__delete__">
                   {t("excelHeader.deleteSheet", { sheetName: activeSheetName })}
                 </option>
               )}

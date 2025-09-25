@@ -3,7 +3,7 @@ import { useVirtualizer } from "@tanstack/react-virtual"
 import ExcelCell from "./ExcelCell"
 import ExcelHeader, { ExcelHeaderRef } from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
-import { writeFile } from "xlsx"
+import { writeFile, utils } from "xlsx"
 import type { WorkBook } from "xlsx"
 import { recalculateSheet } from "./utils/recalculateSheet"
 import { sheetToData, dataToSheet } from "./utils/xlsx"
@@ -11,6 +11,7 @@ import { isMac } from "./utils/isMac"
 import { getLastNonEmptyRow, getLastNonEmptyCol } from "./utils/sheetStats"
 import { PartialCellObj, SheetData } from "./types"
 import { getMaxColumnIndex, indexToColumnName } from "./utils/columnUtils"
+import { useTranslation } from "react-i18next"
 
 const EXTRA_ROWS = 20
 const EXTRA_COLS = 20
@@ -35,6 +36,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   onHasChangesChange,
   onFileNameChange,
 }) => {
+  const { t } = useTranslation()
   const { isFullScreen, toggleFullScreen } = useFullScreen()
   const [activeSheetIndex, setActiveSheetIndex] = useState(0)
   const [sheets, setSheets] = useState<SheetData[]>(
@@ -147,6 +149,58 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     estimateSize: () => 32,
     overscan: 50,
   })
+
+  const getNextSheetName = useCallback((existingNames: string[]) => {
+    const localized = t("header.newSheetName", { defaultValue: "Sheet1" })
+    const trimmed = localized.trim()
+    const match = trimmed.match(/^(.*?)(\d+)$/)
+    const prefix = (match?.[1] ?? trimmed.replace(/\d+$/, "")) || "Sheet"
+    const start = match ? parseInt(match[2], 10) || 1 : 1
+    const usedNames = new Set(existingNames)
+
+    if (!match && trimmed && !usedNames.has(trimmed)) {
+      return trimmed
+    }
+
+    let counter = start
+    let candidate = `${prefix}${counter}`
+    while (usedNames.has(candidate)) {
+      counter += 1
+      candidate = `${prefix}${counter}`
+    }
+    return candidate
+  }, [t])
+
+  const handleAddSheet = useCallback(() => {
+    let newSheetIndex = 0
+    let newSheetName = ""
+    const blankWorksheet = utils.aoa_to_sheet([[]])
+    const newSheetData = sheetToData(blankWorksheet)
+
+    setSheets((prevSheets) => {
+      const nextName = getNextSheetName(prevSheets.map((sheet) => sheet.name))
+      const nextId = prevSheets.reduce((max, sheet) => Math.max(max, sheet.id), 0) + 1
+      const updatedSheets = [
+        ...prevSheets,
+        {
+          id: nextId,
+          name: nextName,
+          data: newSheetData,
+        },
+      ]
+      newSheetIndex = updatedSheets.length - 1
+      newSheetName = nextName
+      return updatedSheets
+    })
+
+    if (!newSheetName) return
+
+    workbook.SheetNames.push(newSheetName)
+    workbook.Sheets[newSheetName] = blankWorksheet
+    setActiveSheetIndex(newSheetIndex)
+    setHasChanges(true)
+    onHasChangesChange?.(true)
+  }, [getNextSheetName, workbook, onHasChangesChange])
 
   const selectCell = useCallback(
     (row: number, col: number) => {
@@ -448,6 +502,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         worksheets={sheets.map((ws) => ({ id: ws.id, name: ws.name }))}
         activeSheetIndex={activeSheetIndex}
         setActiveSheetIndex={setActiveSheetIndex}
+        onAddSheet={handleAddSheet}
         hasChanges={hasChanges}
         onDownload={handleDownload}
         findQuery={findQuery}
