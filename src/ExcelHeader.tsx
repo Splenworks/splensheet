@@ -24,6 +24,8 @@ interface ExcelHeaderProps {
   activeSheetIndex: number
   setActiveSheetIndex: (index: number) => void
   onAddSheet?: () => void
+  onRenameSheet?: () => void
+  onDeleteSheet?: () => void
   hasChanges?: boolean
   onDownload?: () => void
   findQuery?: string
@@ -38,7 +40,7 @@ export interface ExcelHeaderRef {
   focusFind: () => void
 }
 
-const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({ 
+const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
   isFullScreen,
   toggleFullScreen,
   onClose,
@@ -48,6 +50,8 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
   activeSheetIndex,
   setActiveSheetIndex,
   onAddSheet,
+  onRenameSheet,
+  onDeleteSheet,
   hasChanges,
   onDownload,
   findQuery = "",
@@ -72,9 +76,17 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
     const value = e.target.value
     if (value === "__add__") {
       onAddSheet?.()
+      e.target.value = String(activeSheetIndex)
       return
     }
-    if (value === "__rename__" || value === "__delete__") {
+    if (value === "__rename__") {
+      onRenameSheet?.()
+      e.target.value = String(activeSheetIndex)
+      return;
+    }
+    if (value === "__delete__") {
+      onDeleteSheet?.()
+      e.target.value = String(activeSheetIndex)
       return
     }
     const newIndex = Number(value)

@@ -202,6 +202,77 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     onHasChangesChange?.(true)
   }, [getNextSheetName, workbook, onHasChangesChange])
 
+  const handleRenameSheet = useCallback(() => {
+    const sheet = sheets[activeSheetIndex]
+    if (!sheet) return
+
+    const currentName = sheet.name
+    const promptMessage = t("excelHeader.renameSheetPrompt", {
+      sheetName: currentName,
+      defaultValue: `Enter a new name for "${currentName}"`,
+    })
+    const result = window.prompt(promptMessage, currentName)
+    if (result === null) return
+
+    const trimmed = result.trim()
+    if (!trimmed || trimmed === currentName) return
+
+    if (sheets.some((ws, idx) => idx !== activeSheetIndex && ws.name === trimmed)) {
+      window.alert(t("excelHeader.renameSheetDuplicate", {
+        sheetName: trimmed,
+        defaultValue: `A sheet named "${trimmed}" already exists.`,
+      }))
+      return
+    }
+
+    setSheets((prev) => {
+      const updated = [...prev]
+      updated[activeSheetIndex] = {
+        ...updated[activeSheetIndex],
+        name: trimmed,
+      }
+      return updated
+    })
+
+    const oldName = workbook.SheetNames[activeSheetIndex]
+    if (oldName !== trimmed) {
+      workbook.SheetNames[activeSheetIndex] = trimmed
+      workbook.Sheets[trimmed] = workbook.Sheets[oldName]
+      delete workbook.Sheets[oldName]
+    }
+
+    setHasChanges(true)
+    onHasChangesChange?.(true)
+  }, [activeSheetIndex, sheets, t, workbook, onHasChangesChange])
+
+  const handleDeleteSheet = useCallback(() => {
+    if (sheets.length <= 1) return
+
+    const sheet = sheets[activeSheetIndex]
+    if (!sheet) return
+
+    const confirmMessage = t("excelHeader.deleteSheetConfirm", {
+      sheetName: sheet.name,
+      defaultValue: `Delete "${sheet.name}"?`,
+    })
+    if (!window.confirm(confirmMessage)) return
+
+    const removedName = workbook.SheetNames[activeSheetIndex]
+    const nextActiveIndex = activeSheetIndex >= sheets.length - 1
+      ? Math.max(0, sheets.length - 2)
+      : activeSheetIndex
+
+    setSheets((prev) => prev.filter((_, idx) => idx !== activeSheetIndex))
+    workbook.SheetNames.splice(activeSheetIndex, 1)
+    delete workbook.Sheets[removedName]
+
+    setActiveSheetIndex(nextActiveIndex)
+    setHasChanges(true)
+    onHasChangesChange?.(true)
+    undoStack.current = []
+    redoStack.current = []
+  }, [activeSheetIndex, sheets, t, workbook, onHasChangesChange])
+
   const selectCell = useCallback(
     (row: number, col: number) => {
       let r = row
@@ -503,6 +574,8 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         activeSheetIndex={activeSheetIndex}
         setActiveSheetIndex={setActiveSheetIndex}
         onAddSheet={handleAddSheet}
+        onRenameSheet={handleRenameSheet}
+        onDeleteSheet={handleDeleteSheet}
         hasChanges={hasChanges}
         onDownload={handleDownload}
         findQuery={findQuery}

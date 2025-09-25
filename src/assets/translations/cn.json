@@ -31,6 +31,9 @@
   "excelHeader": {
     "addSheet": "添加新工作表",
     "renameSheet": "将 {{sheetName}} 重命名",
-    "deleteSheet": "删除 {{sheetName}}"
+    "deleteSheet": "删除 {{sheetName}}",
+    "renameSheetPrompt": "请输入“{{sheetName}}”的新名称",
+    "renameSheetDuplicate": "名为“{{sheetName}}”的工作表已存在。",
+    "deleteSheetConfirm": "删除“{{sheetName}}”吗？"
   }
 }

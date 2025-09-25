@@ -31,6 +31,9 @@
   "excelHeader": {
     "addSheet": "新しいシートを追加",
     "renameSheet": "{{sheetName}} の名前を変更",
-    "deleteSheet": "{{sheetName}} を削除"
+    "deleteSheet": "{{sheetName}} を削除",
+    "renameSheetPrompt": "\"{{sheetName}}\" の新しい名前を入力してください",
+    "renameSheetDuplicate": "\"{{sheetName}}\" というシートは既に存在します。",
+    "deleteSheetConfirm": "\"{{sheetName}}\" を削除しますか？"
   }
 }
