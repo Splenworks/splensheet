@@ -27,5 +27,13 @@
     "exitFullscreen": "Exit Fullscreen",
     "toggleDarkMode": "Toggle Dark Mode",
     "download": "Download"
+  },
+  "excelHeader": {
+    "addSheet": "Add a new sheet",
+    "renameSheet": "Rename {{sheetName}}",
+    "deleteSheet": "Delete {{sheetName}}",
+    "renameSheetPrompt": "Enter a new name for \"{{sheetName}}\"",
+    "renameSheetDuplicate": "A sheet named \"{{sheetName}}\" already exists.",
+    "deleteSheetConfirm": "Delete \"{{sheetName}}\"?"
   }
 }

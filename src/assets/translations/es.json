@@ -27,5 +27,13 @@
     "exitFullscreen": "Salir de pantalla completa",
     "toggleDarkMode": "Cambiar modo oscuro",
     "download": "Descargar"
+  },
+  "excelHeader": {
+    "addSheet": "Agregar una nueva hoja",
+    "renameSheet": "Renombrar {{sheetName}}",
+    "deleteSheet": "Eliminar {{sheetName}}",
+    "renameSheetPrompt": "Introduce un nuevo nombre para \"{{sheetName}}\"",
+    "renameSheetDuplicate": "Ya existe una hoja llamada \"{{sheetName}}\".",
+    "deleteSheetConfirm": "¿Eliminar \"{{sheetName}}\"?"
   }
 }
