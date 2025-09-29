@@ -6,6 +6,7 @@ interface IconButtonProps {
   id?: string
   className?: string
   onClick?: () => void
+  isHover?: boolean
 }
 
 const IconButton: React.FC<IconButtonProps> = ({
@@ -13,17 +14,19 @@ const IconButton: React.FC<IconButtonProps> = ({
   id,
   className,
   onClick,
+  isHover = false,
 }) => {
   return (
     <button
       id={id}
       className={twMerge(
-        "group hover:bg-opacity-50 flex size-7 cursor-pointer items-center justify-center rounded-full transition-colors duration-300 ease-in-out hover:bg-zinc-400 dark:hover:bg-zinc-600 focus:outline-pink-900 dark:focus:outline-pink-700",
+        "group hover:bg-opacity-50 flex size-7 cursor-pointer items-center justify-center rounded-full transition-colors duration-300 ease-in-out focus:outline-pink-900 dark:focus:outline-pink-700",
+        isHover ? "bg-zinc-400 dark:bg-zinc-600" : "hover:bg-zinc-400 dark:hover:bg-zinc-600",
         className,
       )}
       onClick={onClick}
     >
-      {React.createElement(svgIcon, { className: "size-4 text-black dark:text-white group-hover:text-white" })}
+      {React.createElement(svgIcon, { className: `size-4 text-black dark:text-white ${isHover ? "text-white" : "group-hover:text-white"}` })}
     </button>
   )
 }

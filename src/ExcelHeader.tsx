@@ -11,6 +11,7 @@ import { useDarkmode } from "./hooks/useDarkmode"
 import ExcelDarkModeToggleIcon from "./ExcelDarkModeToggleIcon"
 import FindBar, { FindBarRef } from "./FindBar"
 import { twJoin } from "tailwind-merge"
+import Menu from "./Menu"
 
 interface ExcelHeaderProps {
   isFullScreen: boolean
@@ -124,6 +125,12 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
     }
   }, [isEditingName])
 
+  const menuItems = useMemo(() => ([
+    { id: "new", label: t("others.new") },
+    { id: "open", label: t("others.open") },
+    { id: "download", label: t("others.download") },
+  ]), [t])
+
   const finishEditing = () => {
     setIsEditingName(false)
     const extDot = fileName.lastIndexOf('.')
@@ -169,11 +176,18 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
     <>
       <header className="flex h-11 items-center justify-between px-2 bg-gray-200 dark:bg-neutral-800 relative">
         <div className="flex items-center space-x-2">
-          <Tooltip text={t("others.menu")} place="bottom" align="left" className="rounded-full">
-            <IconButton
-              svgIcon={MenuIcon}
-            />
-          </Tooltip>
+          <Menu
+            items={menuItems}
+            renderTrigger={({ toggle, isOpen }) => (
+              <Tooltip text={isOpen ? "" : t("others.menu")} place="bottom" align="left" className="rounded-full">
+                <IconButton
+                  svgIcon={MenuIcon}
+                  onClick={toggle}
+                  isHover={isOpen}
+                />
+              </Tooltip>
+            )}
+          />
           {!isCsv && (
             <select
               className="h-7 rounded border max-w-55 border-gray-300 bg-white px-1 text-xs dark:border-neutral-600 dark:bg-neutral-700 dark:text-white focus:outline-pink-900 dark:focus:outline-pink-700"

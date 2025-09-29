@@ -27,7 +27,9 @@
     "exitFullscreen": "フルスクリーンを終了",
     "toggleDarkMode": "ダークモード切替",
     "download": "ダウンロード",
-    "menu": "メニュー"
+    "menu": "メニュー",
+    "new": "新規",
+    "open": "開く"
   },
   "excelHeader": {
     "addSheet": "新しいシートを追加",
