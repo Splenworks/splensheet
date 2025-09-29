@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle, useMemo } from "react"
+import { Bars3Icon } from "@heroicons/react/24/outline"
 import { useTranslation } from "react-i18next"
 import ExpandIcon from "./assets/icons/expand.svg?react"
 import CompressIcon from "./assets/icons/compress.svg?react"
@@ -145,6 +146,10 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
     )
   }
 
+  const MenuIcon: React.FC<{ className?: string }> = ({ className }) => {
+    return <Bars3Icon className={className} />
+  }
+
   const dividerLabel = useMemo(() => {
     const labels = [
       ...worksheets.map(({ name }) => name),
@@ -164,6 +169,11 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
     <>
       <header className="flex h-11 items-center justify-between px-2 bg-gray-200 dark:bg-neutral-800 relative">
         <div className="flex items-center space-x-2">
+          <Tooltip text={t("others.menu")} place="bottom" align="left" className="rounded-full">
+            <IconButton
+              svgIcon={MenuIcon}
+            />
+          </Tooltip>
           {!isCsv && (
             <select
               className="h-7 rounded border max-w-55 border-gray-300 bg-white px-1 text-xs dark:border-neutral-600 dark:bg-neutral-700 dark:text-white focus:outline-pink-900 dark:focus:outline-pink-700"

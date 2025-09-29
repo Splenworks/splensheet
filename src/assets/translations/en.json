@@ -26,7 +26,8 @@
     "fullscreen": "Fullscreen",
     "exitFullscreen": "Exit Fullscreen",
     "toggleDarkMode": "Toggle Dark Mode",
-    "download": "Download"
+    "download": "Download",
+    "menu": "Menu"
   },
   "excelHeader": {
     "addSheet": "Add a new sheet",

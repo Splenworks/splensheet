@@ -26,7 +26,8 @@
     "fullscreen": "Pantalla completa",
     "exitFullscreen": "Salir de pantalla completa",
     "toggleDarkMode": "Cambiar modo oscuro",
-    "download": "Descargar"
+    "download": "Descargar",
+    "menu": "Menú"
   },
   "excelHeader": {
     "addSheet": "Agregar una nueva hoja",

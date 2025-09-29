@@ -26,7 +26,8 @@
     "fullscreen": "全屏",
     "exitFullscreen": "退出全屏",
     "toggleDarkMode": "切换深色模式",
-    "download": "下载"
+    "download": "下载",
+    "menu": "菜单"
   },
   "excelHeader": {
     "addSheet": "添加新工作表",

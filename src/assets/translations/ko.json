@@ -26,7 +26,8 @@
     "fullscreen": "전체화면",
     "exitFullscreen": "전체화면 나가기",
     "toggleDarkMode": "다크 모드 전환",
-    "download": "다운로드"
+    "download": "다운로드",
+    "menu": "메뉴"
   },
   "excelHeader": {
     "addSheet": "새 시트 추가",
