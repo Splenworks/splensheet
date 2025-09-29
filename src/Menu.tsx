@@ -70,7 +70,7 @@ const Menu: React.FC<MenuProps> = ({
             <button
               key={item.id}
               type="button"
-              className="cursor-pointer flex w-full items-center px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-neutral-700"
+              className="cursor-pointer flex w-full items-center px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-zinc-600"
               role="menuitem"
               onClick={() => {
                 item.onSelect?.()
