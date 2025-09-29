@@ -42,6 +42,11 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
         </div>
         <input
           ref={inputRef}
+          spellCheck={false}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          type="text"
           className={twJoin(
             "h-7 w-32 rounded border border-gray-300 pl-4.5 pr-1 py-0.5 text-xs text-black dark:border-neutral-600 dark:text-white",
             "focus:outline-2 focus:outline-pink-900 dark:focus:outline-pink-700",
