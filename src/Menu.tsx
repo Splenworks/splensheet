@@ -5,6 +5,7 @@ interface MenuItem {
   id: string
   label: React.ReactNode
   onSelect?: () => void
+  icon?: React.ComponentType<{ className?: string }>
 }
 
 interface MenuProps {
@@ -70,14 +71,20 @@ const Menu: React.FC<MenuProps> = ({
             <button
               key={item.id}
               type="button"
-              className="cursor-pointer flex w-full items-center px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-zinc-600"
+              className="cursor-pointer flex w-full items-center gap-2 px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-zinc-600"
               role="menuitem"
               onClick={() => {
                 item.onSelect?.()
                 closeMenu()
               }}
             >
-              {item.label}
+              {item.icon && (
+                <item.icon
+                  aria-hidden="true"
+                  className="h-4 w-4 text-gray-500 dark:text-neutral-400"
+                />
+              )}
+              <span className="flex-1">{item.label}</span>
             </button>
           ))}
         </div>

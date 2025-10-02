@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle, useMemo } from "react"
-import { Bars3Icon } from "@heroicons/react/24/outline"
+import { ArrowDownTrayIcon, Bars3Icon, FolderOpenIcon, PlusIcon } from "@heroicons/react/24/outline"
 import { useTranslation } from "react-i18next"
 import ExpandIcon from "./assets/icons/expand.svg?react"
 import CompressIcon from "./assets/icons/compress.svg?react"
@@ -126,9 +126,9 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
   }, [isEditingName])
 
   const menuItems = useMemo(() => ([
-    { id: "new", label: t("others.new") },
-    { id: "open", label: t("others.open") },
-    { id: "download", label: t("others.download") },
+    { id: "new", label: t("others.new"), icon: PlusIcon },
+    { id: "open", label: t("others.open"), icon: FolderOpenIcon },
+    { id: "download", label: t("others.download"), icon: ArrowDownTrayIcon },
   ]), [t])
 
   const finishEditing = () => {
