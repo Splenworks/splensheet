@@ -110,7 +110,7 @@ const Menu: React.FC<MenuProps> = ({
               <button
                 key={item.id}
                 type="button"
-                className="cursor-pointer flex w-full items-center gap-2 px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-zinc-600"
+                className="cursor-pointer flex w-full items-center gap-2.5 px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-zinc-600"
                 role="menuitem"
                 onClick={() => {
                   item.onSelect?.()
@@ -120,7 +120,7 @@ const Menu: React.FC<MenuProps> = ({
                 {Icon && (
                   <Icon
                     aria-hidden="true"
-                    className="h-4 w-4 text-gray-500 dark:text-neutral-400"
+                    className="h-4 w-4 text-black dark:text-white -ml-0.5"
                   />
                 )}
                 <span className="flex-1">{item.label}</span>
