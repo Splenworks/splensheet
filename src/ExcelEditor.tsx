@@ -150,6 +150,18 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     overscan: 50,
   })
 
+  useEffect(() => {
+    const parent = parentRef.current
+    if (!parent) return
+
+    parent.scrollTop = 0
+    parent.scrollLeft = 0
+
+    if (useVirtual) {
+      rowVirtualizer.scrollToIndex(0)
+    }
+  }, [activeSheetIndex, rowVirtualizer, useVirtual])
+
   const getNextSheetName = useCallback((existingNames: string[]) => {
     const localized = t("header.newSheetName", { defaultValue: "Sheet1" })
     const trimmed = localized.trim()
