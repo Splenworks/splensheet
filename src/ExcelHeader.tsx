@@ -129,7 +129,12 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
   const menuItems = useMemo(() => ([
     { id: "new", label: t("menu.new"), icon: PlusIcon },
     { id: "open", label: t("menu.open"), icon: FolderOpenIcon },
-    { id: "download", label: t("menu.download"), icon: ArrowDownTrayIcon },
+    {
+      id: "download",
+      label: t("menu.download"),
+      icon: ArrowDownTrayIcon,
+      onSelect: onDownload,
+    },
     { id: "divider-1", type: "divider" as const },
     {
       id: "open-source",
@@ -137,7 +142,7 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
       onSelect: () => window.open("https://github.com/Splenworks/splensheet", "_blank", "noopener,noreferrer"),
     },
     { id: "version", type: "info" as const, label: `${t("menu.version")} ${APP_VERSION}.${CommitHash.substring(0, 7)}` },
-  ]), [t])
+  ]), [t, onDownload])
 
   const finishEditing = () => {
     setIsEditingName(false)
