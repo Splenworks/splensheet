@@ -30,6 +30,7 @@ interface ExcelHeaderProps {
   onRenameSheet?: () => void
   onDeleteSheet?: () => void
   hasChanges?: boolean
+  onOpen?: () => void
   onDownload?: () => void
   findQuery?: string
   onFindQueryChange?: (val: string) => void
@@ -56,6 +57,7 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
   onRenameSheet,
   onDeleteSheet,
   hasChanges,
+  onOpen,
   onDownload,
   findQuery = "",
   onFindQueryChange,
@@ -131,9 +133,14 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
       id: "new",
       label: t("menu.new"),
       icon: PlusIcon,
-      onSelect: () => window.open(window.location.origin, "_blank", "noopener,noreferrer"),
+      onSelect: () => window.open(new URL(import.meta.env.BASE_URL, window.location.origin).toString(), "_blank", "noopener,noreferrer"),
     },
-    { id: "open", label: t("menu.open"), icon: FolderOpenIcon },
+    {
+      id: "open",
+      label: t("menu.open"),
+      icon: FolderOpenIcon,
+      onSelect: onOpen,
+    },
     {
       id: "download",
       label: t("menu.download"),
@@ -147,7 +154,7 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
       onSelect: () => window.open("https://github.com/Splenworks/splensheet", "_blank", "noopener,noreferrer"),
     },
     { id: "version", type: "info" as const, label: `${t("menu.version")} ${APP_VERSION}.${CommitHash.substring(0, 7)}` },
-  ]), [t, onDownload])
+  ]), [t, onOpen, onDownload])
 
   const finishEditing = () => {
     setIsEditingName(false)
