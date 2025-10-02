@@ -136,7 +136,7 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
       label: t("menu.openSource"),
       onSelect: () => window.open("https://github.com/Splenworks/splensheet", "_blank", "noopener,noreferrer"),
     },
-    { id: "version", label: `${t("menu.version")} ${APP_VERSION}.${CommitHash.substring(0, 7)}` },
+    { id: "version", type: "info" as const, label: `${t("menu.version")} ${APP_VERSION}.${CommitHash.substring(0, 7)}` },
   ]), [t])
 
   const finishEditing = () => {

@@ -15,7 +15,13 @@ type MenuDividerItem = {
   className?: string
 }
 
-type MenuItem = MenuActionItem | MenuDividerItem
+type MenuInfoItem = {
+  id: string
+  label: React.ReactNode
+  type: "info"
+}
+
+type MenuItem = MenuActionItem | MenuDividerItem | MenuInfoItem
 
 interface MenuProps {
   items: MenuItem[]
@@ -84,6 +90,17 @@ const Menu: React.FC<MenuProps> = ({
                   role="separator"
                   className={twMerge("mx-2 my-2 border-t border-gray-200 dark:border-neutral-700", item.className)}
                 />
+              )
+            }
+
+            if (item.type === "info") {
+              return (
+                <div
+                  key={item.id}
+                  className="px-4 py-2"
+                >
+                  {item.label}
+                </div>
               )
             }
 
