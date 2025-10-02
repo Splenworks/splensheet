@@ -127,7 +127,12 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
   }, [isEditingName])
 
   const menuItems = useMemo(() => ([
-    { id: "new", label: t("menu.new"), icon: PlusIcon },
+    {
+      id: "new",
+      label: t("menu.new"),
+      icon: PlusIcon,
+      onSelect: () => window.open(window.location.origin, "_blank", "noopener,noreferrer"),
+    },
     { id: "open", label: t("menu.open"), icon: FolderOpenIcon },
     {
       id: "download",
