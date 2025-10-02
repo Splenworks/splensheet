@@ -204,7 +204,7 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
           <Menu
             items={menuItems}
             renderTrigger={({ toggle, isOpen }) => (
-              <Tooltip text={isOpen ? "" : t("others.menu")} place="bottom" align="left" className="rounded-full">
+              <Tooltip text={isOpen ? "" : t("menu.menu")} place="bottom" align="left" className="rounded-full">
                 <IconButton
                   svgIcon={MenuIcon}
                   onClick={toggle}
