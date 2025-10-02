@@ -1,12 +1,21 @@
 import React, { useEffect, useRef, useState } from "react"
 import { twMerge } from "tailwind-merge"
 
-interface MenuItem {
+type MenuActionItem = {
   id: string
   label: React.ReactNode
   onSelect?: () => void
   icon?: React.ComponentType<{ className?: string }>
+  type?: "item"
 }
+
+type MenuDividerItem = {
+  id: string
+  type: "divider"
+  className?: string
+}
+
+type MenuItem = MenuActionItem | MenuDividerItem
 
 interface MenuProps {
   items: MenuItem[]
@@ -67,26 +76,40 @@ const Menu: React.FC<MenuProps> = ({
           role="menu"
           aria-label="menu"
         >
-          {items.map(item => (
-            <button
-              key={item.id}
-              type="button"
-              className="cursor-pointer flex w-full items-center gap-2 px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-zinc-600"
-              role="menuitem"
-              onClick={() => {
-                item.onSelect?.()
-                closeMenu()
-              }}
-            >
-              {item.icon && (
-                <item.icon
-                  aria-hidden="true"
-                  className="h-4 w-4 text-gray-500 dark:text-neutral-400"
+          {items.map(item => {
+            if (item.type === "divider") {
+              return (
+                <div
+                  key={item.id}
+                  role="separator"
+                  className={twMerge("mx-2 my-2 border-t border-gray-200 dark:border-neutral-700", item.className)}
                 />
-              )}
-              <span className="flex-1">{item.label}</span>
-            </button>
-          ))}
+              )
+            }
+
+            const Icon = item.icon
+
+            return (
+              <button
+                key={item.id}
+                type="button"
+                className="cursor-pointer flex w-full items-center gap-2 px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-zinc-600"
+                role="menuitem"
+                onClick={() => {
+                  item.onSelect?.()
+                  closeMenu()
+                }}
+              >
+                {Icon && (
+                  <Icon
+                    aria-hidden="true"
+                    className="h-4 w-4 text-gray-500 dark:text-neutral-400"
+                  />
+                )}
+                <span className="flex-1">{item.label}</span>
+              </button>
+            )
+          })}
         </div>
       )}
     </div>

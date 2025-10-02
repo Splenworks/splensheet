@@ -29,7 +29,9 @@
     "download": "ダウンロード",
     "menu": "メニュー",
     "new": "新規",
-    "open": "開く"
+    "open": "開く",
+    "openSource": "オープンソース",
+    "version": "バージョン"
   },
   "excelHeader": {
     "addSheet": "新しいシートを追加",

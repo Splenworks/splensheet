@@ -29,7 +29,9 @@
     "download": "Download",
     "menu": "Menu",
     "new": "New",
-    "open": "Open"
+    "open": "Open",
+    "openSource": "Open Source",
+    "version": "Version"
   },
   "excelHeader": {
     "addSheet": "Add a new sheet",
