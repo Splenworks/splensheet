@@ -12,6 +12,7 @@ import { getLastNonEmptyRow, getLastNonEmptyCol } from "./utils/sheetStats"
 import { PartialCellObj, SheetData } from "./types"
 import { getMaxColumnIndex, indexToColumnName } from "./utils/columnUtils"
 import { useTranslation } from "react-i18next"
+import { loadWorkbook } from "./utils/loadWorkbook"
 
 const EXTRA_ROWS = 20
 const EXTRA_COLS = 20
@@ -53,6 +54,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   const headerRef = useRef<ExcelHeaderRef>(null)
   const activeSheet = sheets[activeSheetIndex]
   const activeDataRef = useRef(activeSheet.data)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const undoStack = useRef<
     Array<{
       sheetIndex: number
@@ -119,6 +121,47 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   useEffect(() => {
     setSelectedCell(null)
   }, [activeSheetIndex])
+
+  const handleOpenDialog = useCallback(() => {
+    const input = fileInputRef.current
+    if (!input) return
+    input.value = ""
+    input.click()
+  }, [])
+
+  const handleFileInputChange = useCallback(async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    try {
+      const nextWorkbook = await loadWorkbook(file)
+      if (!nextWorkbook) return
+
+      const nextSheets = nextWorkbook.SheetNames.map((name, idx) => ({
+        id: idx + 1,
+        name,
+        data: sheetToData(nextWorkbook.Sheets[name]),
+      }))
+
+      setSheets(nextSheets)
+      setActiveSheetIndex(0)
+      setSelectedCell(null)
+      setFindQuery("")
+      setFindIndex(-1)
+      undoStack.current = []
+      redoStack.current = []
+      activeDataRef.current = nextSheets[0]?.data ?? []
+
+      onFileNameChange?.(file.name)
+      setHasChanges(false)
+      onHasChangesChange?.(false)
+      onWorkbookChange?.(nextWorkbook)
+    } finally {
+      event.target.value = ""
+    }
+  }, [onWorkbookChange, onFileNameChange, onHasChangesChange])
 
   const getCellValue = useCallback((c: PartialCellObj | undefined) => {
     if (!c || c.v === undefined) return ""
@@ -575,6 +618,13 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
 
   return (
     <div className="fixed inset-0 flex flex-col bg-white dark:bg-neutral-900">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".xlsx,.xls,.csv"
+        className="hidden"
+        onChange={handleFileInputChange}
+      />
       <ExcelHeader
         ref={headerRef}
         isFullScreen={isFullScreen}
@@ -589,6 +639,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         onRenameSheet={handleRenameSheet}
         onDeleteSheet={handleDeleteSheet}
         hasChanges={hasChanges}
+        onOpen={handleOpenDialog}
         onDownload={handleDownload}
         findQuery={findQuery}
         onFindQueryChange={setFindQuery}

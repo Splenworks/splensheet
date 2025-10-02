@@ -28,6 +28,14 @@
     "toggleDarkMode": "切换深色模式",
     "download": "下载"
   },
+  "menu": {
+    "menu": "菜单",
+    "new": "新建",
+    "open": "打开",
+    "download": "下载",
+    "openSource": "开源",
+    "version": "版本"
+  },
   "excelHeader": {
     "addSheet": "添加新工作表",
     "renameSheet": "将 {{sheetName}} 重命名",

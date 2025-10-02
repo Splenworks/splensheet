@@ -28,6 +28,14 @@
     "toggleDarkMode": "Cambiar modo oscuro",
     "download": "Descargar"
   },
+  "menu": {
+    "menu": "Menú",
+    "new": "Nuevo",
+    "open": "Abrir",
+    "download": "Descargar",
+    "openSource": "Código abierto",
+    "version": "Versión"
+  },
   "excelHeader": {
     "addSheet": "Agregar una nueva hoja",
     "renameSheet": "Renombrar {{sheetName}}",

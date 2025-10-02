@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle, useMemo } from "react"
+import { ArrowDownTrayIcon, Bars3Icon, FolderOpenIcon, PlusIcon } from "@heroicons/react/24/outline"
 import { useTranslation } from "react-i18next"
 import ExpandIcon from "./assets/icons/expand.svg?react"
 import CompressIcon from "./assets/icons/compress.svg?react"
@@ -10,6 +11,8 @@ import { useDarkmode } from "./hooks/useDarkmode"
 import ExcelDarkModeToggleIcon from "./ExcelDarkModeToggleIcon"
 import FindBar, { FindBarRef } from "./FindBar"
 import { twJoin } from "tailwind-merge"
+import Menu from "./Menu"
+import CommitHash from "virtual:commit-hash"
 
 interface ExcelHeaderProps {
   isFullScreen: boolean
@@ -27,6 +30,7 @@ interface ExcelHeaderProps {
   onRenameSheet?: () => void
   onDeleteSheet?: () => void
   hasChanges?: boolean
+  onOpen?: () => void
   onDownload?: () => void
   findQuery?: string
   onFindQueryChange?: (val: string) => void
@@ -53,6 +57,7 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
   onRenameSheet,
   onDeleteSheet,
   hasChanges,
+  onOpen,
   onDownload,
   findQuery = "",
   onFindQueryChange,
@@ -123,6 +128,34 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
     }
   }, [isEditingName])
 
+  const menuItems = useMemo(() => ([
+    {
+      id: "new",
+      label: t("menu.new"),
+      icon: PlusIcon,
+      onSelect: () => window.open(new URL(import.meta.env.BASE_URL, window.location.origin).toString(), "_blank", "noopener,noreferrer"),
+    },
+    {
+      id: "open",
+      label: t("menu.open"),
+      icon: FolderOpenIcon,
+      onSelect: onOpen,
+    },
+    {
+      id: "download",
+      label: t("menu.download"),
+      icon: ArrowDownTrayIcon,
+      onSelect: onDownload,
+    },
+    { id: "divider-1", type: "divider" as const },
+    {
+      id: "open-source",
+      label: t("menu.openSource"),
+      onSelect: () => window.open("https://github.com/Splenworks/splensheet", "_blank", "noopener,noreferrer"),
+    },
+    { id: "version", type: "info" as const, label: `${t("menu.version")} ${APP_VERSION}.${CommitHash.substring(0, 7)}` },
+  ]), [t, onOpen, onDownload])
+
   const finishEditing = () => {
     setIsEditingName(false)
     const extDot = fileName.lastIndexOf('.')
@@ -145,6 +178,10 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
     )
   }
 
+  const MenuIcon: React.FC<{ className?: string }> = ({ className }) => {
+    return <Bars3Icon className={className} />
+  }
+
   const dividerLabel = useMemo(() => {
     const labels = [
       ...worksheets.map(({ name }) => name),
@@ -164,6 +201,16 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
     <>
       <header className="flex h-11 items-center justify-between px-2 bg-gray-200 dark:bg-neutral-800 relative">
         <div className="flex items-center space-x-2">
+          <Menu
+            items={menuItems}
+            renderTrigger={({ toggle, isOpen }) => (
+              <IconButton
+                svgIcon={MenuIcon}
+                onClick={toggle}
+                isHover={isOpen}
+              />
+            )}
+          />
           {!isCsv && (
             <select
               className="h-7 rounded border max-w-55 border-gray-300 bg-white px-1 text-xs dark:border-neutral-600 dark:bg-neutral-700 dark:text-white focus:outline-pink-900 dark:focus:outline-pink-700"

@@ -4891,6 +4891,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lucide-react@npm:^0.544.0":
+  version: 0.544.0
+  resolution: "lucide-react@npm:0.544.0"
+  peerDependencies:
+    react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10c0/2503f8cf65e62915997073b6053423bf8091b9470cb397560b417ef2f1628ea162c49e821b787cf153afb86828482d941f051c3f2aa642a1fa58c3de227e0113
+  languageName: node
+  linkType: hard
+
 "magic-string@npm:^0.25.0, magic-string@npm:^0.25.7":
   version: 0.25.9
   resolution: "magic-string@npm:0.25.9"
@@ -6178,6 +6187,7 @@ __metadata:
     hyperformula: "npm:^3.0.0"
     i18next: "npm:^23.10.1"
     i18next-browser-languagedetector: "npm:^7.2.1"
+    lucide-react: "npm:^0.544.0"
     papaparse: "npm:^5.3.0"
     prettier: "npm:^3.2.5"
     prettier-plugin-organize-imports: "npm:^4.0.0"
