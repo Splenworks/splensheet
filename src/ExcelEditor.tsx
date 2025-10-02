@@ -706,7 +706,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
                   isSelected={selectedCell?.row === rIdx && selectedCell?.col === cIdx}
                   onChange={updateCell}
                   selectCell={selectCell}
-                  isExtraColumn={cIdx >= lastNonEmptyColIndex}
                 />
               )),
             ]

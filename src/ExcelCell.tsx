@@ -16,7 +16,6 @@ interface ExcelCellProps {
   isSelected: boolean
   onChange: (r: number, c: number, cell: PartialCellObj) => void
   selectCell: (r: number, c: number) => void
-  isExtraColumn?: boolean
 }
 
 const ExcelCell: React.FC<ExcelCellProps> = ({
@@ -26,7 +25,6 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
   isSelected,
   onChange,
   selectCell,
-  isExtraColumn = false,
 }) => {
   const [editing, setEditing] = useState(false)
   const [inputValue, setInputValue] = useState("")
@@ -211,8 +209,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
       className={twMerge(
         "relative px-2 py-1 border-gray-300 dark:border-neutral-600",
         "font-normal text-base text-black dark:text-white border cursor-default",
-        isExtraColumn ? "min-w-24" : "min-w-12",
-        "-mt-px -ml-px",
+        "min-w-24 -mt-px -ml-px",
         cell?.t === "n" && "text-right",
         isSelected && "outline-2 outline-pink-900 dark:outline-pink-700 outline-offset-[-3px] z-20",
       )}
