@@ -213,8 +213,6 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
         "font-normal text-base text-black dark:text-white border cursor-default",
         isExtraColumn ? "min-w-24" : "min-w-12",
         "-mt-px -ml-px",
-        // rowIndex > 0 && "-mt-px",
-        // colIndex > 0 && "-ml-px",
         cell?.t === "n" && "text-right",
         isSelected && "outline-2 outline-pink-900 dark:outline-pink-700 outline-offset-[-3px] z-20",
       )}
