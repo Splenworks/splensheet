@@ -204,13 +204,11 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
           <Menu
             items={menuItems}
             renderTrigger={({ toggle, isOpen }) => (
-              <Tooltip text={isOpen ? "" : t("menu.menu")} place="bottom" align="left" className="rounded-full">
-                <IconButton
-                  svgIcon={MenuIcon}
-                  onClick={toggle}
-                  isHover={isOpen}
-                />
-              </Tooltip>
+              <IconButton
+                svgIcon={MenuIcon}
+                onClick={toggle}
+                isHover={isOpen}
+              />
             )}
           />
           {!isCsv && (
