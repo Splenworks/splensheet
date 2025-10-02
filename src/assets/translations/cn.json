@@ -26,10 +26,13 @@
     "fullscreen": "全屏",
     "exitFullscreen": "退出全屏",
     "toggleDarkMode": "切换深色模式",
-    "download": "下载",
+    "download": "下载"
+  },
+  "menu": {
     "menu": "菜单",
     "new": "新建",
     "open": "打开",
+    "download": "下载",
     "openSource": "开源",
     "version": "版本"
   },

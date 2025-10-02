@@ -26,10 +26,13 @@
     "fullscreen": "전체화면",
     "exitFullscreen": "전체화면 나가기",
     "toggleDarkMode": "다크 모드 전환",
-    "download": "다운로드",
+    "download": "다운로드"
+  },
+  "menu": {
     "menu": "메뉴",
     "new": "새로 만들기",
     "open": "열기",
+    "download": "다운로드",
     "openSource": "오픈 소스",
     "version": "버전"
   },

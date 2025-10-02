@@ -26,10 +26,13 @@
     "fullscreen": "Pantalla completa",
     "exitFullscreen": "Salir de pantalla completa",
     "toggleDarkMode": "Cambiar modo oscuro",
-    "download": "Descargar",
+    "download": "Descargar"
+  },
+  "menu": {
     "menu": "Menú",
     "new": "Nuevo",
     "open": "Abrir",
+    "download": "Descargar",
     "openSource": "Código abierto",
     "version": "Versión"
   },

@@ -26,10 +26,13 @@
     "fullscreen": "フルスクリーン",
     "exitFullscreen": "フルスクリーンを終了",
     "toggleDarkMode": "ダークモード切替",
-    "download": "ダウンロード",
+    "download": "ダウンロード"
+  },
+  "menu": {
     "menu": "メニュー",
     "new": "新規",
     "open": "開く",
+    "download": "ダウンロード",
     "openSource": "オープンソース",
     "version": "バージョン"
   },
