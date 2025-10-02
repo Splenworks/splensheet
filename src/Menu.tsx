@@ -69,7 +69,7 @@ const Menu: React.FC<MenuProps> = ({
       {isOpen && (
         <div
           className={twMerge(
-            "absolute z-50 mt-2 w-40 rounded-md border border-gray-200 bg-white py-2 text-sm text-black shadow-lg dark:border-neutral-700 dark:bg-neutral-800 dark:text-white",
+            "absolute z-50 mt-2 w-50 rounded-md border border-gray-200 bg-white py-2 text-sm text-black shadow-lg dark:border-neutral-700 dark:bg-neutral-800 dark:text-white",
             align === "right" ? "right-0" : "left-0",
             menuClassName,
           )}

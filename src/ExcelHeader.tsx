@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle, useMemo } from "react"
 import { ArrowDownTrayIcon, Bars3Icon, FolderOpenIcon, PlusIcon } from "@heroicons/react/24/outline"
-import { Github } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import ExpandIcon from "./assets/icons/expand.svg?react"
 import CompressIcon from "./assets/icons/compress.svg?react"
@@ -13,6 +12,7 @@ import ExcelDarkModeToggleIcon from "./ExcelDarkModeToggleIcon"
 import FindBar, { FindBarRef } from "./FindBar"
 import { twJoin } from "tailwind-merge"
 import Menu from "./Menu"
+import CommitHash from "virtual:commit-hash"
 
 interface ExcelHeaderProps {
   isFullScreen: boolean
@@ -134,10 +134,9 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
     {
       id: "open-source",
       label: t("others.openSource"),
-      icon: Github,
-      onSelect: () => window.open("https://github.com/roycejoe/splensheet", "_blank", "noopener,noreferrer"),
+      onSelect: () => window.open("https://github.com/Splenworks/splensheet", "_blank", "noopener,noreferrer"),
     },
-    { id: "version", label: t("others.version") },
+    { id: "version", label: `${t("others.version")} ${APP_VERSION}.${CommitHash.substring(0, 7)}` },
   ]), [t])
 
   const finishEditing = () => {
