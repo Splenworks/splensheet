@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 import ExpandIcon from "./assets/icons/expand.svg?react"
 import CompressIcon from "./assets/icons/compress.svg?react"
 import DownloadIcon from "./assets/icons/download.svg?react"
+import EllipsisVerticalIcon from "./assets/icons/ellipsis-vertical.svg?react"
 import IconButton from "./IconButton"
 import Tooltip from "./Tooltip"
 import { useDarkmode } from "./hooks/useDarkmode"
@@ -74,6 +75,9 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
           onClick={toggleFullScreen}
         />
       </Tooltip>
+      {/* <Tooltip text={t("others.more")} place="bottom" align="right" className="rounded-full">
+        <IconButton svgIcon={EllipsisVerticalIcon} />
+      </Tooltip> */}
     </div>
   )
 }

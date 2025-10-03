@@ -27,7 +27,8 @@
     "fullscreen": "フルスクリーン",
     "exitFullscreen": "フルスクリーンを終了",
     "toggleDarkMode": "ダークモード切替",
-    "download": "ダウンロード"
+    "download": "ダウンロード",
+    "more": "その他"
   },
   "menu": {
     "menu": "メニュー",
