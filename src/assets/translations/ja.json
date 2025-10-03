@@ -8,6 +8,7 @@
   "dragDropArea": {
     "dropHere": "ここにドロップしてください",
     "mainMessage": "ここに<u>スプレッドシート</u>ファイル（.xlsx、.xls、または .csv）をドラッグ＆ドロップしてください！",
+    "overlayMessage": "スプレッドシートをドロップして開く",
     "subMessage": "数式を編集してファイルを保存することもできます。",
     "noImageFilesFound": "スプレッドシートファイルが見つかりません。",
     "neverStoreYourData": "お客様のデータをサーバに保存することは決してありません。"

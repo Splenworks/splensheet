@@ -8,6 +8,7 @@
   "dragDropArea": {
     "dropHere": "Suelta aquí",
     "mainMessage": "¡Arrastra y suelta un archivo de <u>hoja de cálculo</u> (.xlsx, .xls o .csv) aquí!",
+    "overlayMessage": "Suelta la hoja de cálculo para abrirla",
     "subMessage": "Incluso puedes editar fórmulas y guardar tu archivo.",
     "noImageFilesFound": "No se encontraron archivos de hoja de cálculo.",
     "neverStoreYourData": "Nunca almacenamos tus archivos en nuestro servidor."

@@ -8,6 +8,7 @@
   "dragDropArea": {
     "dropHere": "Drop here",
     "mainMessage": "Drag and drop a <u>spreadsheet</u> file (.xlsx, .xls or .csv) here!",
+    "overlayMessage": "Drop spreadsheet to open",
     "subMessage": "You can even edit formulars and save your file.",
     "noImageFilesFound": "No spreadsheet files found.",
     "neverStoreYourData": "We never store your files on our server."

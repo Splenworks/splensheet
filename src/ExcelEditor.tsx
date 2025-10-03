@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next"
 import { loadWorkbook } from "./utils/loadWorkbook"
 import SpinnerOverlay from "./SpinnerOverlay"
 import SheetGrid from "./SheetGrid"
+import FileDropOverlay from "./FileDropOverlay"
 
 const EXTRA_ROWS = 20
 const EXTRA_COLS = 20
@@ -129,16 +130,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     input.click()
   }, [])
 
-  const handleFileInputChange = useCallback(async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const input = event.target
-    const file = input.files?.[0]
-    if (!file) {
-      input.value = ""
-      return
-    }
-
+  const processFile = useCallback(async (file: File) => {
     setIsLoadingFile(true)
 
     try {
@@ -166,9 +158,25 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       onWorkbookChange?.(nextWorkbook)
     } finally {
       setIsLoadingFile(false)
-      input.value = ""
     }
   }, [onWorkbookChange, onFileNameChange, onHasChangesChange])
+
+  const handleFileInputChange = useCallback(async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const input = event.target
+    const file = input.files?.[0]
+    if (!file) {
+      input.value = ""
+      return
+    }
+
+    try {
+      await processFile(file)
+    } finally {
+      input.value = ""
+    }
+  }, [processFile])
 
   const getCellValue = useCallback((c: PartialCellObj | undefined) => {
     if (!c || c.v === undefined) return ""
@@ -624,7 +632,11 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-white dark:bg-neutral-900">
+    <FileDropOverlay
+      className="fixed inset-0 flex flex-col bg-white dark:bg-neutral-900"
+      onFileDrop={processFile}
+      overlayMessage={t("dragDropArea.overlayMessage", { defaultValue: "Drop spreadsheet to open" })}
+    >
       <input
         ref={fileInputRef}
         type="file"
@@ -670,7 +682,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         parentRef={parentRef}
         gridRef={gridRef}
       />
-    </div>
+    </FileDropOverlay>
   )
 }
 

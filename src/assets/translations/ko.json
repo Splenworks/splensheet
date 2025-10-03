@@ -8,6 +8,7 @@
   "dragDropArea": {
     "dropHere": "여기에 드롭하세요",
     "mainMessage": "여기에 <u>스프레드시트</u> 파일(.xlsx, .xls 또는 .csv)을 드래그 앤 드롭하세요!",
+    "overlayMessage": "스프레드시트를 놓으면 열립니다",
     "subMessage": "수식도 편집하고 파일을 저장할 수 있어요.",
     "noImageFilesFound": "스프레드시트 파일을 찾을 수 없습니다.",
     "neverStoreYourData": "저희는 절대로 파일 정보를 서버에 저장하지 않습니다."
