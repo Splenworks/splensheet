@@ -12,7 +12,15 @@ export default defineConfig({
     tailwindcss(),
     svgr(),
     CommitHashPlugin({ noPrefix: false, noVirtual: false }),
-    VitePWA({ registerType: "autoUpdate" }),
+    VitePWA({
+      registerType: "autoUpdate",
+      strategies: "injectManifest",
+      srcDir: "src",
+      filename: "sw.js",
+      injectManifest: {
+        swSrc: "src/sw.ts",
+      },
+    }),
   ],
   define: {
     APP_VERSION: JSON.stringify(process.env.npm_package_version),
