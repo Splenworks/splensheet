@@ -17,7 +17,6 @@ import CommitHash from "virtual:commit-hash"
 interface ExcelHeaderProps {
   isFullScreen: boolean
   toggleFullScreen: () => void
-  onClose: () => void
   fileName: string
   onFileNameChange?: (val: string) => void
   worksheets: Array<{
@@ -47,7 +46,6 @@ export interface ExcelHeaderRef {
 const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
   isFullScreen,
   toggleFullScreen,
-  onClose,
   fileName,
   onFileNameChange,
   worksheets,
@@ -294,6 +292,7 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
           <Tooltip
             text={isFullScreen ? t("others.exitFullscreen") : t("others.fullscreen")}
             place="bottom"
+            align="right"
             className="rounded-full"
           >
             <IconButton
@@ -301,12 +300,12 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
               onClick={toggleFullScreen}
             />
           </Tooltip>
-          <Tooltip text={t("others.exit")} place="bottom" align="right" className="rounded-full">
+          {/* <Tooltip text={t("others.exit")} place="bottom" align="right" className="rounded-full">
             <IconButton
               svgIcon={XmarkIcon}
               onClick={onClose}
             />
-          </Tooltip>
+          </Tooltip> */}
         </div>
       </header>
     </>

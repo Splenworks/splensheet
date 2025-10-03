@@ -22,7 +22,6 @@ const MAX_COLS = getMaxColumnIndex()
 interface ExcelEditorProps {
   workbook: WorkBook
   fileName: string
-  onClose: () => void
   onWorkbookChange?: (workbook: WorkBook) => void
   initialHasChanges?: boolean
   onHasChangesChange?: (hasChanges: boolean) => void
@@ -32,7 +31,6 @@ interface ExcelEditorProps {
 const ExcelEditor: React.FC<ExcelEditorProps> = ({
   workbook,
   fileName,
-  onClose,
   onWorkbookChange,
   initialHasChanges = false,
   onHasChangesChange,
@@ -560,7 +558,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   }, [
     isFullScreen,
     toggleFullScreen,
-    onClose,
     handleUndo,
     handleRedo,
     handleFindNext,
@@ -640,7 +637,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         toggleFullScreen={toggleFullScreen}
         fileName={fileName}
         onFileNameChange={onFileNameChange}
-        onClose={onClose}
         worksheets={sheets.map((ws) => ({ id: ws.id, name: ws.name }))}
         activeSheetIndex={activeSheetIndex}
         setActiveSheetIndex={setActiveSheetIndex}
