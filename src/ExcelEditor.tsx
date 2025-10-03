@@ -13,6 +13,7 @@ import { PartialCellObj, SheetData } from "./types"
 import { getMaxColumnIndex, indexToColumnName } from "./utils/columnUtils"
 import { useTranslation } from "react-i18next"
 import { loadWorkbook } from "./utils/loadWorkbook"
+import SpinnerOverlay from "./SpinnerOverlay"
 
 const EXTRA_ROWS = 20
 const EXTRA_COLS = 20
@@ -51,6 +52,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null)
   const [findQuery, setFindQuery] = useState("")
   const [findIndex, setFindIndex] = useState(-1)
+  const [isLoadingFile, setIsLoadingFile] = useState(false)
   const headerRef = useRef<ExcelHeaderRef>(null)
   const activeSheet = sheets[activeSheetIndex]
   const activeDataRef = useRef(activeSheet.data)
@@ -132,8 +134,14 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   const handleFileInputChange = useCallback(async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const file = event.target.files?.[0]
-    if (!file) return
+    const input = event.target
+    const file = input.files?.[0]
+    if (!file) {
+      input.value = ""
+      return
+    }
+
+    setIsLoadingFile(true)
 
     try {
       const nextWorkbook = await loadWorkbook(file)
@@ -159,7 +167,8 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       onHasChangesChange?.(false)
       onWorkbookChange?.(nextWorkbook)
     } finally {
-      event.target.value = ""
+      setIsLoadingFile(false)
+      input.value = ""
     }
   }, [onWorkbookChange, onFileNameChange, onHasChangesChange])
 
@@ -648,6 +657,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         findMatchIndex={findIndex}
         findMatchCount={findMatches.length}
       />
+      <SpinnerOverlay visible={isLoadingFile} />
       <div ref={parentRef} className="flex-1 overflow-x-scroll overflow-y-scroll">
         <div
           ref={gridRef}
