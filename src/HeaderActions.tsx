@@ -56,7 +56,7 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
           />
         </Tooltip>
       )}
-      <Tooltip text={t("others.toggleDarkMode")} place="bottom" className="rounded-full">
+      <Tooltip text={t("others.toggleDarkMode")} place="bottom" align="right" className="rounded-full">
         <IconButton
           svgIcon={DarkModeToggleIcon}
           onClick={toggleDarkMode}
