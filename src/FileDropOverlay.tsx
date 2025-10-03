@@ -116,8 +116,8 @@ const FileDropOverlay: React.FC<FileDropOverlayProps> = ({
     >
       {children}
       {isDragActive && (
-        <div className="pointer-events-none fixed inset-0 z-40 flex items-center justify-center bg-white/80 dark:bg-neutral-900/80">
-          <div className="rounded-xl border-4 border-dashed border-pink-900 bg-white/90 px-8 py-6 text-center text-xl font-semibold text-black shadow-lg dark:border-pink-700 dark:bg-neutral-900/90 dark:text-white">
+        <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-white/80 dark:bg-neutral-900/80">
+          <div className="rounded-xl border-4 border-dashed border-pink-900 bg-white/90 px-8 py-6 text-center text-xl tracking-wide font-semibold text-black shadow-lg dark:border-pink-700 dark:bg-neutral-900/90 dark:text-white">
             {overlayMessage}
           </div>
         </div>
