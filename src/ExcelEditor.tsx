@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { useVirtualizer } from "@tanstack/react-virtual"
-import ExcelCell from "./ExcelCell"
 import ExcelHeader, { ExcelHeaderRef } from "./ExcelHeader"
 import { useFullScreen } from "./hooks/useFullScreen"
 import { writeFile, utils } from "xlsx"
@@ -10,10 +9,11 @@ import { sheetToData, dataToSheet } from "./utils/xlsx"
 import { isMac } from "./utils/isMac"
 import { getLastNonEmptyRow, getLastNonEmptyCol } from "./utils/sheetStats"
 import { PartialCellObj, SheetData } from "./types"
-import { getMaxColumnIndex, indexToColumnName } from "./utils/columnUtils"
+import { getMaxColumnIndex } from "./utils/columnUtils"
 import { useTranslation } from "react-i18next"
 import { loadWorkbook } from "./utils/loadWorkbook"
 import SpinnerOverlay from "./SpinnerOverlay"
+import SheetGrid from "./SheetGrid"
 
 const EXTRA_ROWS = 20
 const EXTRA_COLS = 20
@@ -605,11 +605,12 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     onWorkbookChange?.(workbook)
   }, [sheets, activeSheetIndex, workbook, onWorkbookChange])
 
-  const virtualRows = useVirtual ? rowVirtualizer.getVirtualItems() : []
-  const paddingTop = useVirtual && virtualRows.length > 0 ? virtualRows[0].start : 0
-  const paddingBottom = useVirtual && virtualRows.length > 0
+  const virtualRows = useVirtual ? rowVirtualizer.getVirtualItems() : undefined
+  const paddingTop = useVirtual && virtualRows && virtualRows.length > 0 ? virtualRows[0].start : 0
+  const paddingBottom = useVirtual && virtualRows && virtualRows.length > 0
     ? rowVirtualizer.getTotalSize() - virtualRows[virtualRows.length - 1].end
     : 0
+  const gridHeight = useVirtual ? rowVirtualizer.getTotalSize() + 32 : undefined
 
   const handleDownload = () => {
     sheets.forEach((sd, idx) => {
@@ -654,75 +655,21 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         findMatchCount={findMatches.length}
       />
       <SpinnerOverlay visible={isLoadingFile} />
-      <div ref={parentRef} className="flex-1 overflow-x-scroll overflow-y-scroll">
-        <div
-          ref={gridRef}
-          className="min-w-max text-sm grid"
-          style={{
-            gridTemplateColumns: `minmax(3rem, max-content) repeat(${colCount}, minmax(3rem, max-content))`,
-            height: useVirtual ? rowVirtualizer.getTotalSize() + 32 : undefined,
-          }}
-        >
-          {/* Corner cell (top-left) */}
-          <div
-            key={`corner`}
-            className={
-              "sticky top-0 left-0 z-40 bg-gray-100 dark:bg-neutral-800 " +
-              "px-2 h-8 flex items-center justify-center " +
-              "border border-gray-300 dark:border-neutral-600 text-black dark:text-white"
-            }
-          />
-          {/* Sticky Column Header Row */}
-          {Array.from({ length: colCount }).map((_, cIdx) => (
-            <div
-              key={`header-${cIdx}`}
-              className={
-                "sticky top-0 z-30 bg-gray-100 dark:bg-neutral-800 " +
-                "px-2 h-8 flex items-center justify-center -ml-px " +
-                "border border-gray-300 dark:border-neutral-600 text-black dark:text-white"
-              }
-            >
-              {indexToColumnName(cIdx)}
-            </div>
-          ))}
-          {useVirtual && paddingTop > 0 && (
-            <div
-              style={{ height: paddingTop, gridColumn: `1 / span ${colCount + 1}` }}
-            />
-          )}
-          {(useVirtual ? virtualRows.map(v => v.index) : Array.from({ length: rowCount }, (_, i) => i)).map((rIdx) => {
-            const rowData = activeSheet.data[rIdx] || []
-            return [
-              <div
-                key={`rowheader-${rIdx}`}
-                className={
-                  "sticky left-0 z-30 bg-gray-100 dark:bg-neutral-800 " +
-                  "px-2 flex items-center justify-center -mt-px " +
-                  "border border-gray-300 dark:border-neutral-600 text-black dark:text-white"
-                }
-              >
-                {rIdx + 1}
-              </div>,
-              ...Array.from({ length: colCount }).map((_, cIdx) => (
-                <ExcelCell
-                  key={`${rIdx}-${cIdx}`}
-                  rowIndex={rIdx}
-                  colIndex={cIdx}
-                  cell={rowData[cIdx]}
-                  isSelected={selectedCell?.row === rIdx && selectedCell?.col === cIdx}
-                  onChange={updateCell}
-                  selectCell={selectCell}
-                />
-              )),
-            ]
-          })}
-          {useVirtual && paddingBottom > 0 && (
-            <div
-              style={{ height: paddingBottom, gridColumn: `1 / span ${colCount + 1}` }}
-            />
-          )}
-        </div>
-      </div>
+      <SheetGrid
+        data={activeSheet.data}
+        colCount={colCount}
+        rowCount={rowCount}
+        selectedCell={selectedCell}
+        selectCell={selectCell}
+        updateCell={updateCell}
+        useVirtual={useVirtual}
+        virtualRows={virtualRows}
+        paddingTop={paddingTop}
+        paddingBottom={paddingBottom}
+        totalHeight={gridHeight}
+        parentRef={parentRef}
+        gridRef={gridRef}
+      />
     </div>
   )
 }
