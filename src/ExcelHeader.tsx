@@ -1,17 +1,9 @@
-import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react"
-import { useTranslation } from "react-i18next"
-import ExpandIcon from "./assets/icons/expand.svg?react"
-import CompressIcon from "./assets/icons/compress.svg?react"
-import DownloadIcon from "./assets/icons/download.svg?react"
-import IconButton from "./IconButton"
-import Tooltip from "./Tooltip"
-import { useDarkmode } from "./hooks/useDarkmode"
-import ExcelDarkModeToggleIcon from "./ExcelDarkModeToggleIcon"
+import React, { useRef, forwardRef, useImperativeHandle } from "react"
 import FindBar, { FindBarRef } from "./FindBar"
-import { twJoin } from "tailwind-merge"
 import HeaderMenu from "./HeaderMenu"
 import WorksheetSelector from "./WorksheetSelector"
 import FileNameEditor from "./FileNameEditor"
+import HeaderActions from "./HeaderActions"
 
 interface ExcelHeaderProps {
   isFullScreen: boolean
@@ -63,34 +55,14 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
   findMatchIndex = 0,
   findMatchCount = 0,
 }, ref) => {
-  const { t } = useTranslation()
-  const { darkMode, toggleDarkMode } = useDarkmode()
   const isCsv = fileName.toLowerCase().endsWith('.csv')
   const findBarRef = useRef<FindBarRef>(null)
-  const [showBounce, setShowBounce] = useState(false)
 
   useImperativeHandle(ref, () => ({
     focusFind: () => {
       findBarRef.current?.focus()
     }
   }), [])
-
-  useEffect(() => {
-    if (hasChanges) {
-      setShowBounce(true)
-      const timer = setTimeout(() => setShowBounce(false), 5000)
-      return () => clearTimeout(timer)
-    }
-  }, [hasChanges])
-
-  const DarkModeToggleIcon: React.FC<{ className?: string }> = ({ className }) => {
-    return (
-      <ExcelDarkModeToggleIcon
-        darkMode={darkMode}
-        className={`text-black dark:text-white ${className}`}
-      />
-    )
-  }
 
   return (
     <>
@@ -120,35 +92,12 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
         <div className="hidden md:block absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-hidden text-center text-base font-medium text-black dark:text-white">
           <FileNameEditor fileName={fileName} onFileNameChange={onFileNameChange} />
         </div>
-        <div className="flex items-center space-x-2">
-          {hasChanges && (
-            <Tooltip text={t("others.download")} place="bottom" className="rounded-full">
-              <IconButton
-                svgIcon={DownloadIcon}
-                onClick={onDownload}
-                className={twJoin(showBounce && "animate-bounce hover:animate-none")}
-              />
-            </Tooltip>
-          )}
-          <Tooltip text={t("others.toggleDarkMode")} place="bottom" className="rounded-full">
-            <IconButton
-              svgIcon={DarkModeToggleIcon}
-              onClick={toggleDarkMode}
-              className="text-black"
-            />
-          </Tooltip>
-          <Tooltip
-            text={isFullScreen ? t("others.exitFullscreen") : t("others.fullscreen")}
-            place="bottom"
-            align="right"
-            className="rounded-full"
-          >
-            <IconButton
-              svgIcon={isFullScreen ? CompressIcon : ExpandIcon}
-              onClick={toggleFullScreen}
-            />
-          </Tooltip>
-        </div>
+        <HeaderActions
+          hasChanges={hasChanges}
+          onDownload={onDownload}
+          isFullScreen={isFullScreen}
+          toggleFullScreen={toggleFullScreen}
+        />
       </header>
     </>
   )
