@@ -5,7 +5,7 @@ import WorksheetSelector from "./WorksheetSelector"
 import FileNameEditor from "./FileNameEditor"
 import HeaderActions from "./HeaderActions"
 
-interface ExcelHeaderProps {
+interface HeaderProps {
   isFullScreen: boolean
   toggleFullScreen: () => void
   fileName: string
@@ -30,11 +30,11 @@ interface ExcelHeaderProps {
   findMatchCount?: number
 }
 
-export interface ExcelHeaderRef {
+export interface HeaderRef {
   focusFind: () => void
 }
 
-const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
+const Header = forwardRef<HeaderRef, HeaderProps>(({
   isFullScreen,
   toggleFullScreen,
   fileName,
@@ -103,6 +103,6 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
   )
 })
 
-ExcelHeader.displayName = 'ExcelHeader'
+Header.displayName = 'Header'
 
-export default ExcelHeader
+export default Header
