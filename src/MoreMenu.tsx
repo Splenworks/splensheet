@@ -1,11 +1,14 @@
-import React, { useMemo, useCallback } from "react"
+import React, { useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import ExpandIcon from "./assets/icons/expand.svg?react"
-import CompressIcon from "./assets/icons/compress.svg?react"
-import EllipsisVerticalIcon from "./assets/icons/ellipsis-vertical.svg?react"
+import {
+  ArrowsPointingInIcon,
+  ArrowsPointingOutIcon,
+  EllipsisVerticalIcon,
+  MoonIcon,
+  SunIcon,
+} from "@heroicons/react/24/outline"
 import IconButton from "./IconButton"
 import Menu from "./Menu"
-import ExcelDarkModeToggleIcon from "./ExcelDarkModeToggleIcon"
 import { useDarkmode } from "./hooks/useDarkmode"
 
 interface MoreMenuProps {
@@ -15,28 +18,23 @@ interface MoreMenuProps {
 const MoreMenu: React.FC<MoreMenuProps> = ({ isFullScreen }) => {
   const { t } = useTranslation()
   const { darkMode } = useDarkmode()
-  const zeroMarginStyle = useMemo(() => ({ margin: 0 }), [])
 
-  const DarkModeToggleIcon = useCallback(({ className }: { className?: string }) => (
-    <ExcelDarkModeToggleIcon
-      darkMode={darkMode}
-      className={`text-black dark:text-white ${className ?? ""}`}
-      style={zeroMarginStyle}
-    />
-  ), [darkMode, zeroMarginStyle])
+  const TriggerIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <EllipsisVerticalIcon className={className} />
+  )
 
   const menuItems = useMemo(() => ([
     {
       id: "toggle-fullscreen",
       label: t("others.toggleFullscreen", { defaultValue: "Toggle Fullscreen" }),
-      icon: isFullScreen ? CompressIcon : ExpandIcon,
+      icon: isFullScreen ? ArrowsPointingInIcon : ArrowsPointingOutIcon,
     },
     {
       id: "toggle-darkmode",
       label: t("others.toggleDarkMode", { defaultValue: "Toggle Darkmode" }),
-      icon: DarkModeToggleIcon,
+      icon: darkMode ? SunIcon : MoonIcon,
     },
-  ]), [t, isFullScreen, DarkModeToggleIcon])
+  ]), [t, isFullScreen, darkMode])
 
   return (
     <Menu
@@ -44,7 +42,7 @@ const MoreMenu: React.FC<MoreMenuProps> = ({ isFullScreen }) => {
       align="right"
       renderTrigger={({ toggle, isOpen }) => (
         <IconButton
-          svgIcon={EllipsisVerticalIcon}
+          svgIcon={TriggerIcon}
           onClick={toggle}
           isHover={isOpen}
         />
