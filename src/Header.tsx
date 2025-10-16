@@ -100,7 +100,10 @@ const Header = forwardRef<HeaderRef, HeaderProps>(({
             isFullScreen={isFullScreen}
             toggleFullScreen={toggleFullScreen}
           />
-          <MoreMenu isFullScreen={isFullScreen} />
+          <MoreMenu
+            isFullScreen={isFullScreen}
+            toggleFullScreen={toggleFullScreen}
+          />
         </div>
       </header>
     </>

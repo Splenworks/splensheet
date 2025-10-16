@@ -13,11 +13,12 @@ import { useDarkmode } from "./hooks/useDarkmode"
 
 interface MoreMenuProps {
   isFullScreen: boolean
+  toggleFullScreen: () => void
 }
 
-const MoreMenu: React.FC<MoreMenuProps> = ({ isFullScreen }) => {
+const MoreMenu: React.FC<MoreMenuProps> = ({ isFullScreen, toggleFullScreen }) => {
   const { t } = useTranslation()
-  const { darkMode } = useDarkmode()
+  const { darkMode, toggleDarkMode } = useDarkmode()
 
   const TriggerIcon: React.FC<{ className?: string }> = ({ className }) => (
     <EllipsisVerticalIcon className={className} />
@@ -28,13 +29,15 @@ const MoreMenu: React.FC<MoreMenuProps> = ({ isFullScreen }) => {
       id: "toggle-fullscreen",
       label: t("others.toggleFullscreen", { defaultValue: "Toggle Fullscreen" }),
       icon: isFullScreen ? ArrowsPointingInIcon : ArrowsPointingOutIcon,
+      onSelect: toggleFullScreen,
     },
     {
       id: "toggle-darkmode",
       label: t("others.toggleDarkMode", { defaultValue: "Toggle Darkmode" }),
       icon: darkMode ? SunIcon : MoonIcon,
+      onSelect: toggleDarkMode,
     },
-  ]), [t, isFullScreen, darkMode])
+  ]), [t, isFullScreen, darkMode, toggleFullScreen, toggleDarkMode])
 
   return (
     <Menu
