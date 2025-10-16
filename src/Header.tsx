@@ -93,12 +93,12 @@ const Header = forwardRef<HeaderRef, HeaderProps>(({
             matchIndex={findMatchIndex}
             matchCount={findMatchCount}
           />
-          <HeaderActions
+          {/* <HeaderActions
             hasChanges={hasChanges}
             onDownload={onDownload}
             isFullScreen={isFullScreen}
             toggleFullScreen={toggleFullScreen}
-          />
+          /> */}
         </div>
       </header>
     </>
