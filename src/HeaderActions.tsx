@@ -75,9 +75,9 @@ const HeaderActions: React.FC<HeaderActionsProps> = ({
           onClick={toggleFullScreen}
         />
       </Tooltip>
-      {/* <Tooltip text={t("others.more")} place="bottom" align="right" className="rounded-full">
+      <Tooltip text={t("others.more")} place="bottom" align="right" className="rounded-full">
         <IconButton svgIcon={EllipsisVerticalIcon} />
-      </Tooltip> */}
+      </Tooltip>
     </div>
   )
 }
