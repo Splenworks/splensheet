@@ -1,10 +1,14 @@
-import React, { useRef, forwardRef, useImperativeHandle } from "react"
+import { useRef, forwardRef, useImperativeHandle, useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 import FindBar, { FindBarRef } from "./FindBar"
 import HeaderMenu from "./HeaderMenu"
 import WorksheetSelector from "./WorksheetSelector"
 import FileNameEditor from "./FileNameEditor"
-import HeaderActions from "./HeaderActions"
 import MoreMenu from "./MoreMenu"
+import IconButton from "./IconButton"
+import Tooltip from "./Tooltip"
+import DownloadIcon from "./assets/icons/download.svg?react"
+import { twJoin } from "tailwind-merge"
 
 interface HeaderProps {
   isFullScreen: boolean
@@ -56,6 +60,8 @@ const Header = forwardRef<HeaderRef, HeaderProps>(({
   findMatchIndex = 0,
   findMatchCount = 0,
 }, ref) => {
+  const { t } = useTranslation()
+  const [showBounce, setShowBounce] = useState(false)
   const isCsv = fileName.toLowerCase().endsWith('.csv')
   const findBarRef = useRef<FindBarRef>(null)
 
@@ -64,6 +70,18 @@ const Header = forwardRef<HeaderRef, HeaderProps>(({
       findBarRef.current?.focus()
     }
   }), [])
+
+  useEffect(() => {
+    if (!hasChanges) {
+      setShowBounce(false)
+      return
+    }
+
+    setShowBounce(true)
+    const timer = setTimeout(() => setShowBounce(false), 5000)
+
+    return () => clearTimeout(timer)
+  }, [hasChanges])
 
   return (
     <>
@@ -94,12 +112,17 @@ const Header = forwardRef<HeaderRef, HeaderProps>(({
             matchIndex={findMatchIndex}
             matchCount={findMatchCount}
           />
-          <HeaderActions
-            hasChanges={hasChanges}
-            onDownload={onDownload}
-            isFullScreen={isFullScreen}
-            toggleFullScreen={toggleFullScreen}
-          />
+          <div className="flex items-center space-x-2">
+            {hasChanges && (
+              <Tooltip text={t("others.download")} place="bottom" className="rounded-full">
+                <IconButton
+                  svgIcon={DownloadIcon}
+                  onClick={onDownload}
+                  className={twJoin(showBounce && "animate-bounce hover:animate-none")}
+                />
+              </Tooltip>
+            )}
+          </div>
           <MoreMenu
             isFullScreen={isFullScreen}
             toggleFullScreen={toggleFullScreen}
