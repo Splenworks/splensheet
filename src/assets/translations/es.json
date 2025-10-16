@@ -26,6 +26,7 @@
     "exit": "Salir",
     "fullscreen": "Pantalla completa",
     "exitFullscreen": "Salir de pantalla completa",
+    "toggleFullscreen": "Cambiar pantalla completa",
     "toggleDarkMode": "Cambiar modo oscuro",
     "download": "Descargar",
     "more": "Más"

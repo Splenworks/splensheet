@@ -4,6 +4,7 @@ import HeaderMenu from "./HeaderMenu"
 import WorksheetSelector from "./WorksheetSelector"
 import FileNameEditor from "./FileNameEditor"
 import HeaderActions from "./HeaderActions"
+import MoreMenu from "./MoreMenu"
 
 interface HeaderProps {
   isFullScreen: boolean
@@ -93,12 +94,13 @@ const Header = forwardRef<HeaderRef, HeaderProps>(({
             matchIndex={findMatchIndex}
             matchCount={findMatchCount}
           />
-          {/* <HeaderActions
+          <HeaderActions
             hasChanges={hasChanges}
             onDownload={onDownload}
             isFullScreen={isFullScreen}
             toggleFullScreen={toggleFullScreen}
-          /> */}
+          />
+          <MoreMenu />
         </div>
       </header>
     </>
