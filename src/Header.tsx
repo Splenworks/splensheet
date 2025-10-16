@@ -79,6 +79,11 @@ const Header = forwardRef<HeaderRef, HeaderProps>(({
               onDeleteSheet={onDeleteSheet}
             />
           )}
+        </div>
+        <div className="hidden md:block absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-hidden text-center text-base font-medium text-black dark:text-white">
+          <FileNameEditor fileName={fileName} onFileNameChange={onFileNameChange} />
+        </div>
+        <div className="flex items-center space-x-2">
           <FindBar
             ref={findBarRef}
             query={findQuery}
@@ -88,16 +93,13 @@ const Header = forwardRef<HeaderRef, HeaderProps>(({
             matchIndex={findMatchIndex}
             matchCount={findMatchCount}
           />
+          <HeaderActions
+            hasChanges={hasChanges}
+            onDownload={onDownload}
+            isFullScreen={isFullScreen}
+            toggleFullScreen={toggleFullScreen}
+          />
         </div>
-        <div className="hidden md:block absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-hidden text-center text-base font-medium text-black dark:text-white">
-          <FileNameEditor fileName={fileName} onFileNameChange={onFileNameChange} />
-        </div>
-        <HeaderActions
-          hasChanges={hasChanges}
-          onDownload={onDownload}
-          isFullScreen={isFullScreen}
-          toggleFullScreen={toggleFullScreen}
-        />
       </header>
     </>
   )
