@@ -5,7 +5,7 @@ import Menu from "./Menu"
 import IconButton from "./IconButton"
 import CommitHash from "virtual:commit-hash"
 
-interface HeaderMenuProps {
+interface FileMenuProps {
   onOpen?: () => void
   onDownload?: () => void
 }
@@ -14,7 +14,7 @@ const MenuIcon: React.FC<{ className?: string }> = ({ className }) => (
   <Bars3Icon className={className} />
 )
 
-const HeaderMenu: React.FC<HeaderMenuProps> = ({ onOpen, onDownload }) => {
+const FileMenu: React.FC<FileMenuProps> = ({ onOpen, onDownload }) => {
   const { t } = useTranslation()
 
   const menuItems = useMemo(() => ([
@@ -59,4 +59,4 @@ const HeaderMenu: React.FC<HeaderMenuProps> = ({ onOpen, onDownload }) => {
   )
 }
 
-export default HeaderMenu
+export default FileMenu

@@ -1,7 +1,7 @@
 import { useRef, forwardRef, useImperativeHandle, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import FindBar, { FindBarRef } from "./FindBar"
-import HeaderMenu from "./HeaderMenu"
+import FileMenu from "./FileMenu"
 import WorksheetSelector from "./WorksheetSelector"
 import FileNameEditor from "./FileNameEditor"
 import MoreMenu from "./MoreMenu"
@@ -87,7 +87,7 @@ const Header = forwardRef<HeaderRef, HeaderProps>(({
     <>
       <header className="flex h-11 items-center justify-between px-2 bg-gray-200 dark:bg-neutral-800 relative">
         <div className="flex items-center space-x-2">
-          <HeaderMenu onOpen={onOpen} onDownload={onDownload} />
+          <FileMenu onOpen={onOpen} onDownload={onDownload} />
           {!isCsv && (
             <WorksheetSelector
               worksheets={worksheets}
