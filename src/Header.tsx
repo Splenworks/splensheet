@@ -1,11 +1,16 @@
-import React, { useRef, forwardRef, useImperativeHandle } from "react"
+import { useRef, forwardRef, useImperativeHandle, useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 import FindBar, { FindBarRef } from "./FindBar"
 import HeaderMenu from "./HeaderMenu"
 import WorksheetSelector from "./WorksheetSelector"
 import FileNameEditor from "./FileNameEditor"
-import HeaderActions from "./HeaderActions"
+import MoreMenu from "./MoreMenu"
+import IconButton from "./IconButton"
+import Tooltip from "./Tooltip"
+import DownloadIcon from "./assets/icons/download.svg?react"
+import { twJoin } from "tailwind-merge"
 
-interface ExcelHeaderProps {
+interface HeaderProps {
   isFullScreen: boolean
   toggleFullScreen: () => void
   fileName: string
@@ -30,11 +35,11 @@ interface ExcelHeaderProps {
   findMatchCount?: number
 }
 
-export interface ExcelHeaderRef {
+export interface HeaderRef {
   focusFind: () => void
 }
 
-const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
+const Header = forwardRef<HeaderRef, HeaderProps>(({
   isFullScreen,
   toggleFullScreen,
   fileName,
@@ -55,6 +60,8 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
   findMatchIndex = 0,
   findMatchCount = 0,
 }, ref) => {
+  const { t } = useTranslation()
+  const [showBounce, setShowBounce] = useState(false)
   const isCsv = fileName.toLowerCase().endsWith('.csv')
   const findBarRef = useRef<FindBarRef>(null)
 
@@ -63,6 +70,18 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
       findBarRef.current?.focus()
     }
   }), [])
+
+  useEffect(() => {
+    if (!hasChanges) {
+      setShowBounce(false)
+      return
+    }
+
+    setShowBounce(true)
+    const timer = setTimeout(() => setShowBounce(false), 5000)
+
+    return () => clearTimeout(timer)
+  }, [hasChanges])
 
   return (
     <>
@@ -79,6 +98,11 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
               onDeleteSheet={onDeleteSheet}
             />
           )}
+        </div>
+        <div className="hidden md:block absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-hidden text-center text-base font-medium text-black dark:text-white">
+          <FileNameEditor fileName={fileName} onFileNameChange={onFileNameChange} />
+        </div>
+        <div className="flex items-center space-x-2">
           <FindBar
             ref={findBarRef}
             query={findQuery}
@@ -88,21 +112,27 @@ const ExcelHeader = forwardRef<ExcelHeaderRef, ExcelHeaderProps>(({
             matchIndex={findMatchIndex}
             matchCount={findMatchCount}
           />
+          <div className="flex items-center space-x-2">
+            {hasChanges && (
+              <Tooltip text={t("others.download")} place="bottom" className="rounded-full">
+                <IconButton
+                  svgIcon={DownloadIcon}
+                  onClick={onDownload}
+                  className={twJoin(showBounce && "animate-bounce hover:animate-none")}
+                />
+              </Tooltip>
+            )}
+          </div>
+          <MoreMenu
+            isFullScreen={isFullScreen}
+            toggleFullScreen={toggleFullScreen}
+          />
         </div>
-        <div className="hidden md:block absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-hidden text-center text-base font-medium text-black dark:text-white">
-          <FileNameEditor fileName={fileName} onFileNameChange={onFileNameChange} />
-        </div>
-        <HeaderActions
-          hasChanges={hasChanges}
-          onDownload={onDownload}
-          isFullScreen={isFullScreen}
-          toggleFullScreen={toggleFullScreen}
-        />
       </header>
     </>
   )
 })
 
-ExcelHeader.displayName = 'ExcelHeader'
+Header.displayName = 'Header'
 
-export default ExcelHeader
+export default Header

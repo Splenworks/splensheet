@@ -1,12 +1,17 @@
 import DarkModeSwitchIcon from "./DarkModeSwitchIcon"
-import { useState } from "react"
+import { useState, type CSSProperties } from "react"
 
 interface ExcelDarkModeToggleIconProps {
   darkMode: boolean
   className?: string
+  style?: CSSProperties
 }
 
-const ExcelDarkModeToggleIcon: React.FC<ExcelDarkModeToggleIconProps> = ({ darkMode, className }) => {
+const ExcelDarkModeToggleIcon: React.FC<ExcelDarkModeToggleIconProps> = ({
+  darkMode,
+  className,
+  style,
+}) => {
   const [hovered, setHovered] = useState(false)
   return (
     <div
@@ -18,6 +23,7 @@ const ExcelDarkModeToggleIcon: React.FC<ExcelDarkModeToggleIconProps> = ({ darkM
         sunColor={hovered ? "white" : "#E5E7EB"} // white on hover, gray-200 otherwise
         moonColor="white"
         size={16}
+        style={style}
         className={className}
       />
     </div>

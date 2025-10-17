@@ -26,6 +26,7 @@
     "exit": "退出",
     "fullscreen": "全屏",
     "exitFullscreen": "退出全屏",
+    "toggleFullscreen": "切换全屏",
     "toggleDarkMode": "切换深色模式",
     "download": "下载",
     "more": "更多"

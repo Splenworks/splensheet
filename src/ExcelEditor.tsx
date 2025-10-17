@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { useVirtualizer } from "@tanstack/react-virtual"
-import ExcelHeader, { ExcelHeaderRef } from "./ExcelHeader"
+import Header, { HeaderRef } from "./Header"
 import { useFullScreen } from "./hooks/useFullScreen"
 import { writeFile, utils } from "xlsx"
 import type { WorkBook } from "xlsx"
@@ -52,7 +52,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   const [findQuery, setFindQuery] = useState("")
   const [findIndex, setFindIndex] = useState(-1)
   const [isLoadingFile, setIsLoadingFile] = useState(false)
-  const headerRef = useRef<ExcelHeaderRef>(null)
+  const headerRef = useRef<HeaderRef>(null)
   const activeSheet = sheets[activeSheetIndex]
   const activeDataRef = useRef(activeSheet.data)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -644,7 +644,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         className="hidden"
         onChange={handleFileInputChange}
       />
-      <ExcelHeader
+      <Header
         ref={headerRef}
         isFullScreen={isFullScreen}
         toggleFullScreen={toggleFullScreen}

@@ -1,3 +1,4 @@
+import { useMemo, type CSSProperties } from "react"
 import { DarkModeSwitch as Icon } from "react-toggle-dark-mode"
 
 interface DarkModeSwitchIconProps {
@@ -6,6 +7,7 @@ interface DarkModeSwitchIconProps {
   moonColor?: string
   size?: number | string
   className?: string
+  style?: CSSProperties
 }
 
 const DarkModeSwitchIcon: React.FC<DarkModeSwitchIconProps> = ({
@@ -14,14 +16,20 @@ const DarkModeSwitchIcon: React.FC<DarkModeSwitchIconProps> = ({
   moonColor = "white",
   size = 16,
   className,
+  style,
 }) => {
+  const mergedStyle = useMemo<CSSProperties>(() => ({
+    margin: "4px",
+    ...style,
+  }), [style])
+
   return (
     <Icon
       size={size}
       checked={darkMode}
       sunColor={sunColor}
       moonColor={moonColor}
-      style={{ margin: "4px" }}
+      style={mergedStyle}
       onChange={() => { }}
       className={className}
     />
