@@ -28,6 +28,7 @@
     "exitFullscreen": "전체화면 나가기",
     "toggleFullscreen": "전체화면 전환",
     "toggleDarkMode": "다크 모드 전환",
+    "changeLanguage": "언어 변경",
     "download": "다운로드",
     "more": "더 보기"
   },

@@ -28,6 +28,7 @@
     "exitFullscreen": "フルスクリーンを終了",
     "toggleFullscreen": "フルスクリーン切替",
     "toggleDarkMode": "ダークモード切替",
+    "changeLanguage": "言語を変更",
     "download": "ダウンロード",
     "more": "その他"
   },

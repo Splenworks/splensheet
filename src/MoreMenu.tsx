@@ -4,6 +4,7 @@ import {
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
   EllipsisVerticalIcon,
+  LanguageIcon,
   MoonIcon,
   SunIcon,
 } from "@heroicons/react/24/outline"
@@ -36,6 +37,11 @@ const MoreMenu: React.FC<MoreMenuProps> = ({ isFullScreen, toggleFullScreen }) =
       label: t("others.toggleDarkMode", { defaultValue: "Toggle Darkmode" }),
       icon: darkMode ? SunIcon : MoonIcon,
       onSelect: toggleDarkMode,
+    },
+    {
+      id: "change-language",
+      label: t("others.changeLanguage", { defaultValue: "Change Language" }),
+      icon: LanguageIcon,
     },
   ]), [t, isFullScreen, darkMode, toggleFullScreen, toggleDarkMode])
 
