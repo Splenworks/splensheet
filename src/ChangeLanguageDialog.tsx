@@ -38,9 +38,6 @@ const ChangeLanguageDialog: React.FC<ChangeLanguageDialogProps> = ({ activeLangu
           )
         })}
       </div>
-      <p className="text-xs text-gray-500 dark:text-neutral-400">
-        {t("dialog.changeLanguage.comingSoon", { defaultValue: "Language switching is coming soon." })}
-      </p>
     </div>
   )
 }

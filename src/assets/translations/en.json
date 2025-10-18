@@ -35,8 +35,7 @@
   "dialog": {
     "changeLanguage": {
       "title": "Change Language",
-      "description": "Choose the default language you would like to use in SplenSheet.",
-      "comingSoon": "Language switching is coming soon."
+      "description": "Choose the default language you would like to use in SplenSheet."
     }
   },
   "languages": {
