@@ -99,7 +99,7 @@ const Dialog: React.FC<DialogProps> = ({
               key={`dialog-action-${idx}`}
               type="button"
               className={twMerge(
-                "rounded-md px-4 py-2 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600",
+                "rounded-md px-4 py-2 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600",
                 action.variant ? actionVariantClasses[action.variant] : actionVariantClasses.secondary,
               )}
               onClick={action.onClick}
