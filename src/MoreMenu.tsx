@@ -1,15 +1,18 @@
-import React, { useMemo } from "react"
+import React, { useCallback, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import {
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
   EllipsisVerticalIcon,
+  LanguageIcon,
   MoonIcon,
   SunIcon,
 } from "@heroicons/react/24/outline"
 import IconButton from "./IconButton"
 import Menu from "./Menu"
 import { useDarkmode } from "./hooks/useDarkmode"
+import { useDialog } from "./hooks/useDialog"
+import ChangeLanguageDialog from "./ChangeLanguageDialog"
 
 interface MoreMenuProps {
   isFullScreen: boolean
@@ -17,12 +20,31 @@ interface MoreMenuProps {
 }
 
 const MoreMenu: React.FC<MoreMenuProps> = ({ isFullScreen, toggleFullScreen }) => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { darkMode, toggleDarkMode } = useDarkmode()
+  const { openDialog, closeDialog } = useDialog()
+  const activeLanguage = (i18n.resolvedLanguage ?? i18n.language) || "en"
 
   const TriggerIcon: React.FC<{ className?: string }> = ({ className }) => (
     <EllipsisVerticalIcon className={className} />
   )
+
+  const handleChangeLanguage = useCallback(() => {
+    openDialog({
+      title: t("dialog.changeLanguage.title", { defaultValue: "Change Language" }),
+      description: t("dialog.changeLanguage.description", { defaultValue: "Choose the default language you would like to use in SplenSheet." }),
+      content: (
+        <ChangeLanguageDialog activeLanguage={activeLanguage} />
+      ),
+      actions: [
+        {
+          label: t("others.close", { defaultValue: "Close" }),
+          onClick: closeDialog,
+          variant: "secondary",
+        },
+      ],
+    })
+  }, [activeLanguage, openDialog, t, closeDialog])
 
   const menuItems = useMemo(() => ([
     {
@@ -37,7 +59,13 @@ const MoreMenu: React.FC<MoreMenuProps> = ({ isFullScreen, toggleFullScreen }) =
       icon: darkMode ? SunIcon : MoonIcon,
       onSelect: toggleDarkMode,
     },
-  ]), [t, isFullScreen, darkMode, toggleFullScreen, toggleDarkMode])
+    {
+      id: "change-language",
+      label: t("others.changeLanguage", { defaultValue: "Change Language" }),
+      icon: LanguageIcon,
+      onSelect: handleChangeLanguage,
+    },
+  ]), [t, isFullScreen, darkMode, toggleFullScreen, toggleDarkMode, handleChangeLanguage])
 
   return (
     <Menu
