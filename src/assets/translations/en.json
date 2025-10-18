@@ -32,6 +32,20 @@
     "download": "Download",
     "more": "More"
   },
+  "dialog": {
+    "changeLanguage": {
+      "title": "Change Language",
+      "description": "Choose the default language you would like to use in SplenSheet.",
+      "comingSoon": "Language switching is coming soon."
+    }
+  },
+  "languages": {
+    "english": "English",
+    "korean": "Korean",
+    "japanese": "Japanese",
+    "chinese": "Chinese (Simplified)",
+    "spanish": "Spanish"
+  },
   "menu": {
     "menu": "Menu",
     "new": "New",
