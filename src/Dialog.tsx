@@ -1,7 +1,9 @@
 import React, { useEffect } from "react"
 import { createPortal } from "react-dom"
 import { twMerge } from "tailwind-merge"
+import { XMarkIcon } from "@heroicons/react/24/outline"
 import { DialogAction } from "./contexts/DialogContext"
+import IconButton from "./IconButton"
 
 interface DialogProps {
   isOpen: boolean
@@ -74,23 +76,12 @@ const Dialog: React.FC<DialogProps> = ({
             )}
           </div>
           {dismissible && (
-            <button
-              type="button"
-              className="rounded-md p-1 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-white"
-              aria-label="Close dialog"
+            <IconButton
+              svgIcon={XMarkIcon}
               onClick={onClose}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                className="h-5 w-5"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-              </svg>
-            </button>
+              className="text-black hover:text-white dark:text-white"
+              ariaLabel="Close dialog"
+            />
           )}
         </div>
         {content && (
