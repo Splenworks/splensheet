@@ -1,5 +1,6 @@
 import React, { useMemo } from "react"
 import { useTranslation } from "react-i18next"
+import RadioInput from "./RadioInput"
 
 interface ChangeLanguageDialogProps {
   activeLanguage: string
@@ -21,20 +22,15 @@ const ChangeLanguageDialog: React.FC<ChangeLanguageDialogProps> = ({ activeLangu
         {languageOptions.map((language) => {
           const isActive = activeLanguage.startsWith(language.code)
           return (
-            <label
+            <RadioInput
               key={language.code}
-              className="flex cursor-not-allowed items-center gap-2 rounded-md border border-transparent px-2 py-1 text-sm text-gray-700 dark:text-neutral-200"
-            >
-              <input
-                type="radio"
-                name="default-language"
-                value={language.code}
-                defaultChecked={Boolean(isActive)}
-                disabled
-                className="h-4 w-4"
-              />
-              <span>{language.label}</span>
-            </label>
+              name="default-language"
+              value={language.code}
+              defaultChecked={Boolean(isActive)}
+              disabled
+              label={language.label}
+              containerClassName="cursor-not-allowed"
+            />
           )
         })}
       </div>
