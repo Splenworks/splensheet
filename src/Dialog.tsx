@@ -69,11 +69,6 @@ const Dialog: React.FC<DialogProps> = ({
                 {title}
               </h2>
             )}
-            {description && (
-              <p className="mt-2 text-sm text-gray-600 dark:text-neutral-300">
-                {description}
-              </p>
-            )}
           </div>
           {dismissible && (
             <IconButton
@@ -84,6 +79,11 @@ const Dialog: React.FC<DialogProps> = ({
             />
           )}
         </div>
+        {description && (
+          <p className="mt-2 text-sm text-gray-600 dark:text-neutral-300">
+            {description}
+          </p>
+        )}
         {content && (
           <div className="mt-4 text-sm text-gray-700 dark:text-neutral-200">
             {content}
