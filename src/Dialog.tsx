@@ -59,7 +59,7 @@ const Dialog: React.FC<DialogProps> = ({
       onMouseDown={dismissible ? onClose : undefined}
     >
       <div
-        className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-neutral-800"
+        className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-neutral-800"
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-4">
