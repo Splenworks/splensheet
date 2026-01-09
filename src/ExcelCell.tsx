@@ -211,7 +211,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
         "font-normal text-base text-black dark:text-white border cursor-default",
         "min-w-24 -mt-px -ml-px",
         cell?.t === "n" && "text-right",
-        isSelected && "outline-2 outline-pink-900 dark:outline-pink-700 outline-offset-[-3px] z-20",
+        isSelected && "outline-2 outline-gray-900 dark:outline-neutral-400 outline-offset-[-3px] z-20",
       )}
       onClick={startEdit}
     >
