@@ -49,7 +49,7 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
           type="text"
           className={twJoin(
             "h-7 w-50 rounded border border-gray-300 pl-4.5 pr-1 py-0.5 text-xs text-black dark:border-neutral-600 dark:text-white",
-            "focus:outline-2 focus:outline-pink-900 dark:focus:outline-pink-700",
+            "focus:outline-2 focus:outline-gray-900 dark:focus:outline-neutral-400",
             query ? "bg-white dark:bg-neutral-700" : "bg-transparent",
             "focus:bg-white dark:focus:bg-neutral-700",
             "placeholder:text-gray-500 dark:placeholder:text-gray-400"
@@ -80,7 +80,7 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
           {matchCount > 0 && (<>
             <Tooltip text={t('find.previous')} place="bottom" className="rounded-full">
               <button
-                className="text-sm text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white size-5 rounded-full transition-colors duration-300 ease-in-out hover:bg-zinc-400 dark:hover:bg-zinc-600 cursor-pointer focus:outline-pink-900 dark:focus:outline-pink-700"
+                className="text-sm text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white size-5 rounded-full transition-colors duration-300 ease-in-out hover:bg-zinc-400 dark:hover:bg-zinc-600 cursor-pointer focus:outline-gray-900 dark:focus:outline-neutral-400"
                 onClick={onPrev}
               >
                 ↑
@@ -88,7 +88,7 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
             </Tooltip>
             <Tooltip text={t('find.next')} place="bottom" className="rounded-full -m-1">
               <button
-                className="text-sm text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white size-5 rounded-full transition-colors duration-300 ease-in-out hover:bg-zinc-400 dark:hover:bg-zinc-600 cursor-pointer focus:outline-pink-900 dark:focus:outline-pink-700"
+                className="text-sm text-gray-700 hover:text-white dark:text-gray-300 dark:hover:text-white size-5 rounded-full transition-colors duration-300 ease-in-out hover:bg-zinc-400 dark:hover:bg-zinc-600 cursor-pointer focus:outline-gray-900 dark:focus:outline-neutral-400"
                 onClick={onNext}
               >
                 ↓

@@ -13,7 +13,7 @@ const SpinnerOverlay: React.FC<SpinnerOverlayProps> = ({ visible, className }) =
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 dark:bg-neutral-900/80">
       <Spinner className={twMerge(
-        "border-pink-900 dark:border-pink-700 border-r-transparent dark:border-r-transparent",
+        "border-gray-900 dark:border-neutral-400 border-r-transparent dark:border-r-transparent",
         className,
       )} />
     </div>

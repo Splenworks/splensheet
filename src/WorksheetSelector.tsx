@@ -70,7 +70,7 @@ const WorksheetSelector: React.FC<WorksheetSelectorProps> = ({
 
   return (
     <select
-      className="h-7 rounded border max-w-50 border-gray-300 bg-white px-1 text-xs dark:border-neutral-600 dark:bg-neutral-700 dark:text-white focus:outline-pink-900 dark:focus:outline-pink-700"
+      className="h-7 rounded border max-w-50 border-gray-300 bg-white px-1 text-xs dark:border-neutral-600 dark:bg-neutral-700 dark:text-white focus:outline-gray-900 dark:focus:outline-neutral-400"
       value={activeSheetIndex}
       onChange={handleSheetChange}
     >

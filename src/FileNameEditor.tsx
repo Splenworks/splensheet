@@ -47,7 +47,7 @@ const FileNameEditor: React.FC<FileNameEditorProps> = ({ fileName, onFileNameCha
     return (
       <input
         ref={inputRef}
-        className="px-2 py-0.5 rounded bg-white text-black dark:bg-neutral-700 dark:text-white focus:outline-none border-0 focus:border-2 border-pink-900 dark:border-pink-700 text-center"
+        className="px-2 py-0.5 rounded bg-white text-black dark:bg-neutral-700 dark:text-white focus:outline-none border-0 focus:border-2 border-gray-900 dark:border-neutral-400 text-center"
         value={inputValue}
         onChange={(event) => setInputValue(event.target.value)}
         onBlur={finishEditing}
