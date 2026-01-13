@@ -1,9 +1,9 @@
+import { ArrowDownTrayIcon, Bars2Icon, FolderOpenIcon, PlusIcon } from "@heroicons/react/24/outline"
 import React, { useMemo } from "react"
-import { ArrowDownTrayIcon, FolderOpenIcon, PlusIcon, Bars3Icon } from "@heroicons/react/24/outline"
 import { useTranslation } from "react-i18next"
-import Menu from "./Menu"
-import IconButton from "./IconButton"
 import CommitHash from "virtual:commit-hash"
+import IconButton from "./IconButton"
+import Menu from "./Menu"
 
 interface FileMenuProps {
   onOpen?: () => void
@@ -11,7 +11,7 @@ interface FileMenuProps {
 }
 
 const MenuIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <Bars3Icon className={className} />
+  <Bars2Icon className={className} />
 )
 
 const FileMenu: React.FC<FileMenuProps> = ({ onOpen, onDownload }) => {
