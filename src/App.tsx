@@ -1,18 +1,28 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
+import type { WorkBook } from "xlsx"
+import ExcelEditor from "./ExcelEditor"
 import { useFullScreen } from "./hooks/useFullScreen"
 import { FullScreenProvider } from "./providers/FullScreenProvider"
-import { isMac } from "./utils/isMac"
-import ExcelEditor from "./ExcelEditor"
-import type { WorkBook } from "xlsx"
-import { useTranslation } from "react-i18next"
 import SpinnerOverlay from "./SpinnerOverlay"
 import { createWorkbook } from "./utils/createWorkook"
+import { isMac } from "./utils/isMac"
 
 function App() {
   const { toggleFullScreen } = useFullScreen()
   const { t } = useTranslation()
-  const [workbook, setWorkbook] = useState<WorkBook | null>(null)
-  const [fileName, setFileName] = useState<string | null>(null)
+
+  const initialWorkbook = useMemo(() => {
+    const sheetName = t("header.newSheetName", { defaultValue: "Sheet1" })
+    return createWorkbook(sheetName)
+  }, [t])
+
+  const initialFileName = useMemo(() => {
+    return t("header.newFileName", { defaultValue: "Untitled.xlsx" })
+  }, [t])
+
+  const [workbook, setWorkbook] = useState<WorkBook | null>(initialWorkbook)
+  const [fileName, setFileName] = useState<string | null>(initialFileName)
   const [hasChanges, setHasChanges] = useState(false)
 
   useEffect(() => {
@@ -33,15 +43,6 @@ function App() {
       window.removeEventListener("keydown", handleKeyDown)
     }
   }, [toggleFullScreen])
-
-  useEffect(() => {
-    const fileName = t("header.newFileName", { defaultValue: "Untitled.xlsx" })
-    const sheetName = t("header.newSheetName", { defaultValue: "Sheet1" })
-    const wb = createWorkbook(sheetName)
-    setWorkbook(wb)
-    setFileName(fileName)
-    setHasChanges(false)
-  }, [t])
 
   useEffect(() => {
     if (fileName) {
