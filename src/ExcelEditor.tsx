@@ -235,7 +235,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   )
 
   const { undo, redo, resetHistory, recordChange } = useUndoRedo({
-    activeSheetIndex,
     setSheets,
     recalculate: recalculateSheet,
     selectCell,

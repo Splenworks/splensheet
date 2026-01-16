@@ -9,7 +9,6 @@ export type UndoRedoEntry = {
 }
 
 interface UseUndoRedoOptions {
-  activeSheetIndex: number
   setSheets: Dispatch<SetStateAction<SheetData[]>>
   recalculate: (data: PartialCellObj[][]) => PartialCellObj[][]
   selectCell: (row: number, col: number) => void
@@ -17,7 +16,6 @@ interface UseUndoRedoOptions {
 }
 
 export const useUndoRedo = ({
-  activeSheetIndex,
   setSheets,
   recalculate,
   selectCell,
