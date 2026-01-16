@@ -1,5 +1,5 @@
 import React from "react"
-import Spinner from "./Spinner"
+import Spinner from "./ui/Spinner"
 import { twMerge } from "tailwind-merge"
 
 interface SpinnerOverlayProps {
