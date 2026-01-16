@@ -8,7 +8,7 @@ import {
   SunIcon,
 } from "@heroicons/react/24/outline"
 import IconButton from "./ui/IconButton"
-import Menu from "./Menu"
+import Menu from "./ui/Menu"
 import { useDarkmode } from "./hooks/useDarkmode"
 
 interface MoreMenuProps {

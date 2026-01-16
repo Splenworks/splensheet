@@ -12,7 +12,7 @@ import { PartialCellObj, SheetData } from "./types"
 import { getMaxColumnIndex } from "./utils/columnUtils"
 import { useTranslation } from "react-i18next"
 import { loadWorkbook } from "./utils/loadWorkbook"
-import SpinnerOverlay from "./SpinnerOverlay"
+import SpinnerOverlay from "./ui/SpinnerOverlay"
 import SheetGrid from "./SheetGrid"
 import FileDropOverlay from "./FileDropOverlay"
 

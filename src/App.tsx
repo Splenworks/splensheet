@@ -4,7 +4,7 @@ import type { WorkBook } from "xlsx"
 import ExcelEditor from "./ExcelEditor"
 import { useFullScreen } from "./hooks/useFullScreen"
 import { FullScreenProvider } from "./providers/FullScreenProvider"
-import SpinnerOverlay from "./SpinnerOverlay"
+import SpinnerOverlay from "./ui/SpinnerOverlay"
 import { createWorkbook } from "./utils/createWorkbook"
 import { isMac } from "./utils/isMac"
 

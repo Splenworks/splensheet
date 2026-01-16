@@ -3,7 +3,7 @@ import React, { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import CommitHash from "virtual:commit-hash"
 import IconButton from "./ui/IconButton"
-import Menu from "./Menu"
+import Menu from "./ui/Menu"
 
 interface FileMenuProps {
   onOpen?: () => void
