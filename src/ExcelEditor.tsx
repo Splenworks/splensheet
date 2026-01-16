@@ -18,6 +18,7 @@ import FileDropOverlay from "./FileDropOverlay"
 import { useWorkbookSheets } from "./hooks/useWorkbookSheets"
 import { useUndoRedo, type UndoRedoEntry } from "./hooks/useUndoRedo"
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts"
+import { useSelection } from "./hooks/useSelection"
 
 const EXTRA_ROWS = 20
 const EXTRA_COLS = 20
@@ -43,7 +44,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   const { t } = useTranslation()
   const { isFullScreen, toggleFullScreen } = useFullScreen()
   const [hasChanges, setHasChanges] = useState(initialHasChanges)
-  const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null)
   const [findQuery, setFindQuery] = useState("")
   const [findIndex, setFindIndex] = useState(-1)
   const [isLoadingFile, setIsLoadingFile] = useState(false)
@@ -97,10 +97,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     rowCountRef.current = rowCount
     colCountRef.current = colCount
   }, [rowCount, colCount])
-
-  useEffect(() => {
-    setSelectedCell(null)
-  }, [activeSheetIndex])
 
   const handleOpenDialog = useCallback(() => {
     const input = fileInputRef.current
@@ -185,55 +181,15 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     markChanged()
   }, [activeSheetIndex, sheets, t, renameSheet, markChanged])
 
-  const selectCell = useCallback(
-    (row: number, col: number) => {
-      let r = row
-      let c = col
-      const maxRow = rowCountRef.current
-      const maxCol = colCountRef.current
-      if (c >= maxCol) {
-        c = 0
-        r += 1
-      } else if (c < 0) {
-        c = maxCol - 1
-        r -= 1
-      }
-      if (r < 0 || r >= maxRow) return
-
-      setSelectedCell({ row: r, col: c })
-
-      // Scroll to the target row
-      if (useVirtual) {
-        rowVirtualizer.scrollToIndex(r)
-      } else {
-        setTimeout(() => {
-          gridRef.current
-            ?.querySelector<HTMLDivElement>(`[data-row='${r}'][data-col='${c}']`)
-            ?.scrollIntoView({ block: "nearest", inline: "nearest" })
-        }, 0)
-      }
-
-      // Handle horizontal scrolling
-      const parent = parentRef.current
-      if (parent) {
-        let targetCell: HTMLElement | null = null
-        targetCell = parent.querySelector(`[data-col="${c}"]`)
-        if (targetCell) {
-          const cellRect = targetCell.getBoundingClientRect()
-          const parentWidth = parent.clientWidth
-          if (cellRect.left < 0 || cellRect.right > parentWidth) {
-            const left = cellRect.left - parent.getBoundingClientRect().left + parent.scrollLeft
-            if (left < parent.scrollLeft) {
-              parent.scrollLeft = left
-            } else if (left + cellRect.width > parent.scrollLeft + parentWidth) {
-              parent.scrollLeft = left + cellRect.width - parentWidth
-            }
-          }
-        }
-      }
-    },
-    [rowVirtualizer, useVirtual],
-  )
+  const { selectedCell, selectCell, clearSelection } = useSelection({
+    activeSheetIndex,
+    rowCountRef,
+    colCountRef,
+    useVirtual,
+    rowVirtualizer,
+    gridRef,
+    parentRef,
+  })
 
   const { undo, redo, resetHistory, recordChange } = useUndoRedo({
     setSheets,
@@ -306,7 +262,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
 
       setSheets(nextSheets)
       setActiveSheetIndex(0)
-      setSelectedCell(null)
+      clearSelection()
       setFindQuery("")
       setFindIndex(-1)
       resetHistory()
@@ -319,6 +275,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       setIsLoadingFile(false)
     }
   }, [
+    clearSelection,
     onWorkbookChange,
     onFileNameChange,
     onHasChangesChange,
@@ -383,7 +340,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     isMac,
     selectedCell,
     selectCell,
-    clearSelection: () => setSelectedCell(null),
+    clearSelection,
     focusFind,
     onFindNext: handleFindNext,
     onFindPrev: handleFindPrev,
