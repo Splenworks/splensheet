@@ -34,3 +34,11 @@ export async function loadWorkbook(file: File): Promise<WorkBook | null> {
     return null
   }
 }
+
+export function createWorkbook(sheetName: string): WorkBook {
+  const wb = utils.book_new()
+  const ws = utils.aoa_to_sheet([[]])
+  utils.book_append_sheet(wb, ws, sheetName)
+  return wb
+}
+
