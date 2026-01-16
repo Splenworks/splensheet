@@ -5,7 +5,7 @@ import ExcelEditor from "./ExcelEditor"
 import { useFullScreen } from "./hooks/useFullScreen"
 import { FullScreenProvider } from "./providers/FullScreenProvider"
 import SpinnerOverlay from "./SpinnerOverlay"
-import { createWorkbook } from "./utils/createWorkook"
+import { createWorkbook } from "./utils/createWorkbook"
 import { isMac } from "./utils/isMac"
 
 function App() {
