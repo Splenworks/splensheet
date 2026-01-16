@@ -17,6 +17,7 @@ import SheetGrid from "./SheetGrid"
 import FileDropOverlay from "./FileDropOverlay"
 import { useWorkbookSheets } from "./hooks/useWorkbookSheets"
 import { useUndoRedo, type UndoRedoEntry } from "./hooks/useUndoRedo"
+import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts"
 
 const EXTRA_ROWS = 20
 const EXTRA_COLS = 20
@@ -372,101 +373,28 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     gotoMatch(prev)
   }, [findMatches, findIndex, gotoMatch])
 
+  const focusFind = useCallback(() => {
+    headerRef.current?.focusFind()
+  }, [])
+
+  useKeyboardShortcuts({
+    isFullScreen,
+    toggleFullScreen,
+    isMac,
+    selectedCell,
+    selectCell,
+    clearSelection: () => setSelectedCell(null),
+    focusFind,
+    onFindNext: handleFindNext,
+    onFindPrev: handleFindPrev,
+    onUndo: undo,
+    onRedo: redo,
+    gridRef,
+  })
+
   useEffect(() => {
     setFindIndex(-1)
   }, [findQuery, activeSheetIndex])
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const key = event.key.toLowerCase()
-
-      // Check if any input is currently focused (to avoid interfering with cell editing)
-      const activeElement = document.activeElement
-      const isInputFocused = activeElement?.tagName === 'INPUT' || activeElement?.tagName === 'TEXTAREA'
-
-      if (
-        (isMac && event.metaKey && key === "f") ||
-        (!isMac && event.ctrlKey && key === "f")
-      ) {
-        event.preventDefault()
-        headerRef.current?.focusFind()
-        return
-      }
-
-      if (
-        (isMac && event.metaKey && key === "z") ||
-        (!isMac && event.ctrlKey && key === "z")
-      ) {
-        event.preventDefault()
-        undo()
-        return
-      }
-      if (
-        (isMac && event.metaKey && key === "y") ||
-        (!isMac && event.ctrlKey && key === "y")
-      ) {
-        event.preventDefault()
-        redo()
-        return
-      }
-      if (
-        (isMac && event.metaKey && key === "g") ||
-        (!isMac && event.ctrlKey && key === "g")
-      ) {
-        event.preventDefault()
-        if (event.shiftKey) {
-          handleFindPrev()
-        } else {
-          handleFindNext()
-        }
-        return
-      }
-      if (key === "escape") {
-        if (isFullScreen) {
-          toggleFullScreen()
-        } else if (selectedCell) {
-          setSelectedCell(null)
-        }
-        return
-      }
-
-      // Handle arrow key navigation when not editing a cell
-      if (!isInputFocused && selectedCell) {
-        if (key === "arrowright") {
-          event.preventDefault()
-          selectCell(selectedCell.row, selectedCell.col + 1)
-        } else if (key === "arrowleft") {
-          event.preventDefault()
-          selectCell(selectedCell.row, selectedCell.col - 1)
-        } else if (key === "arrowdown") {
-          event.preventDefault()
-          selectCell(selectedCell.row + 1, selectedCell.col)
-        } else if (key === "arrowup") {
-          event.preventDefault()
-          selectCell(selectedCell.row - 1, selectedCell.col)
-        } else if (key === "enter") {
-          event.preventDefault()
-          const target = gridRef.current?.querySelector<HTMLDivElement>(
-            `[data-row='${selectedCell.row}'][data-col='${selectedCell.col}']`,
-          )
-          target?.click()
-        }
-      }
-    }
-    window.addEventListener("keydown", handleKeyDown)
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-    }
-  }, [
-    isFullScreen,
-    toggleFullScreen,
-    undo,
-    redo,
-    handleFindNext,
-    handleFindPrev,
-    selectedCell,
-    selectCell,
-  ])
 
   useEffect(() => {
     const sheetName = workbook.SheetNames[activeSheetIndex]
