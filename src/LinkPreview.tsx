@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback } from "react"
 import { twJoin } from "tailwind-merge"
-import Spinner from "./Spinner"
+import Spinner from "./ui/Spinner"
 
 interface LinkPreviewProps {
   url: string

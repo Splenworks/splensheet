@@ -1,6 +1,6 @@
 import { forwardRef, useImperativeHandle, useRef } from "react"
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline"
-import Tooltip from "./Tooltip"
+import Tooltip from "./ui/Tooltip"
 import { twJoin } from "tailwind-merge"
 import { useTranslation } from "react-i18next"
 

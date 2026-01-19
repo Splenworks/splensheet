@@ -2,8 +2,8 @@ import { ArrowDownTrayIcon, Bars2Icon, FolderOpenIcon, PlusIcon } from "@heroico
 import React, { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import CommitHash from "virtual:commit-hash"
-import IconButton from "./IconButton"
-import Menu from "./Menu"
+import IconButton from "./ui/IconButton"
+import Menu from "./ui/Menu"
 
 interface FileMenuProps {
   onOpen?: () => void

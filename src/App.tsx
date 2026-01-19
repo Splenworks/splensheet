@@ -2,14 +2,10 @@ import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import type { WorkBook } from "xlsx"
 import ExcelEditor from "./ExcelEditor"
-import { useFullScreen } from "./hooks/useFullScreen"
-import { FullScreenProvider } from "./providers/FullScreenProvider"
-import SpinnerOverlay from "./SpinnerOverlay"
-import { createWorkbook } from "./utils/createWorkook"
-import { isMac } from "./utils/isMac"
+import SpinnerOverlay from "./ui/SpinnerOverlay"
+import { createWorkbook } from "./utils/workbook"
 
 function App() {
-  const { toggleFullScreen } = useFullScreen()
   const { t } = useTranslation()
 
   const initialWorkbook = useMemo(() => {
@@ -26,25 +22,6 @@ function App() {
   const [hasChanges, setHasChanges] = useState(false)
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        (event.key === "f" ||
-          (isMac && event.metaKey && event.key === "Enter") ||
-          (!isMac && event.altKey && event.key === "Enter"))
-      ) {
-        // F
-        // Command + Enter (Mac)
-        // Alt + Enter (Windows)
-        toggleFullScreen()
-      }
-    }
-    window.addEventListener("keydown", handleKeyDown)
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-    }
-  }, [toggleFullScreen])
-
-  useEffect(() => {
     if (fileName) {
       document.title = `${fileName} - SplenSheet`;
     } else {
@@ -54,16 +31,14 @@ function App() {
 
   if (workbook) {
     return (
-      <FullScreenProvider>
-        <ExcelEditor
-          workbook={workbook}
-          fileName={fileName ?? ""}
-          onFileNameChange={setFileName}
-          onWorkbookChange={setWorkbook}
-          initialHasChanges={hasChanges}
-          onHasChangesChange={setHasChanges}
-        />
-      </FullScreenProvider>
+      <ExcelEditor
+        workbook={workbook}
+        fileName={fileName ?? ""}
+        onFileNameChange={setFileName}
+        onWorkbookChange={setWorkbook}
+        initialHasChanges={hasChanges}
+        onHasChangesChange={setHasChanges}
+      />
     )
   }
 
