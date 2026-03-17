@@ -44,11 +44,9 @@ export const FullScreenProvider: React.FC<PropsWithChildren> = ({
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
-        event.key === "f" ||
         (isMac && event.metaKey && event.key === "Enter") ||
         (!isMac && event.altKey && event.key === "Enter")
       ) {
-        // F
         // Command + Enter (Mac)
         // Alt + Enter (Windows)
         toggleFullScreen()
