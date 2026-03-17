@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"
+import { getBaseName } from "./utils/string"
 
 interface FileNameEditorProps {
   fileName: string
@@ -7,14 +8,9 @@ interface FileNameEditorProps {
 
 const FileNameEditor: React.FC<FileNameEditorProps> = ({ fileName, onFileNameChange }) => {
   const [isEditing, setIsEditing] = useState(false)
-  const [inputValue, setInputValue] = useState("")
+  const [inputValue, setInputValue] = useState(() => getBaseName(fileName))
   const inputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    const dot = fileName.lastIndexOf('.')
-    const base = dot > 0 ? fileName.slice(0, dot) : fileName
-    setInputValue(base)
-  }, [fileName])
+  const baseFileName = getBaseName(fileName)
 
   useEffect(() => {
     if (!isEditing) return
@@ -28,8 +24,7 @@ const FileNameEditor: React.FC<FileNameEditorProps> = ({ fileName, onFileNameCha
     const ext = extDot >= 0 ? fileName.slice(extDot) : ''
     const trimmed = inputValue.trim()
     if (!trimmed) {
-      const base = ext ? fileName.slice(0, extDot) : fileName
-      setInputValue(base)
+      setInputValue(baseFileName)
       return
     }
     const nextName = `${trimmed}${ext}`
@@ -38,9 +33,7 @@ const FileNameEditor: React.FC<FileNameEditorProps> = ({ fileName, onFileNameCha
 
   const cancelEditing = () => {
     setIsEditing(false)
-    const dot = fileName.lastIndexOf('.')
-    const base = dot > 0 ? fileName.slice(0, dot) : fileName
-    setInputValue(base)
+    setInputValue(baseFileName)
   }
 
   if (isEditing) {
@@ -63,7 +56,10 @@ const FileNameEditor: React.FC<FileNameEditorProps> = ({ fileName, onFileNameCha
     <button
       type="button"
       className="px-2 py-0.5 rounded hover:bg-gray-300/70 dark:hover:bg-neutral-700/70 cursor-text"
-      onClick={() => setIsEditing(true)}
+      onClick={() => {
+        setInputValue(baseFileName)
+        setIsEditing(true)
+      }}
     >
       {fileName}
     </button>
