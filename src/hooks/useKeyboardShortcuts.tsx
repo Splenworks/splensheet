@@ -1,9 +1,8 @@
-import { useEffect, type RefObject } from "react"
-import { isMac } from "../utils/browser"
+import { useEffect, type RefObject } from "react";
+import { isMac } from "../utils/browser";
+import { useFullScreen } from "./useFullScreen";
 
 interface UseKeyboardShortcutsOptions {
-  isFullScreen: boolean
-  toggleFullScreen: () => void
   selectedCell: { row: number; col: number } | null
   selectCell: (row: number, col: number) => void
   clearSelection: () => void
@@ -16,8 +15,6 @@ interface UseKeyboardShortcutsOptions {
 }
 
 export const useKeyboardShortcuts = ({
-  isFullScreen,
-  toggleFullScreen,
   selectedCell,
   selectCell,
   clearSelection,
@@ -28,6 +25,7 @@ export const useKeyboardShortcuts = ({
   onRedo,
   gridRef,
 }: UseKeyboardShortcutsOptions) => {
+  const { isFullScreen, toggleFullScreen } = useFullScreen()
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const key = event.key.toLowerCase()

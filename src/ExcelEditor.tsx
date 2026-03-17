@@ -5,7 +5,6 @@ import type { WorkBook } from "xlsx"
 import { writeFile } from "xlsx"
 import FileDropOverlay from "./FileDropOverlay"
 import Header from "./Header"
-import { useFullScreen } from "./hooks/useFullScreen"
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts"
 import { useSelection } from "./hooks/useSelection"
 import { useUndoRedo, type UndoRedoEntry } from "./hooks/useUndoRedo"
@@ -41,7 +40,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   onFileNameChange,
 }) => {
   const { t } = useTranslation()
-  const { isFullScreen, toggleFullScreen } = useFullScreen()
   const [hasChanges, setHasChanges] = useState(initialHasChanges)
   const [findQuery, setFindQuery] = useState("")
   const [findIndex, setFindIndex] = useState(-1)
@@ -334,8 +332,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   }, [])
 
   useKeyboardShortcuts({
-    isFullScreen,
-    toggleFullScreen,
     selectedCell,
     selectCell,
     clearSelection,
@@ -389,8 +385,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         onChange={handleFileInputChange}
       />
       <Header
-        isFullScreen={isFullScreen}
-        toggleFullScreen={toggleFullScreen}
         fileName={fileName}
         onFileNameChange={onFileNameChange}
         worksheets={sheets.map((ws) => ({ id: ws.id, name: ws.name }))}

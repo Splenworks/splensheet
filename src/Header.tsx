@@ -1,18 +1,17 @@
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import FindBar from "./FindBar"
+import { twJoin } from "tailwind-merge"
+import DownloadIcon from "./assets/icons/download.svg?react"
 import FileMenu from "./FileMenu"
-import WorksheetSelector from "./WorksheetSelector"
 import FileNameEditor from "./FileNameEditor"
+import FindBar from "./FindBar"
+import { useFullScreen } from "./hooks/useFullScreen"
 import MoreMenu from "./MoreMenu"
 import IconButton from "./ui/IconButton"
 import Tooltip from "./ui/Tooltip"
-import DownloadIcon from "./assets/icons/download.svg?react"
-import { twJoin } from "tailwind-merge"
+import WorksheetSelector from "./WorksheetSelector"
 
 interface HeaderProps {
-  isFullScreen: boolean
-  toggleFullScreen: () => void
   fileName: string
   onFileNameChange?: (val: string) => void
   worksheets: Array<{
@@ -38,8 +37,6 @@ interface HeaderProps {
 }
 
 const Header = ({
-  isFullScreen,
-  toggleFullScreen,
   fileName,
   onFileNameChange,
   worksheets,
@@ -61,6 +58,7 @@ const Header = ({
   findMatchCount = 0,
 }: HeaderProps) => {
   const { t } = useTranslation()
+  const { isFullScreen, toggleFullScreen } = useFullScreen()
   const [showBounce, setShowBounce] = useState(false)
   const isCsv = fileName.toLowerCase().endsWith('.csv')
 
