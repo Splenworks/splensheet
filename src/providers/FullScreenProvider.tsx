@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useEffect } from "react"
+import React, { PropsWithChildren, useCallback, useEffect } from "react"
 import { FullScreenContext } from "../contexts/FullScreenContext"
 import { isMac } from "../utils/isMac"
 
@@ -10,7 +10,7 @@ export const FullScreenProvider: React.FC<PropsWithChildren> = ({
   const [isFullScreen, setIsFullScreen] = React.useState(
     !!document.fullscreenElement,
   )
-  const toggleFullScreen = () => {
+  const toggleFullScreen = useCallback(() => {
     const fullscreenSection = document.querySelector(
       "#" + FULLSCREEN_ELEMENT_ID,
     )
@@ -25,7 +25,7 @@ export const FullScreenProvider: React.FC<PropsWithChildren> = ({
     } else {
       document.exitFullscreen()
     }
-  }
+  }, [])
 
   useEffect(() => {
     const onFullScreenChange = () => {
