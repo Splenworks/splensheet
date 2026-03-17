@@ -60,19 +60,23 @@ const Header = ({
   const { t } = useTranslation()
   const { isFullScreen, toggleFullScreen } = useFullScreen()
   const [showBounce, setShowBounce] = useState(false)
+  const [prevHasChanges, setPrevHasChanges] = useState(hasChanges)
   const isCsv = fileName.toLowerCase().endsWith('.csv')
 
-  useEffect(() => {
-    if (!hasChanges) {
-      setShowBounce(false)
-      return
-    }
-
+  if (hasChanges && !prevHasChanges) {
+    setPrevHasChanges(true)
     setShowBounce(true)
-    const timer = setTimeout(() => setShowBounce(false), 5000)
+  } else if (!hasChanges && prevHasChanges) {
+    setPrevHasChanges(false)
+    setShowBounce(false)
+  }
 
+  useEffect(() => {
+    if (!showBounce) return
+
+    const timer = setTimeout(() => setShowBounce(false), 5000)
     return () => clearTimeout(timer)
-  }, [hasChanges])
+  }, [showBounce])
 
   return (
     <>
