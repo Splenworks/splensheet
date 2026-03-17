@@ -1,24 +1,23 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { useVirtualizer } from "@tanstack/react-virtual"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
+import type { WorkBook } from "xlsx"
+import { writeFile } from "xlsx"
+import FileDropOverlay from "./FileDropOverlay"
 import Header from "./Header"
 import { useFullScreen } from "./hooks/useFullScreen"
-import { writeFile } from "xlsx"
-import type { WorkBook } from "xlsx"
-import { recalculateSheet } from "./utils/recalculateSheet"
-import { dataToSheet, sheetToData } from "./utils/xlsx"
-import { isMac } from "./utils/isMac"
-import { getLastNonEmptyRow, getLastNonEmptyCol } from "./utils/sheetStats"
-import { PartialCellObj } from "./types"
-import { getMaxColumnIndex } from "./utils/columnUtils"
-import { useTranslation } from "react-i18next"
-import { loadWorkbook } from "./utils/workbook"
-import SpinnerOverlay from "./ui/SpinnerOverlay"
-import SheetGrid from "./SheetGrid"
-import FileDropOverlay from "./FileDropOverlay"
-import { useWorkbookSheets } from "./hooks/useWorkbookSheets"
-import { useUndoRedo, type UndoRedoEntry } from "./hooks/useUndoRedo"
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts"
 import { useSelection } from "./hooks/useSelection"
+import { useUndoRedo, type UndoRedoEntry } from "./hooks/useUndoRedo"
+import { useWorkbookSheets } from "./hooks/useWorkbookSheets"
+import SheetGrid from "./SheetGrid"
+import { PartialCellObj } from "./types"
+import SpinnerOverlay from "./ui/SpinnerOverlay"
+import { getMaxColumnIndex } from "./utils/columnUtils"
+import { recalculateSheet } from "./utils/recalculateSheet"
+import { getLastNonEmptyCol, getLastNonEmptyRow } from "./utils/sheetStats"
+import { loadWorkbook } from "./utils/workbook"
+import { dataToSheet, sheetToData } from "./utils/xlsx"
 
 const EXTRA_ROWS = 20
 const EXTRA_COLS = 20
@@ -228,7 +227,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     },
     [activeSheetIndex, markChanged, recordChange, setSheets, recalculateSheet],
   )
-  
+
   const handleDeleteSheet = useCallback(() => {
     if (sheets.length <= 1) return
 
@@ -337,7 +336,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   useKeyboardShortcuts({
     isFullScreen,
     toggleFullScreen,
-    isMac,
     selectedCell,
     selectCell,
     clearSelection,

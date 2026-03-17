@@ -1,9 +1,9 @@
 import { useEffect, type RefObject } from "react"
+import { isMac } from "../utils/browser"
 
 interface UseKeyboardShortcutsOptions {
   isFullScreen: boolean
   toggleFullScreen: () => void
-  isMac: boolean
   selectedCell: { row: number; col: number } | null
   selectCell: (row: number, col: number) => void
   clearSelection: () => void
@@ -18,7 +18,6 @@ interface UseKeyboardShortcutsOptions {
 export const useKeyboardShortcuts = ({
   isFullScreen,
   toggleFullScreen,
-  isMac,
   selectedCell,
   selectCell,
   clearSelection,
@@ -113,7 +112,6 @@ export const useKeyboardShortcuts = ({
     focusFind,
     gridRef,
     isFullScreen,
-    isMac,
     onFindNext,
     onFindPrev,
     onRedo,

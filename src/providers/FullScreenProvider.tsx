@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useCallback, useEffect } from "react"
 import { FullScreenContext } from "../contexts/FullScreenContext"
-import { isMac } from "../utils/isMac"
+import { isMac } from "../utils/browser"
 
 const FULLSCREEN_ELEMENT_ID = "fullscreenSection"
 
