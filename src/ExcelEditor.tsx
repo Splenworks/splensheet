@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { useVirtualizer } from "@tanstack/react-virtual"
-import Header, { HeaderRef } from "./Header"
+import Header from "./Header"
 import { useFullScreen } from "./hooks/useFullScreen"
 import { writeFile } from "xlsx"
 import type { WorkBook } from "xlsx"
@@ -46,8 +46,8 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   const [hasChanges, setHasChanges] = useState(initialHasChanges)
   const [findQuery, setFindQuery] = useState("")
   const [findIndex, setFindIndex] = useState(-1)
+  const [isFindBarFocused, setIsFindBarFocused] = useState(false)
   const [isLoadingFile, setIsLoadingFile] = useState(false)
-  const headerRef = useRef<HeaderRef>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
   const parentRef = useRef<HTMLDivElement>(null)
@@ -331,7 +331,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   }, [findMatches, findIndex, gotoMatch])
 
   const focusFind = useCallback(() => {
-    headerRef.current?.focusFind()
+    setIsFindBarFocused(true)
   }, [])
 
   useKeyboardShortcuts({
@@ -391,7 +391,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         onChange={handleFileInputChange}
       />
       <Header
-        ref={headerRef}
         isFullScreen={isFullScreen}
         toggleFullScreen={toggleFullScreen}
         fileName={fileName}
@@ -405,6 +404,8 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
         hasChanges={hasChanges}
         onOpen={handleOpenDialog}
         onDownload={handleDownload}
+        isFindBarFocused={isFindBarFocused}
+        onFindBarFocusedChange={setIsFindBarFocused}
         findQuery={findQuery}
         onFindQueryChange={setFindQuery}
         onFindNext={handleFindNext}

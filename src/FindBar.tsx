@@ -1,10 +1,12 @@
-import { forwardRef, useImperativeHandle, useRef } from "react"
+import { useEffect, useRef } from "react"
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline"
 import Tooltip from "./ui/Tooltip"
 import { twJoin } from "tailwind-merge"
 import { useTranslation } from "react-i18next"
 
 interface FindBarProps {
+  isFindBarFocused: boolean
+  onFindBarFocusedChange?: (isFocused: boolean) => void
   query: string
   onQueryChange: (val: string) => void
   onNext: () => void
@@ -13,26 +15,24 @@ interface FindBarProps {
   matchCount: number
 }
 
-export interface FindBarRef {
-  focus: () => void
-}
-
-const FindBar = forwardRef<FindBarRef, FindBarProps>(({
+const FindBar = ({
+  isFindBarFocused,
+  onFindBarFocusedChange,
   query,
   onQueryChange,
   onNext,
   onPrev,
   matchIndex,
   matchCount,
-}, ref) => {
+}: FindBarProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const { t } = useTranslation()
 
-  useImperativeHandle(ref, () => ({
-    focus: () => {
+  useEffect(() => {
+    if (isFindBarFocused) {
       inputRef.current?.focus()
     }
-  }), [])
+  }, [isFindBarFocused])
 
   return (
     <div className="items-center space-x-2 text-black dark:text-white hidden lg:flex">
@@ -47,6 +47,8 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
           autoCorrect="off"
           autoCapitalize="off"
           type="text"
+          onFocus={() => onFindBarFocusedChange?.(true)}
+          onBlur={() => onFindBarFocusedChange?.(false)}
           className={twJoin(
             "h-7 w-50 rounded border border-gray-300 pl-4.5 pr-1 py-0.5 text-xs text-black dark:border-neutral-600 dark:text-white",
             "focus:outline-2 focus:outline-gray-900 dark:focus:outline-neutral-400",
@@ -100,9 +102,6 @@ const FindBar = forwardRef<FindBarRef, FindBarProps>(({
       )}
     </div>
   )
-})
-
-FindBar.displayName = 'FindBar'
+}
 
 export default FindBar
-

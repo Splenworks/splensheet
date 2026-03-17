@@ -1,6 +1,6 @@
-import { useRef, forwardRef, useImperativeHandle, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import FindBar, { FindBarRef } from "./FindBar"
+import FindBar from "./FindBar"
 import FileMenu from "./FileMenu"
 import WorksheetSelector from "./WorksheetSelector"
 import FileNameEditor from "./FileNameEditor"
@@ -27,6 +27,8 @@ interface HeaderProps {
   hasChanges?: boolean
   onOpen?: () => void
   onDownload?: () => void
+  isFindBarFocused?: boolean
+  onFindBarFocusedChange?: (isFocused: boolean) => void
   findQuery?: string
   onFindQueryChange?: (val: string) => void
   onFindNext?: () => void
@@ -35,11 +37,7 @@ interface HeaderProps {
   findMatchCount?: number
 }
 
-export interface HeaderRef {
-  focusFind: () => void
-}
-
-const Header = forwardRef<HeaderRef, HeaderProps>(({
+const Header = ({
   isFullScreen,
   toggleFullScreen,
   fileName,
@@ -53,23 +51,18 @@ const Header = forwardRef<HeaderRef, HeaderProps>(({
   hasChanges,
   onOpen,
   onDownload,
+  isFindBarFocused = false,
+  onFindBarFocusedChange,
   findQuery = "",
   onFindQueryChange,
   onFindNext,
   onFindPrev,
   findMatchIndex = 0,
   findMatchCount = 0,
-}, ref) => {
+}: HeaderProps) => {
   const { t } = useTranslation()
   const [showBounce, setShowBounce] = useState(false)
   const isCsv = fileName.toLowerCase().endsWith('.csv')
-  const findBarRef = useRef<FindBarRef>(null)
-
-  useImperativeHandle(ref, () => ({
-    focusFind: () => {
-      findBarRef.current?.focus()
-    }
-  }), [])
 
   useEffect(() => {
     if (!hasChanges) {
@@ -104,7 +97,8 @@ const Header = forwardRef<HeaderRef, HeaderProps>(({
         </div>
         <div className="flex items-center space-x-2">
           <FindBar
-            ref={findBarRef}
+            isFindBarFocused={isFindBarFocused}
+            onFindBarFocusedChange={onFindBarFocusedChange}
             query={findQuery}
             onQueryChange={onFindQueryChange || (() => { })}
             onNext={onFindNext || (() => { })}
@@ -131,8 +125,6 @@ const Header = forwardRef<HeaderRef, HeaderProps>(({
       </header>
     </>
   )
-})
-
-Header.displayName = 'Header'
+}
 
 export default Header
