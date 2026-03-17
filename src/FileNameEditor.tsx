@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useState } from "react"
 import { getBaseName } from "./utils/string"
 
 interface FileNameEditorProps {
@@ -9,14 +9,7 @@ interface FileNameEditorProps {
 const FileNameEditor: React.FC<FileNameEditorProps> = ({ fileName, onFileNameChange }) => {
   const [isEditing, setIsEditing] = useState(false)
   const [inputValue, setInputValue] = useState(() => getBaseName(fileName))
-  const inputRef = useRef<HTMLInputElement>(null)
   const baseFileName = getBaseName(fileName)
-
-  useEffect(() => {
-    if (!isEditing) return
-    const handle = window.setTimeout(() => inputRef.current?.focus(), 0)
-    return () => window.clearTimeout(handle)
-  }, [isEditing])
 
   const finishEditing = () => {
     setIsEditing(false)
@@ -39,7 +32,7 @@ const FileNameEditor: React.FC<FileNameEditorProps> = ({ fileName, onFileNameCha
   if (isEditing) {
     return (
       <input
-        ref={inputRef}
+        autoFocus
         className="px-2 py-0.5 rounded bg-white text-black dark:bg-neutral-700 dark:text-white focus:outline-none border-0 focus:border-2 border-gray-900 dark:border-neutral-400 text-center"
         value={inputValue}
         onChange={(event) => setInputValue(event.target.value)}
