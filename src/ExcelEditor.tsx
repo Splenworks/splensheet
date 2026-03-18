@@ -1,16 +1,13 @@
 import { useVirtualizer } from "@tanstack/react-virtual"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
-import type { WorkBook } from "xlsx"
+import { utils, type WorkBook } from "xlsx"
 import { writeFile } from "xlsx"
 import FileDropOverlay from "./FileDropOverlay"
 import Header from "./Header"
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts"
-import { useSelection } from "./hooks/useSelection"
-import { useUndoRedo, type UndoRedoEntry } from "./hooks/useUndoRedo"
-import { useWorkbookSheets } from "./hooks/useWorkbookSheets"
 import SheetGrid from "./SheetGrid"
-import { PartialCellObj } from "./types"
+import { PartialCellObj, SheetData } from "./types"
 import SpinnerOverlay from "./ui/SpinnerOverlay"
 import { getMaxColumnIndex } from "./utils/columnUtils"
 import { recalculateSheet } from "./utils/recalculateSheet"
@@ -21,6 +18,42 @@ import { dataToSheet, sheetToData } from "./utils/xlsx"
 const EXTRA_ROWS = 20
 const EXTRA_COLS = 20
 const MAX_COLS = getMaxColumnIndex()
+
+type CellPosition = { row: number; col: number }
+
+type UndoRedoEntry = {
+  sheetIndex: number
+  r: number
+  c: number
+  prev: PartialCellObj
+}
+
+const buildSheets = (workbook: WorkBook): SheetData[] =>
+  workbook.SheetNames.map((name, idx) => ({
+    id: idx + 1,
+    name,
+    data: sheetToData(workbook.Sheets[name]),
+  }))
+
+const getNextSheetName = (existingNames: string[], localizedBaseName: string) => {
+  const trimmed = localizedBaseName.trim()
+  const match = trimmed.match(/^(.*?)(\d+)$/)
+  const prefix = (match?.[1] ?? trimmed.replace(/\d+$/, "")) || "Sheet"
+  const start = match ? parseInt(match[2], 10) || 1 : 1
+  const usedNames = new Set(existingNames)
+
+  if (!match && trimmed && !usedNames.has(trimmed)) {
+    return trimmed
+  }
+
+  let counter = start
+  let candidate = `${prefix}${counter}`
+  while (usedNames.has(candidate)) {
+    counter += 1
+    candidate = `${prefix}${counter}`
+  }
+  return candidate
+}
 
 interface ExcelEditorProps {
   workbook: WorkBook
@@ -51,18 +84,124 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   const rowCountRef = useRef(0)
   const colCountRef = useRef(0)
 
+  // --- Workbook/Sheets state ---
   const localizedNewSheetName = t("header.newSheetName", { defaultValue: "Sheet1" })
-  const {
-    sheets,
-    setSheets,
-    activeSheet,
-    activeSheetIndex,
-    setActiveSheetIndex,
-    addSheet,
-    renameSheet,
-    deleteSheet,
-  } = useWorkbookSheets(workbook, localizedNewSheetName)
+  const [sheets, setSheets] = useState<SheetData[]>(() => buildSheets(workbook))
+  const [activeSheetIndex, setActiveSheetIndex] = useState(0)
+  const sheetsRef = useRef(sheets)
 
+  useEffect(() => {
+    sheetsRef.current = sheets
+  }, [sheets])
+
+  useEffect(() => {
+    setSheets(buildSheets(workbook))
+  }, [workbook])
+
+  const activeSheet = useMemo(
+    () => sheets[activeSheetIndex],
+    [sheets, activeSheetIndex],
+  )
+
+  const addSheet = useCallback(() => {
+    const prevSheets = sheetsRef.current
+    const nextName = getNextSheetName(
+      prevSheets.map((sheet) => sheet.name),
+      localizedNewSheetName,
+    )
+    const nextId = prevSheets.reduce((max, sheet) => Math.max(max, sheet.id), 0) + 1
+    const blankWorksheet = utils.aoa_to_sheet([[]])
+    const newSheetData = sheetToData(blankWorksheet)
+    const nextSheets = [
+      ...prevSheets,
+      {
+        id: nextId,
+        name: nextName,
+        data: newSheetData,
+      },
+    ]
+
+    setSheets(nextSheets)
+    workbook.SheetNames.push(nextName)
+    workbook.Sheets[nextName] = blankWorksheet
+    setActiveSheetIndex(nextSheets.length - 1)
+    return true
+  }, [localizedNewSheetName, workbook])
+
+  const renameSheet = useCallback(
+    (index: number, nextName: string) => {
+      const prevSheets = sheetsRef.current
+      const sheet = prevSheets[index]
+      if (!sheet) return false
+
+      const updatedSheets = [...prevSheets]
+      updatedSheets[index] = {
+        ...updatedSheets[index],
+        name: nextName,
+      }
+      setSheets(updatedSheets)
+
+      const oldName = workbook.SheetNames[index]
+      if (oldName !== nextName) {
+        workbook.SheetNames[index] = nextName
+        workbook.Sheets[nextName] = workbook.Sheets[oldName]
+        delete workbook.Sheets[oldName]
+      }
+      return true
+    },
+    [workbook],
+  )
+
+  const deleteSheet = useCallback(
+    (index: number) => {
+      const prevSheets = sheetsRef.current
+      if (prevSheets.length <= 1) return false
+
+      const sheet = prevSheets[index]
+      if (!sheet) return false
+
+      const nextSheets = prevSheets.filter((_, idx) => idx !== index)
+      setSheets(nextSheets)
+
+      const removedName = workbook.SheetNames[index]
+      workbook.SheetNames.splice(index, 1)
+      delete workbook.Sheets[removedName]
+
+      const nextActiveIndex = index >= prevSheets.length - 1
+        ? Math.max(0, prevSheets.length - 2)
+        : index
+      setActiveSheetIndex(nextActiveIndex)
+      return true
+    },
+    [workbook],
+  )
+
+  // --- Selection state ---
+  const [selectedCell, setSelectedCell] = useState<CellPosition | null>(null)
+
+  useEffect(() => {
+    setSelectedCell(null)
+  }, [activeSheetIndex])
+
+  const clearSelection = useCallback(() => {
+    setSelectedCell(null)
+  }, [])
+
+  // --- Undo/Redo state ---
+  const undoStack = useRef<UndoRedoEntry[]>([])
+  const redoStack = useRef<UndoRedoEntry[]>([])
+
+  const resetHistory = useCallback(() => {
+    undoStack.current = []
+    redoStack.current = []
+  }, [])
+
+  const recordChange = useCallback((entry: UndoRedoEntry) => {
+    undoStack.current.push(entry)
+    redoStack.current = []
+  }, [])
+
+  // --- Derived data ---
   useEffect(() => {
     setHasChanges(initialHasChanges)
   }, [initialHasChanges])
@@ -72,7 +211,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     onHasChangesChange?.(true)
   }, [onHasChangesChange])
 
-  const activeSheetData = activeSheet?.data ?? []
+  const activeSheetData = useMemo(() => activeSheet?.data ?? [], [activeSheet])
   const rowCount = useMemo(
     () => getLastNonEmptyRow(activeSheetData) + EXTRA_ROWS,
     [activeSheetData],
@@ -95,6 +234,128 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     colCountRef.current = colCount
   }, [rowCount, colCount])
 
+  const rowVirtualizer = useVirtualizer({
+    count: rowCount,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 32,
+    overscan: 50,
+  })
+
+  useEffect(() => {
+    const parent = parentRef.current
+    if (!parent) return
+
+    parent.scrollTop = 0
+    parent.scrollLeft = 0
+
+    if (useVirtual) {
+      rowVirtualizer.scrollToIndex(0)
+    }
+  }, [activeSheetIndex, rowVirtualizer, useVirtual])
+
+  // --- selectCell (depends on refs, virtualizer) ---
+  const selectCell = useCallback(
+    (row: number, col: number) => {
+      let r = row
+      let c = col
+      const maxRow = rowCountRef.current
+      const maxCol = colCountRef.current
+      if (c >= maxCol) {
+        c = 0
+        r += 1
+      } else if (c < 0) {
+        c = maxCol - 1
+        r -= 1
+      }
+      if (r < 0 || r >= maxRow) return
+
+      setSelectedCell({ row: r, col: c })
+
+      if (useVirtual) {
+        rowVirtualizer.scrollToIndex(r)
+      } else {
+        setTimeout(() => {
+          gridRef.current
+            ?.querySelector<HTMLDivElement>(`[data-row='${r}'][data-col='${c}']`)
+            ?.scrollIntoView({ block: "nearest", inline: "nearest" })
+        }, 0)
+      }
+
+      const parent = parentRef.current
+      if (parent) {
+        let targetCell: HTMLElement | null = null
+        targetCell = parent.querySelector(`[data-col="${c}"]`)
+        if (targetCell) {
+          const cellRect = targetCell.getBoundingClientRect()
+          const parentWidth = parent.clientWidth
+          if (cellRect.left < 0 || cellRect.right > parentWidth) {
+            const left = cellRect.left - parent.getBoundingClientRect().left + parent.scrollLeft
+            if (left < parent.scrollLeft) {
+              parent.scrollLeft = left
+            } else if (left + cellRect.width > parent.scrollLeft + parentWidth) {
+              parent.scrollLeft = left + cellRect.width - parentWidth
+            }
+          }
+        }
+      }
+    },
+    [gridRef, parentRef, rowCountRef, rowVirtualizer, useVirtual, colCountRef],
+  )
+
+  // --- Undo/Redo actions (depend on selectCell) ---
+  const undo = useCallback(() => {
+    const last = undoStack.current.pop()
+    if (!last) return
+    setSheets((prev) => {
+      const copy = [...prev]
+      const sheet = { ...copy[last.sheetIndex] }
+      const data = [...sheet.data]
+      const row = [...(data[last.r] || [])]
+
+      redoStack.current.push({
+        sheetIndex: last.sheetIndex,
+        r: last.r,
+        c: last.c,
+        prev: row[last.c] ?? {},
+      })
+
+      row[last.c] = last.prev
+      data[last.r] = row
+      sheet.data = recalculateSheet(data)
+      copy[last.sheetIndex] = sheet
+      return copy
+    })
+    markChanged()
+    selectCell(last.r, last.c)
+  }, [markChanged, selectCell])
+
+  const redo = useCallback(() => {
+    const last = redoStack.current.pop()
+    if (!last) return
+    setSheets((prev) => {
+      const copy = [...prev]
+      const sheet = { ...copy[last.sheetIndex] }
+      const data = [...sheet.data]
+      const row = [...(data[last.r] || [])]
+
+      undoStack.current.push({
+        sheetIndex: last.sheetIndex,
+        r: last.r,
+        c: last.c,
+        prev: row[last.c] ?? {},
+      })
+
+      row[last.c] = last.prev
+      data[last.r] = row
+      sheet.data = recalculateSheet(data)
+      copy[last.sheetIndex] = sheet
+      return copy
+    })
+    markChanged()
+    selectCell(last.r, last.c)
+  }, [markChanged, selectCell])
+
+  // --- File & cell operations ---
   const handleOpenDialog = useCallback(() => {
     const input = fileInputRef.current
     if (!input) return
@@ -124,25 +385,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     })
     return results
   }, [findQuery, activeSheetData, getCellValue])
-
-  const rowVirtualizer = useVirtualizer({
-    count: rowCount,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 32,
-    overscan: 50,
-  })
-
-  useEffect(() => {
-    const parent = parentRef.current
-    if (!parent) return
-
-    parent.scrollTop = 0
-    parent.scrollLeft = 0
-
-    if (useVirtual) {
-      rowVirtualizer.scrollToIndex(0)
-    }
-  }, [activeSheetIndex, rowVirtualizer, useVirtual])
 
   const handleAddSheet = useCallback(() => {
     const didAdd = addSheet()
@@ -178,23 +420,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     markChanged()
   }, [activeSheetIndex, sheets, t, renameSheet, markChanged])
 
-  const { selectedCell, selectCell, clearSelection } = useSelection({
-    activeSheetIndex,
-    rowCountRef,
-    colCountRef,
-    useVirtual,
-    rowVirtualizer,
-    gridRef,
-    parentRef,
-  })
-
-  const { undo, redo, resetHistory, recordChange } = useUndoRedo({
-    setSheets,
-    recalculate: recalculateSheet,
-    selectCell,
-    onChange: markChanged,
-  })
-
   const updateCell = useCallback(
     (r: number, c: number, cell: PartialCellObj) => {
       setSheets((prev) => {
@@ -223,7 +448,7 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
       })
       markChanged()
     },
-    [activeSheetIndex, markChanged, recordChange, setSheets, recalculateSheet],
+    [activeSheetIndex, markChanged, recordChange],
   )
 
   const handleDeleteSheet = useCallback(() => {
@@ -277,8 +502,6 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
     onFileNameChange,
     onHasChangesChange,
     resetHistory,
-    setActiveSheetIndex,
-    setSheets,
   ])
 
   const handleFileInputChange = useCallback(async (
