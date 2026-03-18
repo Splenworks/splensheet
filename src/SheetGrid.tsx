@@ -1,5 +1,4 @@
 import React, { RefObject, useMemo } from "react"
-import type { VirtualItem } from "@tanstack/react-virtual"
 import SheetCell from "./SheetCell"
 import { PartialCellObj } from "./types"
 import { indexToColumnName } from "./utils/columnUtils"
@@ -11,11 +10,6 @@ interface SheetGridProps {
   selectedCell: { row: number; col: number } | null
   selectCell: (row: number, col: number) => void
   updateCell: (row: number, col: number, cell: PartialCellObj) => void
-  useVirtual: boolean
-  virtualRows?: VirtualItem[]
-  paddingTop: number
-  paddingBottom: number
-  totalHeight?: number
   parentRef: RefObject<HTMLDivElement | null>
   gridRef: RefObject<HTMLDivElement | null>
 }
@@ -27,20 +21,12 @@ const SheetGrid: React.FC<SheetGridProps> = ({
   selectedCell,
   selectCell,
   updateCell,
-  useVirtual,
-  virtualRows,
-  paddingTop,
-  paddingBottom,
-  totalHeight,
   parentRef,
   gridRef,
 }) => {
   const rowIndexes = useMemo(() => {
-    if (useVirtual && virtualRows) {
-      return virtualRows.map((v) => v.index)
-    }
     return Array.from({ length: rowCount }, (_, i) => i)
-  }, [rowCount, useVirtual, virtualRows])
+  }, [rowCount])
 
   return (
     <div ref={parentRef} className="flex-1 overflow-x-scroll overflow-y-scroll">
@@ -49,7 +35,6 @@ const SheetGrid: React.FC<SheetGridProps> = ({
         className="min-w-max text-sm grid"
         style={{
           gridTemplateColumns: `minmax(3rem, max-content) repeat(${colCount}, minmax(3rem, max-content))`,
-          height: totalHeight,
         }}
       >
         <div
@@ -72,9 +57,6 @@ const SheetGrid: React.FC<SheetGridProps> = ({
             {indexToColumnName(cIdx)}
           </div>
         ))}
-        {useVirtual && paddingTop > 0 && (
-          <div style={{ height: paddingTop, gridColumn: `1 / span ${colCount + 1}` }} />
-        )}
         {rowIndexes.map((rIdx) => {
           const rowData = data[rIdx] || []
           return [
@@ -101,9 +83,6 @@ const SheetGrid: React.FC<SheetGridProps> = ({
             )),
           ]
         })}
-        {useVirtual && paddingBottom > 0 && (
-          <div style={{ height: paddingBottom, gridColumn: `1 / span ${colCount + 1}` }} />
-        )}
       </div>
     </div>
   )

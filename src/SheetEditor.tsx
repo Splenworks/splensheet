@@ -1,4 +1,3 @@
-import { useVirtualizer } from "@tanstack/react-virtual"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { utils, type WorkBook } from "xlsx"
@@ -227,19 +226,10 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
     [lastNonEmptyColIndex],
   )
 
-  const useVirtual = rowCount > 300
-
   useEffect(() => {
     rowCountRef.current = rowCount
     colCountRef.current = colCount
   }, [rowCount, colCount])
-
-  const rowVirtualizer = useVirtualizer({
-    count: rowCount,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 32,
-    overscan: 50,
-  })
 
   useEffect(() => {
     const parent = parentRef.current
@@ -247,11 +237,7 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
 
     parent.scrollTop = 0
     parent.scrollLeft = 0
-
-    if (useVirtual) {
-      rowVirtualizer.scrollToIndex(0)
-    }
-  }, [activeSheetIndex, rowVirtualizer, useVirtual])
+  }, [activeSheetIndex])
 
   // --- selectCell (depends on refs, virtualizer) ---
   const selectCell = useCallback(
@@ -271,15 +257,11 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
 
       setSelectedCell({ row: r, col: c })
 
-      if (useVirtual) {
-        rowVirtualizer.scrollToIndex(r)
-      } else {
-        setTimeout(() => {
-          gridRef.current
-            ?.querySelector<HTMLDivElement>(`[data-row='${r}'][data-col='${c}']`)
-            ?.scrollIntoView({ block: "nearest", inline: "nearest" })
-        }, 0)
-      }
+      setTimeout(() => {
+        gridRef.current
+          ?.querySelector<HTMLDivElement>(`[data-row='${r}'][data-col='${c}']`)
+          ?.scrollIntoView({ block: "nearest", inline: "nearest" })
+      }, 0)
 
       const parent = parentRef.current
       if (parent) {
@@ -299,7 +281,7 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
         }
       }
     },
-    [gridRef, parentRef, rowCountRef, rowVirtualizer, useVirtual, colCountRef],
+    [gridRef, parentRef, rowCountRef, colCountRef],
   )
 
   // --- Undo/Redo actions (depend on selectCell) ---
@@ -525,7 +507,6 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
     (idx: number) => {
       const match = findMatches[idx]
       if (!match) return
-      if (useVirtual) rowVirtualizer.scrollToIndex(match.row)
       selectCell(match.row, match.col)
       setTimeout(() => {
         gridRef.current
@@ -533,7 +514,7 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
           ?.scrollIntoView({ block: "nearest", inline: "center" })
       }, 0)
     },
-    [findMatches, rowVirtualizer, selectCell, useVirtual],
+    [findMatches, selectCell],
   )
 
   const handleFindNext = useCallback(() => {
@@ -575,13 +556,6 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
     dataToSheet(sheets[activeSheetIndex].data, workbook.Sheets[sheetName])
     onWorkbookChange?.(workbook)
   }, [sheets, activeSheetIndex, workbook, onWorkbookChange])
-
-  const virtualRows = useVirtual ? rowVirtualizer.getVirtualItems() : undefined
-  const paddingTop = useVirtual && virtualRows && virtualRows.length > 0 ? virtualRows[0].start : 0
-  const paddingBottom = useVirtual && virtualRows && virtualRows.length > 0
-    ? rowVirtualizer.getTotalSize() - virtualRows[virtualRows.length - 1].end
-    : 0
-  const gridHeight = useVirtual ? rowVirtualizer.getTotalSize() + 32 : undefined
 
   const handleDownload = () => {
     sheets.forEach((sd, idx) => {
@@ -636,11 +610,6 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
         selectedCell={selectedCell}
         selectCell={selectCell}
         updateCell={updateCell}
-        useVirtual={useVirtual}
-        virtualRows={virtualRows}
-        paddingTop={paddingTop}
-        paddingBottom={paddingBottom}
-        totalHeight={gridHeight}
         parentRef={parentRef}
         gridRef={gridRef}
       />

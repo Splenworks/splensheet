@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
-    "@tanstack/react-virtual": "^3.0.0",
     "hyperformula": "^3.0.0",
     "i18next": "^24.2.2",
     "i18next-browser-languagedetector": "^8.0.2",
