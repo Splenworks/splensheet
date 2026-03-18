@@ -1,19 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { utils, type WorkBook } from "xlsx"
+import { type WorkBook } from "xlsx"
 import FileManager, { FileLoadResult } from "./FileManager"
 import Header from "./Header"
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts"
 import SheetGrid from "./SheetGrid"
-import { PartialCellObj, SheetData } from "./types"
-import { getMaxColumnIndex } from "./utils/columnUtils"
+import SheetManager, { SheetManagerRenderProps } from "./SheetManager"
+import { PartialCellObj } from "./types"
 import { recalculateSheet } from "./utils/recalculateSheet"
-import { getLastNonEmptyCol, getLastNonEmptyRow } from "./utils/sheetStats"
-import { dataToSheet, sheetToData } from "./utils/xlsx"
-
-const EXTRA_ROWS = 20
-const EXTRA_COLS = 20
-const MAX_COLS = getMaxColumnIndex()
 
 type CellPosition = { row: number; col: number }
 
@@ -22,33 +16,6 @@ type UndoRedoEntry = {
   r: number
   c: number
   prev: PartialCellObj
-}
-
-const buildSheets = (workbook: WorkBook): SheetData[] =>
-  workbook.SheetNames.map((name, idx) => ({
-    id: idx + 1,
-    name,
-    data: sheetToData(workbook.Sheets[name]),
-  }))
-
-const getNextSheetName = (existingNames: string[], localizedBaseName: string) => {
-  const trimmed = localizedBaseName.trim()
-  const match = trimmed.match(/^(.*?)(\d+)$/)
-  const prefix = (match?.[1] ?? trimmed.replace(/\d+$/, "")) || "Sheet"
-  const start = match ? parseInt(match[2], 10) || 1 : 1
-  const usedNames = new Set(existingNames)
-
-  if (!match && trimmed && !usedNames.has(trimmed)) {
-    return trimmed
-  }
-
-  let counter = start
-  let candidate = `${prefix}${counter}`
-  while (usedNames.has(candidate)) {
-    counter += 1
-    candidate = `${prefix}${counter}`
-  }
-  return candidate
 }
 
 interface SheetEditorProps {
@@ -60,11 +27,30 @@ interface SheetEditorProps {
   onFileNameChange?: (val: string) => void
 }
 
-const SheetEditor: React.FC<SheetEditorProps> = ({
+interface SheetEditorContentProps extends SheetManagerRenderProps {
+  workbook: WorkBook
+  fileName: string
+  onWorkbookChange?: (workbook: WorkBook) => void
+  initialHasChanges: boolean
+  onHasChangesChange?: (hasChanges: boolean) => void
+  onFileNameChange?: (val: string) => void
+}
+
+const SheetEditorContent: React.FC<SheetEditorContentProps> = ({
+  sheets,
+  setSheets,
+  activeSheetIndex,
+  setActiveSheetIndex,
+  activeSheetData,
+  rowCount,
+  colCount,
+  addSheet,
+  renameSheet,
+  deleteSheet,
   workbook,
   fileName,
   onWorkbookChange,
-  initialHasChanges = false,
+  initialHasChanges,
   onHasChangesChange,
   onFileNameChange,
 }) => {
@@ -75,114 +61,6 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
   const [isFindBarFocused, setIsFindBarFocused] = useState(false)
   const gridRef = useRef<HTMLDivElement>(null)
   const parentRef = useRef<HTMLDivElement>(null)
-  const rowCountRef = useRef(0)
-  const colCountRef = useRef(0)
-
-  // --- Workbook/Sheets state ---
-  const localizedNewSheetName = t("header.newSheetName", { defaultValue: "Sheet1" })
-  const [sheets, setSheets] = useState<SheetData[]>(() => buildSheets(workbook))
-  const [activeSheetIndex, setActiveSheetIndex] = useState(0)
-  const sheetsRef = useRef(sheets)
-
-  useEffect(() => {
-    sheetsRef.current = sheets
-  }, [sheets])
-
-  useEffect(() => {
-    setSheets(buildSheets(workbook))
-  }, [workbook])
-
-  const activeSheet = useMemo(
-    () => sheets[activeSheetIndex],
-    [sheets, activeSheetIndex],
-  )
-
-  const addSheet = useCallback(() => {
-    const prevSheets = sheetsRef.current
-    const nextName = getNextSheetName(
-      prevSheets.map((sheet) => sheet.name),
-      localizedNewSheetName,
-    )
-    const nextId = prevSheets.reduce((max, sheet) => Math.max(max, sheet.id), 0) + 1
-    const blankWorksheet = utils.aoa_to_sheet([[]])
-    const newSheetData = sheetToData(blankWorksheet)
-    const nextSheets = [
-      ...prevSheets,
-      {
-        id: nextId,
-        name: nextName,
-        data: newSheetData,
-      },
-    ]
-
-    setSheets(nextSheets)
-    onWorkbookChange?.({
-      ...workbook,
-      SheetNames: [...workbook.SheetNames, nextName],
-      Sheets: { ...workbook.Sheets, [nextName]: blankWorksheet },
-    })
-    setActiveSheetIndex(nextSheets.length - 1)
-    return true
-  }, [localizedNewSheetName, workbook, onWorkbookChange])
-
-  const renameSheet = useCallback(
-    (index: number, nextName: string) => {
-      const prevSheets = sheetsRef.current
-      const sheet = prevSheets[index]
-      if (!sheet) return false
-
-      const updatedSheets = [...prevSheets]
-      updatedSheets[index] = {
-        ...updatedSheets[index],
-        name: nextName,
-      }
-      setSheets(updatedSheets)
-
-      const oldName = workbook.SheetNames[index]
-      if (oldName !== nextName) {
-        const nextSheetNames = [...workbook.SheetNames]
-        nextSheetNames[index] = nextName
-        const { [oldName]: renamedSheet, ...restSheets } = workbook.Sheets
-        onWorkbookChange?.({
-          ...workbook,
-          SheetNames: nextSheetNames,
-          Sheets: { ...restSheets, [nextName]: renamedSheet },
-        })
-      }
-      return true
-    },
-    [workbook, onWorkbookChange],
-  )
-
-  const deleteSheet = useCallback(
-    (index: number) => {
-      const prevSheets = sheetsRef.current
-      if (prevSheets.length <= 1) return false
-
-      const sheet = prevSheets[index]
-      if (!sheet) return false
-
-      const nextSheets = prevSheets.filter((_, idx) => idx !== index)
-      setSheets(nextSheets)
-
-      const removedName = workbook.SheetNames[index]
-      const restSheets = Object.fromEntries(
-        Object.entries(workbook.Sheets).filter(([name]) => name !== removedName),
-      )
-      onWorkbookChange?.({
-        ...workbook,
-        SheetNames: workbook.SheetNames.filter((_, idx) => idx !== index),
-        Sheets: restSheets,
-      })
-
-      const nextActiveIndex = index >= prevSheets.length - 1
-        ? Math.max(0, prevSheets.length - 2)
-        : index
-      setActiveSheetIndex(nextActiveIndex)
-      return true
-    },
-    [workbook, onWorkbookChange],
-  )
 
   // --- Selection state ---
   const [selectedCell, setSelectedCell] = useState<CellPosition | null>(null)
@@ -219,27 +97,6 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
     onHasChangesChange?.(true)
   }, [onHasChangesChange])
 
-  const activeSheetData = useMemo(() => activeSheet?.data ?? [], [activeSheet])
-  const rowCount = useMemo(
-    () => getLastNonEmptyRow(activeSheetData) + EXTRA_ROWS,
-    [activeSheetData],
-  )
-
-  const lastNonEmptyColIndex = useMemo(
-    () => getLastNonEmptyCol(activeSheetData),
-    [activeSheetData],
-  )
-
-  const colCount = useMemo(
-    () => Math.min(lastNonEmptyColIndex + EXTRA_COLS, MAX_COLS + 1),
-    [lastNonEmptyColIndex],
-  )
-
-  useEffect(() => {
-    rowCountRef.current = rowCount
-    colCountRef.current = colCount
-  }, [rowCount, colCount])
-
   useEffect(() => {
     const parent = parentRef.current
     if (!parent) return
@@ -248,21 +105,19 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
     parent.scrollLeft = 0
   }, [activeSheetIndex])
 
-  // --- selectCell (depends on refs, virtualizer) ---
+  // --- selectCell ---
   const selectCell = useCallback(
     (row: number, col: number) => {
       let r = row
       let c = col
-      const maxRow = rowCountRef.current
-      const maxCol = colCountRef.current
-      if (c >= maxCol) {
+      if (c >= colCount) {
         c = 0
         r += 1
       } else if (c < 0) {
-        c = maxCol - 1
+        c = colCount - 1
         r -= 1
       }
-      if (r < 0 || r >= maxRow) return
+      if (r < 0 || r >= rowCount) return
 
       setSelectedCell({ row: r, col: c })
 
@@ -290,10 +145,10 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
         }
       }
     },
-    [gridRef, parentRef, rowCountRef, colCountRef],
+    [rowCount, colCount],
   )
 
-  // --- Undo/Redo actions (depend on selectCell) ---
+  // --- Undo/Redo actions ---
   const undo = useCallback(() => {
     const last = undoStack.current.pop()
     if (!last) return
@@ -318,7 +173,7 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
     })
     markChanged()
     selectCell(last.r, last.c)
-  }, [markChanged, selectCell])
+  }, [setSheets, markChanged, selectCell])
 
   const redo = useCallback(() => {
     const last = redoStack.current.pop()
@@ -344,7 +199,7 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
     })
     markChanged()
     selectCell(last.r, last.c)
-  }, [markChanged, selectCell])
+  }, [setSheets, markChanged, selectCell])
 
   const getCellValue = useCallback((c: PartialCellObj | undefined) => {
     if (!c || c.v === undefined) return ""
@@ -431,7 +286,7 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
       })
       markChanged()
     },
-    [activeSheetIndex, markChanged, recordChange],
+    [activeSheetIndex, setSheets, markChanged, recordChange],
   )
 
   const handleDeleteSheet = useCallback(() => {
@@ -463,7 +318,7 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
     setHasChanges(false)
     onHasChangesChange?.(false)
     onWorkbookChange?.(result.workbook)
-  }, [clearSelection, onWorkbookChange, onFileNameChange, onHasChangesChange, resetHistory])
+  }, [setSheets, setActiveSheetIndex, clearSelection, onWorkbookChange, onFileNameChange, onHasChangesChange, resetHistory])
 
   const handleDownloadComplete = useCallback(() => {
     setHasChanges(false)
@@ -518,12 +373,6 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
     setFindIndex(-1)
   }, [findQuery, activeSheetIndex])
 
-  useEffect(() => {
-    const sheetName = workbook.SheetNames[activeSheetIndex]
-    dataToSheet(sheets[activeSheetIndex].data, workbook.Sheets[sheetName])
-    onWorkbookChange?.(workbook)
-  }, [sheets, activeSheetIndex, workbook, onWorkbookChange])
-
   return (
     <FileManager
       workbook={workbook}
@@ -569,6 +418,38 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
         </>
       )}
     </FileManager>
+  )
+}
+
+const SheetEditor: React.FC<SheetEditorProps> = ({
+  workbook,
+  fileName,
+  onWorkbookChange,
+  initialHasChanges = false,
+  onHasChangesChange,
+  onFileNameChange,
+}) => {
+  const { t } = useTranslation()
+  const newSheetName = t("header.newSheetName", { defaultValue: "Sheet1" })
+
+  return (
+    <SheetManager
+      workbook={workbook}
+      onWorkbookChange={onWorkbookChange}
+      newSheetName={newSheetName}
+    >
+      {(sheetProps) => (
+        <SheetEditorContent
+          {...sheetProps}
+          workbook={workbook}
+          fileName={fileName}
+          onWorkbookChange={onWorkbookChange}
+          initialHasChanges={initialHasChanges}
+          onHasChangesChange={onHasChangesChange}
+          onFileNameChange={onFileNameChange}
+        />
+      )}
+    </SheetManager>
   )
 }
 
