@@ -116,11 +116,14 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
     ]
 
     setSheets(nextSheets)
-    workbook.SheetNames.push(nextName)
-    workbook.Sheets[nextName] = blankWorksheet
+    onWorkbookChange?.({
+      ...workbook,
+      SheetNames: [...workbook.SheetNames, nextName],
+      Sheets: { ...workbook.Sheets, [nextName]: blankWorksheet },
+    })
     setActiveSheetIndex(nextSheets.length - 1)
     return true
-  }, [localizedNewSheetName, workbook])
+  }, [localizedNewSheetName, workbook, onWorkbookChange])
 
   const renameSheet = useCallback(
     (index: number, nextName: string) => {
@@ -137,13 +140,18 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
 
       const oldName = workbook.SheetNames[index]
       if (oldName !== nextName) {
-        workbook.SheetNames[index] = nextName
-        workbook.Sheets[nextName] = workbook.Sheets[oldName]
-        delete workbook.Sheets[oldName]
+        const nextSheetNames = [...workbook.SheetNames]
+        nextSheetNames[index] = nextName
+        const { [oldName]: renamedSheet, ...restSheets } = workbook.Sheets
+        onWorkbookChange?.({
+          ...workbook,
+          SheetNames: nextSheetNames,
+          Sheets: { ...restSheets, [nextName]: renamedSheet },
+        })
       }
       return true
     },
-    [workbook],
+    [workbook, onWorkbookChange],
   )
 
   const deleteSheet = useCallback(
@@ -158,8 +166,14 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
       setSheets(nextSheets)
 
       const removedName = workbook.SheetNames[index]
-      workbook.SheetNames.splice(index, 1)
-      delete workbook.Sheets[removedName]
+      const restSheets = Object.fromEntries(
+        Object.entries(workbook.Sheets).filter(([name]) => name !== removedName),
+      )
+      onWorkbookChange?.({
+        ...workbook,
+        SheetNames: workbook.SheetNames.filter((_, idx) => idx !== index),
+        Sheets: restSheets,
+      })
 
       const nextActiveIndex = index >= prevSheets.length - 1
         ? Math.max(0, prevSheets.length - 2)
@@ -167,7 +181,7 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
       setActiveSheetIndex(nextActiveIndex)
       return true
     },
-    [workbook],
+    [workbook, onWorkbookChange],
   )
 
   // --- Selection state ---
