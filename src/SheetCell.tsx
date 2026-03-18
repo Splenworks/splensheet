@@ -9,7 +9,7 @@ import { isHttpUrl, isImageUrl } from "./utils/url"
 
 const FUNCTION_NAMES = HyperFormula.getRegisteredFunctionNames("enGB").sort()
 
-interface ExcelCellProps {
+interface SheetCellProps {
   rowIndex: number
   colIndex: number
   cell: PartialCellObj | undefined
@@ -18,7 +18,7 @@ interface ExcelCellProps {
   selectCell: (r: number, c: number) => void
 }
 
-const ExcelCell: React.FC<ExcelCellProps> = ({
+const SheetCell: React.FC<SheetCellProps> = ({
   rowIndex,
   colIndex,
   cell,
@@ -249,7 +249,7 @@ const ExcelCell: React.FC<ExcelCellProps> = ({
 }
 
 export default React.memo(
-  ExcelCell,
+  SheetCell,
   (prev, next) =>
     prev.cell === next.cell &&
     prev.isSelected === next.isSelected &&

@@ -1,6 +1,6 @@
 import React, { RefObject, useMemo } from "react"
 import type { VirtualItem } from "@tanstack/react-virtual"
-import ExcelCell from "./ExcelCell"
+import SheetCell from "./SheetCell"
 import { PartialCellObj } from "./types"
 import { indexToColumnName } from "./utils/columnUtils"
 
@@ -89,7 +89,7 @@ const SheetGrid: React.FC<SheetGridProps> = ({
               {rIdx + 1}
             </div>,
             ...Array.from({ length: colCount }).map((_, cIdx) => (
-              <ExcelCell
+              <SheetCell
                 key={`${rIdx}-${cIdx}`}
                 rowIndex={rIdx}
                 colIndex={cIdx}

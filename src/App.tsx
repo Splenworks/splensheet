@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import type { WorkBook } from "xlsx"
-import ExcelEditor from "./ExcelEditor"
+import SheetEditor from "./SheetEditor"
 import SpinnerOverlay from "./ui/SpinnerOverlay"
 import { createWorkbook } from "./utils/workbook"
 
@@ -31,7 +31,7 @@ function App() {
 
   if (workbook) {
     return (
-      <ExcelEditor
+      <SheetEditor
         workbook={workbook}
         fileName={fileName ?? ""}
         onFileNameChange={setFileName}

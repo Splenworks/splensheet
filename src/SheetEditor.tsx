@@ -55,7 +55,7 @@ const getNextSheetName = (existingNames: string[], localizedBaseName: string) =>
   return candidate
 }
 
-interface ExcelEditorProps {
+interface SheetEditorProps {
   workbook: WorkBook
   fileName: string
   onWorkbookChange?: (workbook: WorkBook) => void
@@ -64,7 +64,7 @@ interface ExcelEditorProps {
   onFileNameChange?: (val: string) => void
 }
 
-const ExcelEditor: React.FC<ExcelEditorProps> = ({
+const SheetEditor: React.FC<SheetEditorProps> = ({
   workbook,
   fileName,
   onWorkbookChange,
@@ -648,4 +648,4 @@ const ExcelEditor: React.FC<ExcelEditorProps> = ({
   )
 }
 
-export default ExcelEditor
+export default SheetEditor
