@@ -1,17 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { utils, type WorkBook } from "xlsx"
-import { writeFile } from "xlsx"
-import FileDropOverlay from "./FileDropOverlay"
+import FileManager, { FileLoadResult } from "./FileManager"
 import Header from "./Header"
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts"
 import SheetGrid from "./SheetGrid"
 import { PartialCellObj, SheetData } from "./types"
-import SpinnerOverlay from "./ui/SpinnerOverlay"
 import { getMaxColumnIndex } from "./utils/columnUtils"
 import { recalculateSheet } from "./utils/recalculateSheet"
 import { getLastNonEmptyCol, getLastNonEmptyRow } from "./utils/sheetStats"
-import { loadWorkbook } from "./utils/workbook"
 import { dataToSheet, sheetToData } from "./utils/xlsx"
 
 const EXTRA_ROWS = 20
@@ -76,8 +73,6 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
   const [findQuery, setFindQuery] = useState("")
   const [findIndex, setFindIndex] = useState(-1)
   const [isFindBarFocused, setIsFindBarFocused] = useState(false)
-  const [isLoadingFile, setIsLoadingFile] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
   const parentRef = useRef<HTMLDivElement>(null)
   const rowCountRef = useRef(0)
@@ -337,14 +332,6 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
     selectCell(last.r, last.c)
   }, [markChanged, selectCell])
 
-  // --- File & cell operations ---
-  const handleOpenDialog = useCallback(() => {
-    const input = fileInputRef.current
-    if (!input) return
-    input.value = ""
-    input.click()
-  }, [])
-
   const getCellValue = useCallback((c: PartialCellObj | undefined) => {
     if (!c || c.v === undefined) return ""
     if (c.t === "b") return c.v ? "TRUE" : "FALSE"
@@ -451,57 +438,23 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
     resetHistory()
   }, [activeSheetIndex, sheets, t, deleteSheet, markChanged, resetHistory])
 
-  const processFile = useCallback(async (file: File) => {
-    setIsLoadingFile(true)
+  const handleFileLoad = useCallback((result: FileLoadResult) => {
+    setSheets(result.sheets)
+    setActiveSheetIndex(0)
+    clearSelection()
+    setFindQuery("")
+    setFindIndex(-1)
+    resetHistory()
+    onFileNameChange?.(result.fileName)
+    setHasChanges(false)
+    onHasChangesChange?.(false)
+    onWorkbookChange?.(result.workbook)
+  }, [clearSelection, onWorkbookChange, onFileNameChange, onHasChangesChange, resetHistory])
 
-    try {
-      const nextWorkbook = await loadWorkbook(file)
-      if (!nextWorkbook) return
-
-      const nextSheets = nextWorkbook.SheetNames.map((name, idx) => ({
-        id: idx + 1,
-        name,
-        data: sheetToData(nextWorkbook.Sheets[name]),
-      }))
-
-      setSheets(nextSheets)
-      setActiveSheetIndex(0)
-      clearSelection()
-      setFindQuery("")
-      setFindIndex(-1)
-      resetHistory()
-
-      onFileNameChange?.(file.name)
-      setHasChanges(false)
-      onHasChangesChange?.(false)
-      onWorkbookChange?.(nextWorkbook)
-    } finally {
-      setIsLoadingFile(false)
-    }
-  }, [
-    clearSelection,
-    onWorkbookChange,
-    onFileNameChange,
-    onHasChangesChange,
-    resetHistory,
-  ])
-
-  const handleFileInputChange = useCallback(async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const input = event.target
-    const file = input.files?.[0]
-    if (!file) {
-      input.value = ""
-      return
-    }
-
-    try {
-      await processFile(file)
-    } finally {
-      input.value = ""
-    }
-  }, [processFile])
+  const handleDownloadComplete = useCallback(() => {
+    setHasChanges(false)
+    onHasChangesChange?.(false)
+  }, [onHasChangesChange])
 
   const gotoMatch = useCallback(
     (idx: number) => {
@@ -557,63 +510,51 @@ const SheetEditor: React.FC<SheetEditorProps> = ({
     onWorkbookChange?.(workbook)
   }, [sheets, activeSheetIndex, workbook, onWorkbookChange])
 
-  const handleDownload = () => {
-    sheets.forEach((sd, idx) => {
-      const sheetName = workbook.SheetNames[idx]
-      const ws = workbook.Sheets[sheetName]
-      dataToSheet(sd.data, ws)
-    })
-    writeFile(workbook, fileName)
-    setHasChanges(false)
-    onHasChangesChange?.(false)
-  }
-
   return (
-    <FileDropOverlay
-      className="fixed inset-0 flex flex-col bg-white dark:bg-neutral-900"
-      onFileDrop={processFile}
+    <FileManager
+      workbook={workbook}
+      fileName={fileName}
+      sheets={sheets}
       overlayMessage={t("dragDropArea.overlayMessage", { defaultValue: "Drop spreadsheet to open" })}
+      onFileLoad={handleFileLoad}
+      onDownloadComplete={handleDownloadComplete}
     >
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".xlsx,.xls,.csv"
-        className="hidden"
-        onChange={handleFileInputChange}
-      />
-      <Header
-        fileName={fileName}
-        onFileNameChange={onFileNameChange}
-        worksheets={sheets.map((ws) => ({ id: ws.id, name: ws.name }))}
-        activeSheetIndex={activeSheetIndex}
-        setActiveSheetIndex={setActiveSheetIndex}
-        onAddSheet={handleAddSheet}
-        onRenameSheet={handleRenameSheet}
-        onDeleteSheet={handleDeleteSheet}
-        hasChanges={hasChanges}
-        onOpen={handleOpenDialog}
-        onDownload={handleDownload}
-        isFindBarFocused={isFindBarFocused}
-        onFindBarFocusedChange={setIsFindBarFocused}
-        findQuery={findQuery}
-        onFindQueryChange={setFindQuery}
-        onFindNext={handleFindNext}
-        onFindPrev={handleFindPrev}
-        findMatchIndex={findIndex}
-        findMatchCount={findMatches.length}
-      />
-      <SpinnerOverlay visible={isLoadingFile} />
-      <SheetGrid
-        data={activeSheetData}
-        colCount={colCount}
-        rowCount={rowCount}
-        selectedCell={selectedCell}
-        selectCell={selectCell}
-        updateCell={updateCell}
-        parentRef={parentRef}
-        gridRef={gridRef}
-      />
-    </FileDropOverlay>
+      {({ onOpen, onDownload }) => (
+        <>
+          <Header
+            fileName={fileName}
+            onFileNameChange={onFileNameChange}
+            worksheets={sheets.map((ws) => ({ id: ws.id, name: ws.name }))}
+            activeSheetIndex={activeSheetIndex}
+            setActiveSheetIndex={setActiveSheetIndex}
+            onAddSheet={handleAddSheet}
+            onRenameSheet={handleRenameSheet}
+            onDeleteSheet={handleDeleteSheet}
+            hasChanges={hasChanges}
+            onOpen={onOpen}
+            onDownload={onDownload}
+            isFindBarFocused={isFindBarFocused}
+            onFindBarFocusedChange={setIsFindBarFocused}
+            findQuery={findQuery}
+            onFindQueryChange={setFindQuery}
+            onFindNext={handleFindNext}
+            onFindPrev={handleFindPrev}
+            findMatchIndex={findIndex}
+            findMatchCount={findMatches.length}
+          />
+          <SheetGrid
+            data={activeSheetData}
+            colCount={colCount}
+            rowCount={rowCount}
+            selectedCell={selectedCell}
+            selectCell={selectCell}
+            updateCell={updateCell}
+            parentRef={parentRef}
+            gridRef={gridRef}
+          />
+        </>
+      )}
+    </FileManager>
   )
 }
 
