@@ -21,12 +21,12 @@ const IconButton: React.FC<IconButtonProps> = ({
       id={id}
       className={twMerge(
         "group hover:bg-opacity-50 flex size-7 cursor-pointer items-center justify-center rounded-full transition-colors duration-300 ease-in-out focus:outline-gray-900 dark:focus:outline-neutral-400",
-        isHover ? "bg-zinc-400 dark:bg-zinc-600" : "hover:bg-zinc-400 dark:hover:bg-zinc-600",
+        isHover ? "bg-white dark:bg-neutral-700" : "hover:bg-white dark:hover:bg-neutral-700",
         className,
       )}
       onClick={onClick}
     >
-      {React.createElement(svgIcon, { className: `size-4 text-black dark:text-white ${isHover ? "text-white" : "group-hover:text-white"}` })}
+      {React.createElement(svgIcon, { className: `size-4 text-black dark:text-white ${isHover ? "text-black dark:text-white" : "group-hover:text-black dark:group-hover:text-white"}` })}
     </button>
   )
 }
