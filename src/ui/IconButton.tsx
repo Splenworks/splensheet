@@ -20,7 +20,7 @@ const IconButton: React.FC<IconButtonProps> = ({
     <button
       id={id}
       className={twMerge(
-        "group hover:bg-opacity-50 flex size-7 cursor-pointer items-center justify-center rounded-full transition-colors duration-300 ease-in-out focus:outline-gray-900 dark:focus:outline-neutral-400",
+        "group hover:bg-opacity-50 flex size-7 cursor-pointer items-center justify-center rounded-md transition-colors duration-300 ease-in-out focus:outline-gray-900 dark:focus:outline-neutral-400",
         isHover ? "bg-white dark:bg-neutral-700" : "hover:bg-white dark:hover:bg-neutral-700",
         className,
       )}
