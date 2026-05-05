@@ -7,4 +7,6 @@ export type SheetData = {
   name: string
   data: PartialCellObj[][]
   importedWorksheet?: WorkSheet
+  colWidths: Record<number, number>
+  rowHeights: Record<number, number>
 }

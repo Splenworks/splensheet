@@ -23,7 +23,11 @@ export async function loadWorkbook(file: File): Promise<WorkBook | null> {
     }
     if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
       const arrayBuffer = await file.arrayBuffer()
-      return read(arrayBuffer, { type: "array", cellDates: true })
+      return read(arrayBuffer, {
+        type: "array",
+        cellDates: true,
+        cellStyles: true,
+      })
     } else {
       const csvData = await file.text()
       return parseCsv(csvData)

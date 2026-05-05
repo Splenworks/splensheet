@@ -5,7 +5,6 @@ import LinkPreview from "./LinkPreview"
 import { HyperFormula } from "hyperformula"
 import { formatDate } from "./utils/date"
 import { PartialCellObj } from "./types"
-import { COL_W, HEADER_H, HEADER_W, ROW_H } from "./utils/gridDimensions"
 import { isHttpUrl, isImageUrl } from "./utils/url"
 
 const FUNCTION_NAMES = HyperFormula.getRegisteredFunctionNames("enGB").sort()
@@ -13,6 +12,10 @@ const FUNCTION_NAMES = HyperFormula.getRegisteredFunctionNames("enGB").sort()
 interface SheetCellProps {
   rowIndex: number
   colIndex: number
+  top: number
+  left: number
+  width: number
+  height: number
   cell: PartialCellObj | undefined
   isSelected: boolean
   onChange: (r: number, c: number, cell: PartialCellObj) => void
@@ -22,6 +25,10 @@ interface SheetCellProps {
 const SheetCell: React.FC<SheetCellProps> = ({
   rowIndex,
   colIndex,
+  top,
+  left,
+  width,
+  height,
   cell,
   isSelected,
   onChange,
@@ -209,10 +216,10 @@ const SheetCell: React.FC<SheetCellProps> = ({
       data-col={colIndex}
       style={{
         position: "absolute",
-        top: HEADER_H + rowIndex * ROW_H,
-        left: HEADER_W + colIndex * COL_W,
-        width: COL_W + 1,
-        height: ROW_H + 1,
+        top,
+        left,
+        width: width + 1,
+        height: height + 1,
       }}
       className={twMerge(
         "px-2 py-1 border-gray-300 dark:border-neutral-600",
@@ -261,5 +268,9 @@ export default React.memo(
   (prev, next) =>
     prev.cell === next.cell &&
     prev.isSelected === next.isSelected &&
-    prev.selectCell === next.selectCell,
+    prev.selectCell === next.selectCell &&
+    prev.top === next.top &&
+    prev.left === next.left &&
+    prev.width === next.width &&
+    prev.height === next.height,
 )

@@ -3,7 +3,7 @@ import type { PartialCellObj, SheetData } from "../types"
 import { getMaxColumnIndex } from "../utils/columnUtils"
 import { MAX_VIRTUAL_ROWS } from "../utils/gridDimensions"
 import { recalculateSheet } from "../utils/recalculateSheet"
-import { sheetToData } from "../utils/xlsx"
+import { readColWidths, readRowHeights, sheetToData } from "../utils/xlsx"
 
 const VIRTUAL_COL_COUNT = getMaxColumnIndex() + 1
 
@@ -32,17 +32,24 @@ export type SpreadsheetAction =
   | { type: "add-sheet"; baseName: string }
   | { type: "rename-sheet"; index: number; name: string }
   | { type: "delete-sheet"; index: number }
+  | { type: "set-col-width"; col: number; width: number }
+  | { type: "set-row-height"; row: number; height: number }
   | { type: "mark-saved" }
   | { type: "undo" }
   | { type: "redo" }
 
 export const buildSheetsFromWorkbook = (workbook: WorkBook): SheetData[] =>
-  workbook.SheetNames.map((name, idx) => ({
-    id: idx + 1,
-    name,
-    data: sheetToData(workbook.Sheets[name]),
-    importedWorksheet: workbook.Sheets[name],
-  }))
+  workbook.SheetNames.map((name, idx) => {
+    const ws = workbook.Sheets[name]
+    return {
+      id: idx + 1,
+      name,
+      data: sheetToData(ws),
+      importedWorksheet: ws,
+      colWidths: readColWidths(ws),
+      rowHeights: readRowHeights(ws),
+    }
+  })
 
 const getNextSheetName = (existingNames: string[], baseName: string): string => {
   const trimmed = baseName.trim()
@@ -66,7 +73,7 @@ export const createInitialState = (
   fileName: string,
   sheetName: string,
 ): SpreadsheetState => ({
-  sheets: [{ id: 1, name: sheetName, data: [[]] }],
+  sheets: [{ id: 1, name: sheetName, data: [[]], colWidths: {}, rowHeights: {} }],
   activeSheetIndex: 0,
   fileName,
   hasChanges: false,
@@ -147,6 +154,8 @@ export const spreadsheetReducer = (
             name: nextName,
             data: sheetToData(blankWs),
             importedWorksheet: blankWs,
+            colWidths: {},
+            rowHeights: {},
           },
         ],
         activeSheetIndex: state.sheets.length,
@@ -180,6 +189,28 @@ export const spreadsheetReducer = (
         past: [],
         future: [],
       }
+    }
+
+    case "set-col-width": {
+      const sheet = state.sheets[state.activeSheetIndex]
+      if (!sheet) return state
+      const sheets = [...state.sheets]
+      sheets[state.activeSheetIndex] = {
+        ...sheet,
+        colWidths: { ...sheet.colWidths, [action.col]: action.width },
+      }
+      return { ...state, sheets, hasChanges: true }
+    }
+
+    case "set-row-height": {
+      const sheet = state.sheets[state.activeSheetIndex]
+      if (!sheet) return state
+      const sheets = [...state.sheets]
+      sheets[state.activeSheetIndex] = {
+        ...sheet,
+        rowHeights: { ...sheet.rowHeights, [action.row]: action.height },
+      }
+      return { ...state, sheets, hasChanges: true }
     }
 
     case "mark-saved":
@@ -218,6 +249,12 @@ export const spreadsheetReducer = (
 
 export const selectActiveSheetData = (state: SpreadsheetState) =>
   state.sheets[state.activeSheetIndex]?.data ?? []
+
+export const selectActiveSheetColWidths = (state: SpreadsheetState) =>
+  state.sheets[state.activeSheetIndex]?.colWidths ?? {}
+
+export const selectActiveSheetRowHeights = (state: SpreadsheetState) =>
+  state.sheets[state.activeSheetIndex]?.rowHeights ?? {}
 
 export const selectRowCount = () => MAX_VIRTUAL_ROWS
 

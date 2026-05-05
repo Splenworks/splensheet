@@ -1,5 +1,5 @@
 import { utils, writeFile } from "xlsx"
-import { dataToSheet } from "../utils/xlsx"
+import { dataToSheet, writeColWidths, writeRowHeights } from "../utils/xlsx"
 import type { SpreadsheetState } from "./spreadsheet"
 
 export const downloadWorkbook = (state: SpreadsheetState) => {
@@ -7,6 +7,8 @@ export const downloadWorkbook = (state: SpreadsheetState) => {
   state.sheets.forEach((sd) => {
     const ws = sd.importedWorksheet ?? utils.aoa_to_sheet([[]])
     dataToSheet(sd.data, ws)
+    writeColWidths(ws, sd.colWidths)
+    writeRowHeights(ws, sd.rowHeights)
     utils.book_append_sheet(wb, ws, sd.name)
   })
   const imported = state.importedWorkbook

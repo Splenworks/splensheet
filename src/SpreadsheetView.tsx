@@ -5,7 +5,9 @@ import Header from "./Header"
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts"
 import SheetGrid from "./SheetGrid"
 import {
+  selectActiveSheetColWidths,
   selectActiveSheetData,
+  selectActiveSheetRowHeights,
   selectColCount,
   selectRowCount,
 } from "./state/spreadsheet"
@@ -43,6 +45,8 @@ const SpreadsheetView: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const activeSheetData = selectActiveSheetData(state)
+  const colWidths = selectActiveSheetColWidths(state)
+  const rowHeights = selectActiveSheetRowHeights(state)
   const rowCount = selectRowCount()
   const colCount = selectColCount()
 
@@ -85,14 +89,28 @@ const SpreadsheetView: React.FC = () => {
       setSelectedCell({ row: r, col: c })
 
       const parent = parentRef.current
-      if (parent) scrollCellIntoView(parent, r, c)
+      if (parent) scrollCellIntoView(parent, r, c, rowHeights, colWidths)
     },
-    [rowCount, colCount],
+    [rowCount, colCount, rowHeights, colWidths],
   )
 
   const updateCell = useCallback(
     (r: number, c: number, cell: PartialCellObj) => {
       dispatch({ type: "update-cell", r, c, cell })
+    },
+    [dispatch],
+  )
+
+  const setColWidth = useCallback(
+    (col: number, width: number) => {
+      dispatch({ type: "set-col-width", col, width })
+    },
+    [dispatch],
+  )
+
+  const setRowHeight = useCallback(
+    (row: number, height: number) => {
+      dispatch({ type: "set-row-height", row, height })
     },
     [dispatch],
   )
@@ -319,9 +337,13 @@ const SpreadsheetView: React.FC = () => {
         data={activeSheetData}
         colCount={colCount}
         rowCount={rowCount}
+        colWidths={colWidths}
+        rowHeights={rowHeights}
         selectedCell={selectedCell}
         selectCell={selectCell}
         updateCell={updateCell}
+        setColWidth={setColWidth}
+        setRowHeight={setRowHeight}
         parentRef={parentRef}
         gridRef={gridRef}
       />
