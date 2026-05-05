@@ -39,6 +39,9 @@
     "openSource": "Código abierto",
     "version": "Versión"
   },
+  "language": {
+    "label": "Idioma"
+  },
   "excelHeader": {
     "addSheet": "Agregar una nueva hoja",
     "renameSheet": "Renombrar {{sheetName}}",

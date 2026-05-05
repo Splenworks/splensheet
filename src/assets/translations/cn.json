@@ -39,6 +39,9 @@
     "openSource": "开源",
     "version": "版本"
   },
+  "language": {
+    "label": "语言"
+  },
   "excelHeader": {
     "addSheet": "添加新工作表",
     "renameSheet": "将 {{sheetName}} 重命名",

@@ -39,6 +39,9 @@
     "openSource": "오픈 소스",
     "version": "버전"
   },
+  "language": {
+    "label": "언어"
+  },
   "excelHeader": {
     "addSheet": "새 시트 추가",
     "renameSheet": "{{sheetName}} 이름 바꾸기",

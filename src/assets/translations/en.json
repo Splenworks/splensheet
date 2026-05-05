@@ -39,6 +39,9 @@
     "openSource": "Open Source",
     "version": "Version"
   },
+  "language": {
+    "label": "Language"
+  },
   "excelHeader": {
     "addSheet": "Add a new sheet",
     "renameSheet": "Rename {{sheetName}}",
