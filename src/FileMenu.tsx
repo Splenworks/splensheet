@@ -53,6 +53,7 @@ const FileMenu: React.FC<FileMenuProps> = ({ onOpen, onDownload }) => {
           svgIcon={MenuIcon}
           onClick={toggle}
           isHover={isOpen}
+          className="mx-0.5"
         />
       )}
     />
