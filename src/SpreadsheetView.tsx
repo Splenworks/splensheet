@@ -13,6 +13,7 @@ import { downloadWorkbook } from "./state/buildWorkbook"
 import { useSpreadsheet } from "./state/useSpreadsheet"
 import { PartialCellObj } from "./types"
 import SpinnerOverlay from "./ui/SpinnerOverlay"
+import { scrollCellIntoView } from "./utils/gridDimensions"
 import { loadWorkbook } from "./utils/workbook"
 
 type CellPosition = { row: number; col: number }
@@ -42,8 +43,8 @@ const SpreadsheetView: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const activeSheetData = selectActiveSheetData(state)
-  const rowCount = useMemo(() => selectRowCount(state), [state])
-  const colCount = useMemo(() => selectColCount(state), [state])
+  const rowCount = selectRowCount()
+  const colCount = selectColCount()
 
   useEffect(() => {
     document.title = state.fileName
@@ -83,28 +84,8 @@ const SpreadsheetView: React.FC = () => {
 
       setSelectedCell({ row: r, col: c })
 
-      setTimeout(() => {
-        gridRef.current
-          ?.querySelector<HTMLDivElement>(`[data-row='${r}'][data-col='${c}']`)
-          ?.scrollIntoView({ block: "nearest", inline: "nearest" })
-      }, 0)
-
       const parent = parentRef.current
-      if (parent) {
-        const targetCell = parent.querySelector<HTMLElement>(`[data-col="${c}"]`)
-        if (targetCell) {
-          const cellRect = targetCell.getBoundingClientRect()
-          const parentWidth = parent.clientWidth
-          if (cellRect.left < 0 || cellRect.right > parentWidth) {
-            const left = cellRect.left - parent.getBoundingClientRect().left + parent.scrollLeft
-            if (left < parent.scrollLeft) {
-              parent.scrollLeft = left
-            } else if (left + cellRect.width > parent.scrollLeft + parentWidth) {
-              parent.scrollLeft = left + cellRect.width - parentWidth
-            }
-          }
-        }
-      }
+      if (parent) scrollCellIntoView(parent, r, c)
     },
     [rowCount, colCount],
   )
@@ -244,11 +225,6 @@ const SpreadsheetView: React.FC = () => {
       const match = findMatches[idx]
       if (!match) return
       selectCell(match.row, match.col)
-      setTimeout(() => {
-        gridRef.current
-          ?.querySelector<HTMLDivElement>(`[data-row='${match.row}'][data-col='${match.col}']`)
-          ?.scrollIntoView({ block: "nearest", inline: "center" })
-      }, 0)
     },
     [findMatches, selectCell],
   )

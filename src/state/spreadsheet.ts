@@ -1,13 +1,11 @@
 import { utils, type WorkBook } from "xlsx"
 import type { PartialCellObj, SheetData } from "../types"
 import { getMaxColumnIndex } from "../utils/columnUtils"
+import { MAX_VIRTUAL_ROWS } from "../utils/gridDimensions"
 import { recalculateSheet } from "../utils/recalculateSheet"
-import { getLastNonEmptyCol, getLastNonEmptyRow } from "../utils/sheetStats"
 import { sheetToData } from "../utils/xlsx"
 
-const EXTRA_ROWS = 20
-const EXTRA_COLS = 20
-const MAX_COLS = getMaxColumnIndex()
+const VIRTUAL_COL_COUNT = getMaxColumnIndex() + 1
 
 export type HistoryEntry = {
   sheetIndex: number
@@ -221,8 +219,6 @@ export const spreadsheetReducer = (
 export const selectActiveSheetData = (state: SpreadsheetState) =>
   state.sheets[state.activeSheetIndex]?.data ?? []
 
-export const selectRowCount = (state: SpreadsheetState) =>
-  getLastNonEmptyRow(selectActiveSheetData(state)) + EXTRA_ROWS
+export const selectRowCount = () => MAX_VIRTUAL_ROWS
 
-export const selectColCount = (state: SpreadsheetState) =>
-  Math.min(getLastNonEmptyCol(selectActiveSheetData(state)) + EXTRA_COLS, MAX_COLS + 1)
+export const selectColCount = () => VIRTUAL_COL_COUNT

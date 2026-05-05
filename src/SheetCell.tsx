@@ -5,6 +5,7 @@ import LinkPreview from "./LinkPreview"
 import { HyperFormula } from "hyperformula"
 import { formatDate } from "./utils/date"
 import { PartialCellObj } from "./types"
+import { COL_W, HEADER_H, HEADER_W, ROW_H } from "./utils/gridDimensions"
 import { isHttpUrl, isImageUrl } from "./utils/url"
 
 const FUNCTION_NAMES = HyperFormula.getRegisteredFunctionNames("enGB").sort()
@@ -206,10 +207,17 @@ const SheetCell: React.FC<SheetCellProps> = ({
     <div
       data-row={rowIndex}
       data-col={colIndex}
+      style={{
+        position: "absolute",
+        top: HEADER_H + rowIndex * ROW_H,
+        left: HEADER_W + colIndex * COL_W,
+        width: COL_W + 1,
+        height: ROW_H + 1,
+      }}
       className={twMerge(
-        "relative px-2 py-1 border-gray-300 dark:border-neutral-600",
+        "px-2 py-1 border-gray-300 dark:border-neutral-600",
         "font-normal text-base text-black dark:text-white border cursor-default",
-        "min-w-24 -mt-px -ml-px",
+        "whitespace-nowrap",
         cell?.t === "n" && "text-right",
         isSelected && "outline-2 outline-gray-900 dark:outline-neutral-400 outline-offset-[-3px] z-20",
       )}
