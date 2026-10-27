@@ -55,12 +55,6 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url, delay = 300, children })
   }, [url])
 
   useEffect(() => {
-    if (show && !metadata && !loading) {
-      loadMetadata()
-    }
-  }, [show, metadata, loading, loadMetadata])
-
-  useEffect(() => {
     return () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current)
@@ -76,6 +70,9 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url, delay = 300, children })
         setShowAbove(rect.top > window.innerHeight / 2)
       }
       setShow(true)
+      if (!metadata && !loading) {
+        loadMetadata()
+      }
     }, delay)
   }
 

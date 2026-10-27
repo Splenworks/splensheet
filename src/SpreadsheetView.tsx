@@ -51,8 +51,15 @@ const SpreadsheetView: React.FC = () => {
       : "Splensheet - Free Online Spreadsheet Editor with Formula Support"
   }, [state.fileName])
 
-  useEffect(() => {
+  // Reset selection and find position when the active sheet changes
+  const [prevSheetIndex, setPrevSheetIndex] = useState(state.activeSheetIndex)
+  if (prevSheetIndex !== state.activeSheetIndex) {
+    setPrevSheetIndex(state.activeSheetIndex)
     setSelectedCell(null)
+    setFindIndex(-1)
+  }
+
+  useEffect(() => {
     const parent = parentRef.current
     if (parent) {
       parent.scrollTop = 0
@@ -60,9 +67,10 @@ const SpreadsheetView: React.FC = () => {
     }
   }, [state.activeSheetIndex])
 
-  useEffect(() => {
+  const handleFindQueryChange = useCallback((query: string) => {
+    setFindQuery(query)
     setFindIndex(-1)
-  }, [findQuery, state.activeSheetIndex])
+  }, [])
 
   const clearSelection = useCallback(() => {
     setSelectedCell(null)
@@ -333,7 +341,7 @@ const SpreadsheetView: React.FC = () => {
         isFindBarFocused={isFindBarFocused}
         onFindBarFocusedChange={setIsFindBarFocused}
         findQuery={findQuery}
-        onFindQueryChange={setFindQuery}
+        onFindQueryChange={handleFindQueryChange}
         onFindNext={handleFindNext}
         onFindPrev={handleFindPrev}
         findMatchIndex={findIndex}
